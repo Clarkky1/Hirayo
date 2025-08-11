@@ -35,6 +35,11 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="lenders" options={{ headerShown: false }} />
+        <Stack.Screen name="my-items" options={{ headerShown: false }} />
+        <Stack.Screen name="lender-settings" options={{ headerShown: false }} />
+        <Stack.Screen name="analytics" options={{ headerShown: false }} />
+        <Stack.Screen name="earnings" options={{ headerShown: false }} />
         <Stack.Screen name="personal-information" options={{ headerShown: false }} />
         <Stack.Screen name="post-item" options={{ headerShown: false }} />
         <Stack.Screen name="payment-methods" options={{ headerShown: false }} />

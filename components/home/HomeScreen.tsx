@@ -125,10 +125,6 @@ export default function HomeScreen() {
         <View style={styles.categoriesSection}>
           <View style={styles.categoriesHeader}>
             <Text style={styles.categoriesTitle}>Categories</Text>
-            <TouchableOpacity style={styles.postItemButton} onPress={() => router.push('/post-item' as any)}>
-              <Ionicons name="add" size={16} color={Colors.text.inverse} />
-              <Text style={styles.postItemText}>Post Item</Text>
-            </TouchableOpacity>
           </View>
           <View style={styles.categoriesGrid}>
             {categories.map((category) => (
@@ -175,6 +171,18 @@ export default function HomeScreen() {
             contentContainerStyle={styles.popularList}
             ItemSeparatorComponent={() => <View style={{ width: Spacing.md }} />}
           />
+        </View>
+
+        {/* Become a Lender Section */}
+        <View style={styles.lenderSection}>
+          <View style={styles.lenderContent}>
+            <Text style={styles.lenderTitle}>Become a Lender</Text>
+            <Text style={styles.lenderSubtitle}>Start earning by renting out your items</Text>
+            <TouchableOpacity style={styles.lenderButton} onPress={() => router.push('/lenders' as any)}>
+              <Text style={styles.lenderButtonText}>Get Started</Text>
+              <Ionicons name="arrow-forward" size={16} color={Colors.text.inverse} />
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -231,21 +239,6 @@ const styles = StyleSheet.create({
     ...TextStyles.heading.h2,
     color: Colors.text.primary,
     fontWeight: 'bold',
-  },
-  postItemButton: {
-    backgroundColor: Colors.primary[500],
-    borderRadius: BorderRadius.lg,
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: Spacing.xs,
-    flexDirection: 'row',
-    alignItems: 'center',
-    ...Shadows.softSm,
-  },
-  postItemText: {
-    ...TextStyles.body.small,
-    color: Colors.text.inverse,
-    fontWeight: '600',
-    marginLeft: Spacing.xs,
   },
 
   categoriesGrid: {
@@ -388,5 +381,43 @@ const styles = StyleSheet.create({
   popularList: {
     paddingHorizontal: Spacing.sm,
     paddingBottom: Spacing.sm,
+  },
+  lenderSection: {
+    backgroundColor: Colors.primary[50],
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.lg,
+    marginTop: Spacing.md,
+    marginBottom: Spacing.xl,
+    ...Shadows.sm,
+  },
+  lenderContent: {
+    alignItems: 'center',
+  },
+  lenderTitle: {
+    ...TextStyles.heading.h3,
+    color: Colors.text.primary,
+    fontWeight: 'bold',
+    marginBottom: Spacing.xs,
+  },
+  lenderSubtitle: {
+    ...TextStyles.body.small,
+    color: Colors.text.secondary,
+    textAlign: 'center',
+    marginBottom: Spacing.md,
+  },
+  lenderButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.primary[600],
+    borderRadius: BorderRadius.md,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    ...Shadows.sm,
+  },
+  lenderButtonText: {
+    ...TextStyles.body.small,
+    color: Colors.text.inverse,
+    fontWeight: 'bold',
+    marginRight: Spacing.xs,
   },
 });
