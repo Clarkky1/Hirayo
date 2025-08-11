@@ -43,6 +43,7 @@ export default function RootLayout() {
         <Stack.Screen name="help-support" options={{ headerShown: false }} />
         <Stack.Screen name="about" options={{ headerShown: false }} />
         <Stack.Screen name="view-messages" options={{ headerShown: false }} />
+        <Stack.Screen name="pay" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />

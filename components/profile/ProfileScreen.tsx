@@ -219,20 +219,21 @@ const styles = StyleSheet.create({
 
   scrollView: {
     flex: 1,
+    paddingHorizontal: Spacing.lg,
   },
   profileSection: {
     backgroundColor: '#ffffff',
-    paddingHorizontal: 24,
-    paddingTop: 20,
-    paddingBottom: 24,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: 16,
+    paddingBottom: 20,
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
   },
   avatarContainer: {
     position: 'relative',
-    marginTop: 20,
-    marginBottom: 16,
+    marginTop: 16,
+    marginBottom: 12,
   },
   avatar: {
     width: 80,
@@ -265,12 +266,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#333333',
-    marginBottom: 4,
+    marginBottom: 3,
   },
   userEmail: {
     fontSize: 14,
     color: '#666666',
-    marginBottom: 4,
+    marginBottom: 3,
   },
   memberSince: {
     fontSize: 12,
@@ -279,9 +280,9 @@ const styles = StyleSheet.create({
   statsSection: {
     flexDirection: 'row',
     backgroundColor: '#ffffff',
-    paddingVertical: 20,
-    paddingHorizontal: 24,
-    marginBottom: 16,
+    paddingVertical: 16,
+    paddingHorizontal: Spacing.lg,
+    marginBottom: 12,
   },
   statItem: {
     flex: 1,
@@ -291,7 +292,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#0066CC',
-    marginBottom: 4,
+    marginBottom: 3,
   },
   statLabel: {
     fontSize: 12,
@@ -306,13 +307,13 @@ const styles = StyleSheet.create({
 
   menuSection: {
     backgroundColor: '#ffffff',
-    paddingHorizontal: 24,
-    marginBottom: 16,
+    paddingHorizontal: Spacing.lg,
+    marginBottom: 12,
   },
   menuItem: {
     backgroundColor: Colors.background.secondary,
     borderRadius: BorderRadius.lg,
-    padding: Spacing.md,
+    padding: Spacing.sm,
     marginBottom: Spacing.sm,
     flexDirection: 'row',
     alignItems: 'center',
@@ -329,7 +330,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F0F8FF',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 10,
   },
   destructiveIconContainer: {
     backgroundColor: '#FFF5F5',
@@ -352,7 +353,7 @@ const styles = StyleSheet.create({
   },
 
   bottomSpacing: {
-    height: 20,
+    height: 16,
   },
 
 

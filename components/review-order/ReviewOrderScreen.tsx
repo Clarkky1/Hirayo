@@ -1,13 +1,14 @@
 import { BorderRadius, Colors, Shadows, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import React from 'react';
 import {
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 export default function ReviewOrderScreen() {
@@ -24,7 +25,14 @@ export default function ReviewOrderScreen() {
   };
 
   const handlePay = () => {
-    console.log('Pay pressed');
+    console.log('Pay button pressed!');
+    console.log('Attempting to navigate to /pay');
+    try {
+      router.push('/pay' as any);
+      console.log('Navigation successful');
+    } catch (error) {
+      console.error('Navigation error:', error);
+    }
   };
 
   return (
@@ -103,6 +111,8 @@ export default function ReviewOrderScreen() {
           <Text style={styles.reviewsButtonText}>Show all 12 reviews</Text>
         </TouchableOpacity>
 
+
+
         {/* Bottom spacing for footer */}
         <View style={styles.bottomSpacing} />
       </ScrollView>
@@ -130,16 +140,18 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
     paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.md,
   },
   productSection: {
-    marginBottom: Spacing.xl,
+    marginTop: Spacing.md,
+    marginBottom: Spacing.lg,
   },
   imagePlaceholder: {
     width: '100%',
     height: 200,
     backgroundColor: Colors.neutral[300],
     borderRadius: BorderRadius.lg,
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.md,
   },
   productName: {
     ...TextStyles.heading.h2,
@@ -161,23 +173,23 @@ const styles = StyleSheet.create({
     color: Colors.text.secondary,
   },
   rentalPeriodSection: {
-    marginBottom: Spacing.xl,
+    marginBottom: Spacing.lg,
     backgroundColor: Colors.background.secondary,
     borderRadius: BorderRadius.xl,
-    padding: Spacing.lg,
+    padding: Spacing.md,
     borderWidth: 1,
     borderColor: Colors.border.light,
   },
   sectionTitle: {
     ...TextStyles.heading.h2,
     color: Colors.text.primary,
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.md,
     textAlign: 'center',
   },
   rentalRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: Spacing.md,
+    gap: Spacing.sm,
   },
   dateColumn: {
     flex: 1,
@@ -185,7 +197,7 @@ const styles = StyleSheet.create({
   dateHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
     gap: Spacing.sm,
   },
   dateLabel: {
@@ -196,11 +208,11 @@ const styles = StyleSheet.create({
   dateSelector: {
     backgroundColor: Colors.background.secondary,
     borderRadius: BorderRadius.lg,
-    padding: Spacing.md,
+    padding: Spacing.sm,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    ...Shadows.sm,
+    ...Shadows.softSm,
   },
   dateContent: {
     flex: 1,

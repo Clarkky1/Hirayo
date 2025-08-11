@@ -12,6 +12,7 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import { Spacing } from '../../constants/DesignSystem';
 
 interface ProductItem {
   id: string;
@@ -28,12 +29,13 @@ const PCScreen = () => {
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showFiltersDropdown, setShowFiltersDropdown] = useState(false);
   const [selectedSort, setSelectedSort] = useState('');
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedPriceRange, setSelectedPriceRange] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
 
   useEffect(() => {
     if (initialCategory) {
-      setSelectedCategories([initialCategory as string]);
+      setSelectedCategory(initialCategory as string);
     }
   }, [initialCategory]);
 
@@ -53,19 +55,30 @@ const PCScreen = () => {
     { id: 'name', label: 'Name A-Z' },
   ];
 
-  const filterCategories = [
-    { id: 'pc', label: 'PC', icon: 'desktop' },
-    { id: 'gaming', label: 'Gaming', icon: 'game-controller' },
-    { id: 'workstation', label: 'Workstation', icon: 'briefcase' },
-    { id: 'all-in-one', label: 'All-in-One', icon: 'monitor' },
-    { id: 'mini-pc', label: 'Mini PC', icon: 'hardware-chip' },
-  ];
-
   const priceRanges = [
     { id: '0-1000', label: 'Under $1,000' },
     { id: '1000-2000', label: '$1,000 - $2,000' },
     { id: '2000-3000', label: '$2,000 - $3,000' },
     { id: '3000+', label: '$3,000+' },
+  ];
+
+  const categories = [
+    { id: 'gaming', name: 'Gaming', icon: 'game-controller' },
+    { id: 'workstation', name: 'Workstation', icon: 'briefcase' },
+    { id: 'all-in-one', name: 'All-in-One', icon: 'monitor' },
+    { id: 'mini-pc', name: 'Mini PC', icon: 'hardware-chip' },
+    { id: 'custom', name: 'Custom Built', icon: 'construct' },
+  ];
+
+  const locations = [
+    { id: 'nearby', name: 'Nearby (0-5 km)', icon: 'location' },
+    { id: 'same-city', name: 'Same City', icon: 'business' },
+    { id: 'metro-manila', name: 'Metro Manila', icon: 'map' },
+    { id: 'quezon-city', name: 'Quezon City', icon: 'location' },
+    { id: 'makati', name: 'Makati', icon: 'business' },
+    { id: 'manila', name: 'Manila', icon: 'map' },
+    { id: 'taguig', name: 'Taguig', icon: 'location' },
+    { id: 'pasig', name: 'Pasig', icon: 'business' },
   ];
 
   const handleSortBy = () => {
@@ -83,30 +96,24 @@ const PCScreen = () => {
     setShowSortDropdown(false);
   };
 
-  const handleCategoryToggle = (categoryId: string) => {
-    setSelectedCategories(prev => 
-      prev.includes(categoryId) 
-        ? prev.filter(id => id !== categoryId)
-        : [...prev, categoryId]
-    );
+  const handleCategoryPress = (categoryId: string) => {
+    if (selectedCategory === categoryId) {
+      setSelectedCategory(null);
+    } else {
+      setSelectedCategory(categoryId);
+    }
+  };
+
+  const handleLocationPress = (locationId: string) => {
+    if (selectedLocation === locationId) {
+      setSelectedLocation(null);
+    } else {
+      setSelectedLocation(locationId);
+    }
   };
 
   const handlePriceRangeSelect = (rangeId: string) => {
     setSelectedPriceRange(selectedPriceRange === rangeId ? '' : rangeId);
-  };
-
-  const handleApplyFilters = () => {
-    setShowFiltersDropdown(false);
-  };
-
-  const handleClearFilters = () => {
-    setSelectedCategories([]);
-    setSelectedPriceRange('');
-  };
-
-  const handleCategoryNavigation = (categoryId: string) => {
-    // Filter locally instead of navigating
-    handleCategoryToggle(categoryId);
   };
 
   const getSortedProducts = (products: ProductItem[]) => {
@@ -131,9 +138,9 @@ const PCScreen = () => {
   const getFilteredProducts = () => {
     let filtered = products;
 
-    if (selectedCategories.length > 0) {
+    if (selectedCategory) {
       filtered = filtered.filter(product => 
-        selectedCategories.includes(product.category)
+        product.category === selectedCategory
       );
     }
 
@@ -237,25 +244,53 @@ const PCScreen = () => {
             <View style={styles.filterSection}>
               <Text style={styles.filterSectionTitle}>Categories</Text>
               <View style={styles.categoriesGrid}>
-                {filterCategories.map((category) => (
+                {categories.map((category) => (
                   <TouchableOpacity
                     key={category.id}
                     style={[
                       styles.categoryChip,
-                      selectedCategories.includes(category.id) && styles.selectedCategoryChip
+                      selectedCategory === category.id && styles.selectedCategoryChip
                     ]}
-                    onPress={() => handleCategoryNavigation(category.id)}
+                    onPress={() => handleCategoryPress(category.id)}
                   >
                     <Ionicons 
                       name={category.icon as any} 
                       size={20} 
-                      color={selectedCategories.includes(category.id) ? '#fff' : '#333'} 
+                      color={selectedCategory === category.id ? '#fff' : '#333'} 
                     />
                     <Text style={[
                       styles.categoryChipText,
-                      selectedCategories.includes(category.id) && styles.selectedCategoryChipText
+                      selectedCategory === category.id && styles.selectedCategoryChipText
                     ]}>
-                      {category.label}
+                      {category.name}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.filterSection}>
+              <Text style={styles.filterSectionTitle}>Location</Text>
+              <View style={styles.locationsGrid}>
+                {locations.map((location) => (
+                  <TouchableOpacity
+                    key={location.id}
+                    style={[
+                      styles.locationChip,
+                      selectedLocation === location.id && styles.selectedLocationChip
+                    ]}
+                    onPress={() => handleLocationPress(location.id)}
+                  >
+                    <Ionicons 
+                      name={location.icon as any} 
+                      size={20} 
+                      color={selectedLocation === location.id ? '#fff' : '#333'} 
+                    />
+                    <Text style={[
+                      styles.locationChipText,
+                      selectedLocation === location.id && styles.selectedLocationChipText
+                    ]}>
+                      {location.name}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -287,33 +322,47 @@ const PCScreen = () => {
             </View>
 
             <View style={styles.filterActions}>
-              <TouchableOpacity style={styles.clearButton} onPress={handleClearFilters}>
+              <TouchableOpacity style={styles.clearButton} onPress={() => {
+                setSelectedCategory(null);
+                setSelectedPriceRange('');
+              }}>
                 <Text style={styles.clearButtonText}>Clear All</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.applyButton} onPress={handleApplyFilters}>
+              <TouchableOpacity style={styles.applyButton} onPress={() => {
+                setShowFiltersDropdown(false);
+              }}>
                 <Text style={styles.applyButtonText}>Apply Filters</Text>
               </TouchableOpacity>
             </View>
           </View>
         )}
 
-        {(selectedCategories.length > 0 || selectedPriceRange) && (
+        {(selectedCategory || selectedLocation || selectedPriceRange) && (
           <View style={styles.activeFiltersContainer}>
             <Text style={styles.activeFiltersTitle}>Active Filters:</Text>
             <View style={styles.activeFiltersChips}>
-              {selectedCategories.map((categoryId) => {
-                const category = filterCategories.find(c => c.id === categoryId);
-                return (
-                  <TouchableOpacity
-                    key={categoryId}
-                    style={styles.activeFilterChip}
-                    onPress={() => handleCategoryToggle(categoryId)}
-                  >
-                    <Text style={styles.activeFilterChipText}>{category?.label}</Text>
-                    <Ionicons name="close" size={16} color="#fff" />
-                  </TouchableOpacity>
-                );
-              })}
+              {selectedCategory && (
+                <TouchableOpacity
+                  style={styles.activeFilterChip}
+                  onPress={() => setSelectedCategory(null)}
+                >
+                  <Text style={styles.activeFilterChipText}>
+                    {categories.find(c => c.id === selectedCategory)?.name}
+                  </Text>
+                  <Ionicons name="close" size={16} color="#fff" />
+                </TouchableOpacity>
+              )}
+              {selectedLocation && (
+                <TouchableOpacity
+                  style={styles.activeFilterChip}
+                  onPress={() => setSelectedLocation(null)}
+                >
+                  <Text style={styles.activeFilterChipText}>
+                    {locations.find(l => l.id === selectedLocation)?.name}
+                  </Text>
+                  <Ionicons name="close" size={16} color="#fff" />
+                </TouchableOpacity>
+              )}
               {selectedPriceRange && (
                 <TouchableOpacity
                   style={styles.activeFilterChip}
@@ -356,7 +405,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    padding: 20,
+    padding: Spacing.lg,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#e9ecef',
@@ -365,14 +414,14 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   subtitle: {
     fontSize: 16,
     color: '#666',
   },
   searchContainer: {
-    padding: 20,
+    padding: Spacing.lg,
     backgroundColor: '#fff',
   },
   searchBar: {
@@ -380,20 +429,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#f8f9fa',
     borderRadius: 25,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     borderWidth: 1,
     borderColor: '#e9ecef',
   },
   searchInput: {
     flex: 1,
-    marginLeft: 12,
+    marginLeft: 10,
     fontSize: 16,
     color: '#333',
   },
   controlsContainer: {
     flexDirection: 'row',
-    padding: 20,
+    padding: Spacing.lg,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#e9ecef',
@@ -402,16 +451,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#f8f9fa',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     borderRadius: 20,
-    marginRight: 12,
+    marginRight: 10,
     borderWidth: 1,
     borderColor: '#e9ecef',
   },
   controlButtonText: {
-    marginLeft: 8,
-    marginRight: 8,
+    marginLeft: 6,
+    marginRight: 6,
     fontSize: 14,
     color: '#333',
     fontWeight: '500',
@@ -419,23 +468,23 @@ const styles = StyleSheet.create({
   dropdown: {
     position: 'absolute',
     top: 140,
-    left: 20,
-    right: 20,
+    left: Spacing.lg,
+    right: Spacing.lg,
     backgroundColor: '#fff',
     borderRadius: 12,
-    padding: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
+    padding: 6,
+    shadowColor: '#6B7280',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 1,
     zIndex: 1000,
   },
   dropdownItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
+    padding: 14,
     borderRadius: 8,
   },
   selectedDropdownItem: {
@@ -501,6 +550,34 @@ const styles = StyleSheet.create({
   selectedCategoryChipText: {
     color: '#fff',
   },
+  locationsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  locationChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  selectedLocationChip: {
+    backgroundColor: '#007AFF',
+    borderColor: '#007AFF',
+  },
+  locationChipText: {
+    marginLeft: 8,
+    fontSize: 14,
+    color: '#333',
+    fontWeight: '500',
+  },
+  selectedLocationChipText: {
+    color: '#fff',
+  },
   priceRangeItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -540,7 +617,7 @@ const styles = StyleSheet.create({
   },
   applyButton: {
     flex: 1,
-    padding: 16,
+    padding: 14,
     borderRadius: 8,
     backgroundColor: '#007AFF',
     alignItems: 'center',
@@ -551,7 +628,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   activeFiltersContainer: {
-    padding: 20,
+    padding: Spacing.lg,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#e9ecef',
@@ -560,50 +637,50 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   activeFiltersChips: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: 6,
   },
   activeFilterChip: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#007AFF',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
     borderRadius: 16,
   },
   activeFilterChipText: {
     color: '#fff',
     fontSize: 14,
     fontWeight: '500',
-    marginRight: 6,
+    marginRight: 4,
   },
   productsContainer: {
-    padding: 20,
+    padding: Spacing.lg,
   },
   productsTitle: {
     fontSize: 18,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 16,
+    marginBottom: 14,
   },
   productRow: {
     justifyContent: 'space-between',
-    marginBottom: 16,
+    marginBottom: 14,
   },
   productItem: {
     width: '48%',
     backgroundColor: '#fff',
     borderRadius: 12,
-    padding: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    padding: 10,
+    shadowColor: '#6B7280',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 2,
+    elevation: 1,
   },
   productImage: {
     width: '100%',

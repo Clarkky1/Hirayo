@@ -83,39 +83,39 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    marginBottom: 20,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: 12,
+    marginBottom: 16,
   },
   backButton: {
-    padding: 5,
+    padding: 4,
   },
   searchButton: {
-    padding: 5,
+    padding: 4,
   },
   emptyStateContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 40,
+    paddingHorizontal: Spacing.xl,
     paddingTop: 0,
     marginTop: 0,
   },
   savedItemCard: {
     backgroundColor: Colors.background.secondary,
     borderRadius: BorderRadius.lg,
-    padding: Spacing.md,
-    marginBottom: Spacing.md,
+    padding: Spacing.sm,
+    marginBottom: Spacing.sm,
     flexDirection: 'row',
     alignItems: 'center',
-    ...Shadows.sm,
+    ...Shadows.softSm,
   },
   emptyStateTitle: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#666666',
-    marginTop: 20,
-    marginBottom: 8,
+    marginTop: 16,
+    marginBottom: 6,
     textAlign: 'center',
   },
   emptyStateSubtitle: {
@@ -126,14 +126,14 @@ const styles = StyleSheet.create({
   },
   savedItemsContainer: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: 16,
   },
   savedItemsTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#333333',
-    marginBottom: 20,
+    marginBottom: 16,
   },
   savedItemInfo: {
     flex: 1,
@@ -142,12 +142,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#333333',
-    marginBottom: 4,
+    marginBottom: 3,
   },
   savedItemLocation: {
     fontSize: 14,
     color: '#666666',
-    marginBottom: 4,
+    marginBottom: 3,
   },
   savedItemPrice: {
     fontSize: 16,
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     color: Colors.primary[500],
   },
   unsaveButton: {
-    padding: 8,
+    padding: 6,
   },
 
 });

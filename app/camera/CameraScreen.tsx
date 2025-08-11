@@ -11,6 +11,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import { Spacing } from '../../constants/DesignSystem';
 
 interface ProductItem {
   id: string;
@@ -61,6 +62,49 @@ export default function CameraScreen() {
   const [selectedSort, setSelectedSort] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedPriceRange, setSelectedPriceRange] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
+
+  const categories = [
+    { id: 'dslr', name: 'DSLR', icon: 'camera' },
+    { id: 'mirrorless', name: 'Mirrorless', icon: 'camera' },
+    { id: 'action', name: 'Action Camera', icon: 'videocam' },
+    { id: 'drone', name: 'Drone Camera', icon: 'airplane' },
+    { id: 'vintage', name: 'Vintage', icon: 'camera' },
+  ];
+
+  const locations = [
+    { id: 'nearby', name: 'Nearby (0-5 km)', icon: 'location' },
+    { id: 'same-city', name: 'Same City', icon: 'business' },
+    { id: 'metro-manila', name: 'Metro Manila', icon: 'map' },
+    { id: 'quezon-city', name: 'Quezon City', icon: 'location' },
+    { id: 'makati', name: 'Makati', icon: 'business' },
+    { id: 'manila', name: 'Manila', icon: 'map' },
+    { id: 'taguig', name: 'Taguig', icon: 'location' },
+    { id: 'pasig', name: 'Pasig', icon: 'business' },
+  ];
+
+  const handleCategoryPress = (categoryId: string) => {
+    if (selectedCategory === categoryId) {
+      setSelectedCategory(null);
+    } else {
+      setSelectedCategory(categoryId);
+    }
+  };
+
+  const handleLocationPress = (locationId: string) => {
+    if (selectedLocation === locationId) {
+      setSelectedLocation(null);
+    } else {
+      setSelectedLocation(locationId);
+    }
+  };
+
+  const clearFilters = () => {
+    setSelectedCategory(null);
+    setSelectedLocation(null);
+  };
 
   useEffect(() => {
     if (initialCategory) {
@@ -400,24 +444,24 @@ const styles = StyleSheet.create({
   },
 
   searchContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 20,
+    paddingHorizontal: Spacing.lg,
+    marginBottom: 16,
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
     borderRadius: 25,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    shadowColor: '#6B7280',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 2,
+    elevation: 1,
   },
   searchIcon: {
-    marginRight: 12,
+    marginRight: 10,
   },
   searchInput: {
     flex: 1,
@@ -427,30 +471,30 @@ const styles = StyleSheet.create({
   searchButton: {
     backgroundColor: '#007AFF',
     borderRadius: 18,
-    width: 36,
-    height: 36,
+    width: 32,
+    height: 32,
     justifyContent: 'center',
     alignItems: 'center',
   },
   controlsContainer: {
     flexDirection: 'row',
-    paddingHorizontal: 20,
-    marginBottom: 20,
-    gap: 12,
+    paddingHorizontal: Spacing.lg,
+    marginBottom: 16,
+    gap: 10,
   },
   controlButton: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
     borderRadius: 20,
-    shadowColor: '#000',
+    shadowColor: '#6B7280',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-    gap: 8,
+    shadowOpacity: 0.02,
+    shadowRadius: 1,
+    elevation: 1,
+    gap: 6,
   },
   controlButtonText: {
     fontSize: 14,
@@ -460,16 +504,16 @@ const styles = StyleSheet.create({
   dropdown: {
     position: 'absolute',
     top: 120,
-    left: 20,
-    right: 20,
+    left: Spacing.lg,
+    right: Spacing.lg,
     backgroundColor: '#fff',
     borderRadius: 12,
-    paddingVertical: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 8,
+    paddingVertical: 6,
+    shadowColor: '#6B7280',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 2,
     zIndex: 1000,
   },
   dropdownItem: {

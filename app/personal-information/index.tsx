@@ -8,6 +8,7 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import { Spacing } from '../../constants/DesignSystem';
 
 export default function PersonalInformationScreen() {
   const [userData] = useState({
@@ -115,13 +116,16 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+    paddingHorizontal: Spacing.lg,
   },
 
   profileSummary: {
     backgroundColor: '#ffffff',
     alignItems: 'center',
-    paddingVertical: 24,
-    marginBottom: 16,
+    paddingVertical: 20,
+    marginBottom: 12,
+    marginHorizontal: Spacing.lg,
+    borderRadius: 12,
   },
   avatar: {
     width: 80,
@@ -130,7 +134,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#0066CC',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   avatarText: {
     fontSize: 32,
@@ -141,7 +145,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#333333',
-    marginBottom: 4,
+    marginBottom: 3,
   },
   userEmail: {
     fontSize: 14,
@@ -149,22 +153,22 @@ const styles = StyleSheet.create({
   },
   infoSection: {
     backgroundColor: '#ffffff',
-    marginHorizontal: 16,
+    marginHorizontal: Spacing.lg,
     borderRadius: 12,
-    padding: 20,
-    marginBottom: 16,
+    padding: 16,
+    marginBottom: 12,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
     color: '#333333',
-    marginBottom: 20,
+    marginBottom: 16,
   },
   infoItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
   },
@@ -180,7 +184,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f8ff',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 10,
   },
   infoLabel: {
     fontSize: 14,
@@ -195,17 +199,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   editSection: {
-    paddingHorizontal: 16,
-    marginBottom: 16,
+    paddingHorizontal: Spacing.lg,
+    marginBottom: 12,
   },
   editButton: {
     backgroundColor: '#0066CC',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
+    paddingVertical: 12,
     borderRadius: 12,
-    gap: 8,
+    gap: 6,
   },
   editButtonText: {
     color: '#ffffff',

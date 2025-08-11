@@ -45,6 +45,14 @@ const exploreItems: ExploreItem[] = [
   { id: '4', name: 'iPad Pro 12.9" M2', rating: 4.6, location: 'Lapu-Lapu City', price: 30 },
 ];
 
+const popularItems: ExploreItem[] = [
+  { id: 'p1', name: 'DJI Mavic 3 Pro Drone', rating: 4.9, location: 'Cebu City', price: 55 },
+  { id: 'p2', name: 'Gaming PC RTX 4080', rating: 4.7, location: 'Mandaue City', price: 40 },
+  { id: 'p3', name: 'PlayStation 5', rating: 4.8, location: 'Lapu-Lapu City', price: 20 },
+  { id: 'p4', name: 'Sony WH-1000XM5 Headphones', rating: 4.6, location: 'Talisay, Cebu', price: 15 },
+  { id: 'p5', name: 'GoPro Hero 11 Black', rating: 4.8, location: 'Cebu City', price: 25 },
+];
+
 export default function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -57,10 +65,6 @@ export default function HomeScreen() {
       pathname: '/discover',
       params: { category: category.name.toLowerCase() }
     });
-  };
-
-  const handleMore = () => {
-    router.push('/discover');
   };
 
   const handleExploreItemPress = (item: ExploreItem) => {
@@ -105,15 +109,15 @@ export default function HomeScreen() {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Search Bar */}
         <View style={styles.searchBar}>
+          <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search for gadgets..."
-            placeholderTextColor={Colors.text.tertiary}
+            placeholder="Search for items to rent..."
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
           <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-            <Ionicons name="search" size={16} color={Colors.text.inverse} />
+            <Ionicons name="arrow-forward" size={20} color="#fff" />
           </TouchableOpacity>
         </View>
 
@@ -139,7 +143,7 @@ export default function HomeScreen() {
         <View style={styles.exploreSection}>
           <View style={styles.exploreHeader}>
             <Text style={styles.exploreTitle}>Explore</Text>
-            <TouchableOpacity onPress={handleMore}>
+            <TouchableOpacity onPress={() => router.push('/discover')}>
               <Text style={styles.moreText}>More</Text>
             </TouchableOpacity>
           </View>
@@ -150,6 +154,25 @@ export default function HomeScreen() {
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.exploreList}
+            ItemSeparatorComponent={() => <View style={{ width: Spacing.md }} />}
+          />
+        </View>
+
+        {/* Popular Section */}
+        <View style={styles.popularSection}>
+          <View style={styles.popularHeader}>
+            <Text style={styles.popularTitle}>Popular</Text>
+            <TouchableOpacity onPress={() => router.push('/discover')}>
+              <Text style={styles.moreText}>More</Text>
+            </TouchableOpacity>
+          </View>
+          <FlatList
+            data={popularItems}
+            renderItem={({ item }) => <ExploreCard item={item} />}
+            keyExtractor={(item) => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.popularList}
             ItemSeparatorComponent={() => <View style={{ width: Spacing.md }} />}
           />
         </View>
@@ -165,43 +188,44 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    paddingHorizontal: Spacing.md,
-    paddingTop: Spacing.lg,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.md,
   },
   searchBar: {
-    backgroundColor: Colors.background.secondary,
-    borderRadius: BorderRadius.lg,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: Spacing.lg,
-    ...Shadows.sm,
+    backgroundColor: '#fff',
+    borderRadius: 25,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginBottom: Spacing.md,
+    ...Shadows.softBase,
+  },
+  searchIcon: {
+    marginRight: 8,
   },
   searchInput: {
     flex: 1,
-    ...TextStyles.body.medium,
-    color: Colors.text.primary,
-    marginRight: Spacing.sm,
+    fontSize: 16,
+    color: '#333',
   },
   searchButton: {
-    backgroundColor: Colors.primary[500],
-    borderRadius: BorderRadius.full,
-    width: 36,
-    height: 36,
-    alignItems: 'center',
+    backgroundColor: '#007AFF',
+    borderRadius: 16,
+    width: 32,
+    height: 32,
     justifyContent: 'center',
-    marginLeft: Spacing.sm,
-    ...Shadows.sm,
+    alignItems: 'center',
+    ...Shadows.softSm,
   },
   categoriesSection: {
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.md,
   },
   categoriesHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.md,
   },
   categoriesTitle: {
     ...TextStyles.heading.h2,
@@ -211,11 +235,11 @@ const styles = StyleSheet.create({
   postItemButton: {
     backgroundColor: Colors.primary[500],
     borderRadius: BorderRadius.lg,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
     flexDirection: 'row',
     alignItems: 'center',
-    ...Shadows.sm,
+    ...Shadows.softSm,
   },
   postItemText: {
     ...TextStyles.body.small,
@@ -231,7 +255,7 @@ const styles = StyleSheet.create({
   },
   categoryItemWrapper: {
     width: '23%',
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
   },
   categoryItem: {
     backgroundColor: Colors.background.secondary,
@@ -280,7 +304,7 @@ const styles = StyleSheet.create({
   exploreCard: {
     backgroundColor: Colors.background.secondary,
     borderRadius: BorderRadius.lg,
-    width: 200,
+    width: 240,
     height: 280,
     overflow: 'hidden',
     ...Shadows.sm,
@@ -346,5 +370,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     minWidth: 80,
     ...Shadows.xs,
+  },
+  popularSection: {
+    marginBottom: Spacing.md,
+  },
+  popularHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: Spacing.lg,
+  },
+  popularTitle: {
+    ...TextStyles.heading.h2,
+    color: Colors.text.primary,
+    fontWeight: 'bold',
+  },
+  popularList: {
+    paddingHorizontal: Spacing.sm,
+    paddingBottom: Spacing.sm,
   },
 });

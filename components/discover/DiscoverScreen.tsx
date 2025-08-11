@@ -3,14 +3,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  FlatList,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    FlatList,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 
 interface ProductItem {
@@ -45,6 +45,66 @@ export default function DiscoverScreen() {
   const [selectedSort, setSelectedSort] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedPriceRange, setSelectedPriceRange] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
+
+  const categories = [
+    { id: 'camera', name: 'Camera', icon: 'camera' },
+    { id: 'laptop', name: 'Laptop', icon: 'laptop' },
+    { id: 'phone', name: 'Phone', icon: 'phone-portrait' },
+    { id: 'pc', name: 'PC', icon: 'desktop' },
+    { id: 'tablet', name: 'Tablet', icon: 'tablet-portrait' },
+    { id: 'gaming', name: 'Gaming', icon: 'game-controller' },
+    { id: 'audio', name: 'Audio', icon: 'headset' },
+    { id: 'drone', name: 'Drone', icon: 'airplane' },
+  ];
+
+  const locations = [
+    { id: 'nearby', name: 'Nearby (0-5 km)', icon: 'location' },
+    { id: 'same-city', name: 'Same City', icon: 'business' },
+    { id: 'metro-manila', name: 'Metro Manila', icon: 'map' },
+    { id: 'quezon-city', name: 'Quezon City', icon: 'location' },
+    { id: 'makati', name: 'Makati', icon: 'business' },
+    { id: 'manila', name: 'Manila', icon: 'map' },
+    { id: 'taguig', name: 'Taguig', icon: 'location' },
+    { id: 'pasig', name: 'Pasig', icon: 'business' },
+  ];
+
+  const handleCategoryPress = (categoryId: string) => {
+    if (selectedCategory === categoryId) {
+      setSelectedCategory(null);
+    } else {
+      setSelectedCategory(categoryId);
+    }
+  };
+
+  const handleLocationPress = (locationId: string) => {
+    if (selectedLocation === locationId) {
+      setSelectedLocation(null);
+    } else {
+      setSelectedLocation(locationId);
+    }
+  };
+
+  const clearFilters = () => {
+    setSelectedCategory(null);
+    setSelectedLocation(null);
+  };
+
+  const getFilteredCategories = () => {
+    let filtered = categories;
+    
+    if (selectedLocation) {
+      // Filter categories based on location availability
+      // This would typically come from your backend
+      filtered = filtered.filter(cat => 
+        ['camera', 'laptop', 'phone', 'pc'].includes(cat.id)
+      );
+    }
+    
+    return filtered;
+  };
 
   // Auto-filter by category if passed as route parameter
   useEffect(() => {
@@ -250,20 +310,46 @@ export default function DiscoverScreen() {
             <View style={styles.filterSection}>
               <Text style={styles.filterSectionTitle}>Categories</Text>
               <View style={styles.categoriesGrid}>
-                {filterCategories.map((category) => (
+                {categories.map((category) => (
                   <TouchableOpacity
-                    key={category}
+                    key={category.id}
                     style={[
                       styles.categoryChip,
-                      selectedCategories.includes(category) && styles.selectedCategoryChip
+                      selectedCategory === category.id && styles.selectedCategoryChip
                     ]}
-                    onPress={() => handleCategoryNavigation(category)}
+                    onPress={() => handleCategoryPress(category.id)}
                   >
+                    <Ionicons name={category.icon as any} size={16} color={Colors.text.primary} />
                     <Text style={[
                       styles.categoryChipText,
-                      selectedCategories.includes(category) && styles.selectedCategoryChipText
+                      selectedCategory === category.id && styles.selectedCategoryChipText
                     ]}>
-                      {category}
+                      {category.name}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            {/* Locations */}
+            <View style={styles.filterSection}>
+              <Text style={styles.filterSectionTitle}>Location</Text>
+              <View style={styles.locationsGrid}>
+                {locations.map((location) => (
+                  <TouchableOpacity
+                    key={location.id}
+                    style={[
+                      styles.locationChip,
+                      selectedLocation === location.id && styles.selectedLocationChip
+                    ]}
+                    onPress={() => handleLocationPress(location.id)}
+                  >
+                    <Ionicons name={location.icon as any} size={16} color={Colors.text.primary} />
+                    <Text style={[
+                      styles.locationChipText,
+                      selectedLocation === location.id && styles.selectedLocationChipText
+                    ]}>
+                      {location.name}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -360,23 +446,23 @@ const styles = StyleSheet.create({
 
   scrollView: {
     flex: 1,
-    paddingHorizontal: Spacing.md,
-    paddingTop: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.sm,
   },
 
           searchBar: {
           backgroundColor: Colors.background.secondary,
           borderRadius: BorderRadius.lg,
-          paddingHorizontal: Spacing.md,
-          paddingVertical: Spacing.sm,
+          paddingHorizontal: Spacing.sm,
+          paddingVertical: Spacing.xs,
           flexDirection: 'row',
           alignItems: 'center',
-          marginBottom: Spacing.lg,
-          shadowColor: '#000000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
-          elevation: 3,
+          marginBottom: Spacing.md,
+          shadowColor: '#6B7280',
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.03,
+          shadowRadius: 3,
+          elevation: 1,
         },
   searchInput: {
     flex: 1,
@@ -387,17 +473,17 @@ const styles = StyleSheet.create({
   searchButton: {
     backgroundColor: Colors.primary[500],
     borderRadius: BorderRadius.full,
-    width: 36,
-    height: 36,
+    width: 32,
+    height: 32,
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: Spacing.sm,
-    ...Shadows.sm,
+    ...Shadows.softSm,
   },
   controlsContainer: {
     flexDirection: 'row',
-    gap: Spacing.md,
-    marginBottom: Spacing.lg,
+    gap: Spacing.sm,
+    marginBottom: Spacing.md,
   },
   controlButton: {
     flex: 1,
@@ -406,8 +492,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: Colors.background.secondary,
     borderRadius: BorderRadius.base,
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.sm,
     borderWidth: 1,
     borderColor: Colors.border.light,
   },
@@ -420,9 +506,9 @@ const styles = StyleSheet.create({
   dropdown: {
     backgroundColor: Colors.background.secondary,
     borderRadius: BorderRadius.lg,
-    padding: Spacing.md,
-    marginTop: Spacing.sm,
-    ...Shadows.lg,
+    padding: Spacing.sm,
+    marginTop: Spacing.xs,
+    ...Shadows.softLg,
   },
   dropdownItem: {
     flexDirection: 'row',
@@ -475,6 +561,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
     borderWidth: 1,
     borderColor: Colors.border.light,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
   },
   selectedCategoryChip: {
     backgroundColor: Colors.primary[500],
@@ -485,6 +574,33 @@ const styles = StyleSheet.create({
     color: Colors.text.primary,
   },
   selectedCategoryChipText: {
+    color: Colors.text.inverse,
+  },
+  locationsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.sm,
+  },
+  locationChip: {
+    backgroundColor: Colors.background.secondary,
+    borderRadius: BorderRadius.full,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
+  selectedLocationChip: {
+    backgroundColor: Colors.primary[500],
+    borderColor: Colors.primary[500],
+  },
+  locationChipText: {
+    ...TextStyles.body.small,
+    color: Colors.text.primary,
+  },
+  selectedLocationChipText: {
     color: Colors.text.inverse,
   },
   priceRangeItem: {

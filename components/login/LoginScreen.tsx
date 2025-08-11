@@ -94,19 +94,19 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 60,
-    paddingBottom: 40,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: 48,
+    paddingBottom: 32,
   },
   header: {
     fontSize: 24,
     fontWeight: '600',
     textAlign: 'center',
-    marginBottom: 40,
+    marginBottom: 32,
     color: '#000000',
   },
   inputContainer: {
-    marginBottom: 16,
+    marginBottom: 12,
   },
   inputField: {
     backgroundColor: Colors.background.secondary,
@@ -116,22 +116,22 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
     borderWidth: 1,
     borderColor: Colors.border.light,
-    ...Shadows.xs,
+    ...Shadows.softXs,
   },
   termsText: {
     fontSize: 14,
     color: '#666666',
     textAlign: 'center',
-    marginBottom: 32,
+    marginBottom: 24,
     lineHeight: 20,
   },
   continueButton: {
     backgroundColor: Colors.primary[500],
     borderRadius: BorderRadius.lg,
-    paddingVertical: Spacing.lg,
+    paddingVertical: Spacing.md,
     alignItems: 'center',
-    marginTop: Spacing.xl,
-    ...Shadows.button,
+    marginTop: Spacing.lg,
+    ...Shadows.softButton,
   },
   continueButtonActive: {
     backgroundColor: '#0066cc',
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   dividerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 24,
   },
   dividerLine: {
     flex: 1,
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E1E1E1',
   },
   dividerText: {
-    marginHorizontal: 16,
+    marginHorizontal: Spacing.md,
     color: '#666666',
     fontSize: 14,
   },
@@ -160,8 +160,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E1E1E1',
     borderRadius: 8,
-    paddingVertical: 16,
-    marginBottom: 12,
+    paddingVertical: 12,
+    marginBottom: 10,
     backgroundColor: '#ffffff',
   },
   socialButtonContent: {
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   socialButtonText: {
-    marginLeft: 12,
+    marginLeft: 10,
     fontSize: 16,
     color: '#000000',
     fontWeight: '500',

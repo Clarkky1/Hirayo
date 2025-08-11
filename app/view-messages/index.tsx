@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { Spacing } from '../../constants/DesignSystem';
 
 interface ChatMessage {
   id: string;
@@ -207,8 +208,8 @@ const styles = StyleSheet.create({
    },
   chatHeader: {
     backgroundColor: '#ffffff',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
   },
@@ -223,7 +224,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#0066CC',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 10,
   },
   avatarText: {
     fontSize: 16,
@@ -247,12 +248,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   messagesContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    paddingBottom: 20,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
+    paddingBottom: 16,
   },
   messageContainer: {
-    marginBottom: 16,
+    marginBottom: 12,
   },
   userMessage: {
     alignItems: 'flex-end',
@@ -262,8 +263,8 @@ const styles = StyleSheet.create({
   },
   messageBubble: {
     maxWidth: '80%',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
     borderRadius: 20,
   },
   userBubble: {
@@ -279,7 +280,7 @@ const styles = StyleSheet.create({
   messageText: {
     fontSize: 16,
     lineHeight: 22,
-    marginBottom: 4,
+    marginBottom: 3,
   },
   userMessageText: {
     color: '#ffffff',
@@ -301,8 +302,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#ffffff',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
     paddingBottom: 16,
     borderTopWidth: 1,
     borderTopColor: '#e0e0e0',
@@ -311,8 +312,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8f9fa',
     borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
     marginRight: 12,
     maxHeight: 100,
     minHeight: 44,

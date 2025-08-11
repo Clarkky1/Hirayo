@@ -121,12 +121,17 @@ export const Typography = {
 export const Spacing = {
   xs: 4,
   sm: 8,
-  md: 16,
-  lg: 24,
-  xl: 32,
-  '2xl': 48,
-  '3xl': 64,
-  '4xl': 80,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  '2xl': 24,
+  '3xl': 28,
+  '4xl': 32,
+  '5xl': 36,
+  '6xl': 40,
+  '7xl': 44,
+  '8xl': 48,
+  '9xl': 52,
 };
 
 export const BorderRadius = {
@@ -221,6 +226,67 @@ export const Shadows = {
     shadowOpacity: 0.15,
     shadowRadius: 8,
     elevation: 4,
+  },
+  // Soft shadow variants with reduced opacity and softer colors
+  softXs: {
+    shadowColor: '#6B7280',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.02,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  softSm: {
+    shadowColor: '#6B7280',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.03,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+  softBase: {
+    shadowColor: '#6B7280',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  softLg: {
+    shadowColor: '#6B7280',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  softCard: {
+    shadowColor: '#9CA3AF',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  softButton: {
+    shadowColor: '#9CA3AF',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.04,
+    shadowRadius: 3,
+    elevation: 1,
   },
 };
 

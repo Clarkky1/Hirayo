@@ -145,17 +145,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    paddingHorizontal: 24,
-    paddingTop: 40, // Increased top padding for status bar
-    paddingBottom: 40,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: 32,
+    paddingBottom: 32,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 32,
   },
   backButton: {
-    marginRight: 16,
+    marginRight: 12,
   },
   headerTitle: {
     fontSize: 24,
@@ -163,23 +163,23 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   section: {
-    marginBottom: 32,
+    marginBottom: 24,
   },
   sectionLabel: {
     fontSize: 16,
     fontWeight: '600',
     color: '#000000',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   inputContainer: {
-    marginBottom: 12,
+    marginBottom: 10,
   },
   input: {
     borderWidth: 1,
     borderColor: '#E1E1E1',
     borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 12,
     fontSize: 16,
     backgroundColor: '#ffffff',
   },
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   agreementContainer: {
-    marginBottom: 32,
+    marginBottom: 24,
   },
   agreementText: {
     fontSize: 14,
@@ -203,10 +203,10 @@ const styles = StyleSheet.create({
   continueButton: {
     backgroundColor: Colors.primary[500],
     borderRadius: BorderRadius.lg,
-    paddingVertical: Spacing.lg,
+    paddingVertical: Spacing.md,
     alignItems: 'center',
-    marginTop: Spacing.xl,
-    ...Shadows.button,
+    marginTop: Spacing.lg,
+    ...Shadows.softButton,
   },
   continueButtonActive: {
     backgroundColor: '#333333',
@@ -224,6 +224,6 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
     borderWidth: 1,
     borderColor: Colors.border.light,
-    ...Shadows.xs,
+    ...Shadows.softXs,
   },
 });
