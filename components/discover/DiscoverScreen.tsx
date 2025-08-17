@@ -3,14 +3,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-    FlatList,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  FlatList,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { ProductCard } from '../ui/ProductCard';
 
@@ -34,9 +34,9 @@ const products: ProductItem[] = [
   { id: '8', name: 'Sony WH-1000XM5 Headphones', rating: 4.6, location: 'Talisay, Cebu', price: 15, category: 'audio' },
 ];
 
-const sortOptions = ['Price: Low to High', 'Price: High to Low', 'Rating: High to Low', 'Rating: Low to High', 'Newest First'];
+const sortOptions = ['Under ₱500', '₱500 - ₱1,000', '₱1,000 - ₱2,000', '₱2,000+'];
 const filterCategories = ['Camera', 'Laptop', 'Phone', 'Tablet/iPad', 'Drone', 'PC', 'Gaming', 'Audio'];
-const priceRanges = ['Under ₱500', '₱500 - ₱1,000', '₱1,000 - ₱2,000', '₱2,000+'];
+
 
 export default function DiscoverScreen() {
   const params = useLocalSearchParams();
@@ -45,7 +45,7 @@ export default function DiscoverScreen() {
   const [showFiltersDropdown, setShowFiltersDropdown] = useState(false);
   const [selectedSort, setSelectedSort] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedPriceRange, setSelectedPriceRange] = useState('');
+
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
@@ -91,6 +91,7 @@ export default function DiscoverScreen() {
   const clearFilters = () => {
     setSelectedCategory(null);
     setSelectedLocation(null);
+    setSelectedCategories([]);
   };
 
   const getFilteredCategories = () => {
@@ -145,24 +146,50 @@ export default function DiscoverScreen() {
   };
 
   const handleCategoryToggle = (category: string) => {
-    setSelectedCategories(prev => 
-      prev.includes(category) 
-        ? prev.filter(c => c !== category)
-        : [...prev, category]
-    );
+    setSelectedCategories(prev => {
+      if (prev.includes(category)) {
+        const filtered = prev.filter(c => c !== category);
+        // If no categories left, clear all filtering
+        if (filtered.length === 0) {
+          setSelectedCategory(null);
+        }
+        return filtered;
+      } else {
+        return [...prev, category];
+      }
+    });
   };
 
-  const handlePriceRangeSelect = (range: string) => {
-    setSelectedPriceRange(range);
-  };
+
 
   const handleApplyFilters = () => {
     setShowFiltersDropdown(false);
+    // Apply the selected category filter - replace previous categories with new one
+    if (selectedCategory) {
+      const categoryMap: { [key: string]: string } = {
+        'camera': 'Camera',
+        'laptop': 'Laptop',
+        'phone': 'Phone',
+        'tablet': 'Tablet/iPad',
+        'drone': 'Drone',
+        'pc': 'PC',
+        'gaming': 'Gaming',
+        'audio': 'Audio'
+      };
+      
+      const categoryName = categoryMap[selectedCategory];
+      if (categoryName) {
+        // Replace all previous categories with the new selected one
+        setSelectedCategories([categoryName]);
+        // Clear the selectedCategory since it's now applied to selectedCategories
+        setSelectedCategory(null);
+      }
+    }
   };
 
   const handleClearFilters = () => {
     setSelectedCategories([]);
-    setSelectedPriceRange('');
+    setSelectedCategory(null);
   };
 
   const handleCategoryNavigation = (categoryId: string) => {
@@ -172,34 +199,10 @@ export default function DiscoverScreen() {
   const getSortedProducts = () => {
     let sorted = [...products];
     
-    switch (selectedSort) {
-      case 'Price: Low to High':
-        return sorted.sort((a, b) => a.price - b.price);
-      case 'Price: High to Low':
-        return sorted.sort((a, b) => b.price - a.price);
-      case 'Rating: High to Low':
-        return sorted.sort((a, b) => b.rating - a.rating);
-      case 'Rating: Low to High':
-        return sorted.sort((a, b) => a.rating - b.rating);
-      default:
-        return sorted;
-    }
-  };
-
-  const getFilteredProducts = () => {
-    let filtered = getSortedProducts();
-    
-    if (selectedCategories.length > 0) {
-      filtered = filtered.filter(product => 
-        selectedCategories.some(cat => 
-          product.category.toLowerCase() === cat.toLowerCase()
-        )
-      );
-    }
-    
-    if (selectedPriceRange) {
-      filtered = filtered.filter(product => {
-        switch (selectedPriceRange) {
+    // Filter by price range instead of sorting
+    if (selectedSort) {
+      sorted = sorted.filter(product => {
+        switch (selectedSort) {
           case 'Under ₱500':
             return product.price < 500;
           case '₱500 - ₱1,000':
@@ -212,6 +215,21 @@ export default function DiscoverScreen() {
             return true;
         }
       });
+    }
+    
+    return sorted;
+  };
+
+  const getFilteredProducts = () => {
+    let filtered = getSortedProducts();
+    
+    // Only apply category filtering if there are active filters
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter(product => 
+        selectedCategories.some(cat => 
+          product.category.toLowerCase() === cat.toLowerCase()
+        )
+      );
     }
     
     return filtered;
@@ -232,7 +250,8 @@ export default function DiscoverScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      {/* Sticky Header Section */}
+      <View style={styles.stickyHeader}>
 
 
         {/* Search Bar */}
@@ -254,7 +273,7 @@ export default function DiscoverScreen() {
           <TouchableOpacity style={styles.controlButton} onPress={handleSortBy}>
             <Ionicons name="funnel-outline" size={16} color={Colors.text.primary} />
             <Text style={styles.controlButtonText}>
-              {selectedSort || 'Sort by'}
+              {selectedSort || 'Price Range'}
             </Text>
             <Ionicons name="chevron-down" size={14} color={Colors.text.primary} />
           </TouchableOpacity>
@@ -347,30 +366,7 @@ export default function DiscoverScreen() {
               </View>
             </View>
 
-            {/* Price Range */}
-            <View style={styles.filterSection}>
-              <Text style={styles.filterSectionTitle}>Price Range</Text>
-              {priceRanges.map((range, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={[
-                    styles.priceRangeItem,
-                    selectedPriceRange === range && styles.selectedPriceRangeItem
-                  ]}
-                  onPress={() => handlePriceRangeSelect(range)}
-                >
-                  <Text style={[
-                    styles.priceRangeText,
-                    selectedPriceRange === range && styles.selectedPriceRangeText
-                  ]}>
-                    {range}
-                  </Text>
-                  {selectedPriceRange === range && (
-                    <Ionicons name="checkmark" size={14} color={Colors.primary[500]} />
-                  )}
-                </TouchableOpacity>
-              ))}
-            </View>
+
 
             {/* Action Buttons */}
             <View style={styles.filterActions}>
@@ -385,7 +381,7 @@ export default function DiscoverScreen() {
         )}
 
         {/* Active Filters Display */}
-        {(selectedCategories.length > 0 || selectedPriceRange) && (
+        {selectedCategories.length > 0 && (
           <View style={styles.activeFiltersContainer}>
             <Text style={styles.activeFiltersTitle}>Active Filters:</Text>
             <View style={styles.activeFiltersChips}>
@@ -393,22 +389,19 @@ export default function DiscoverScreen() {
                 <View key={category} style={styles.activeFilterChip}>
                   <Text style={styles.activeFilterChipText}>{category}</Text>
                   <TouchableOpacity onPress={() => handleCategoryToggle(category)}>
-                    <Ionicons name="close" size={12} color={Colors.text.inverse} />
+                    <Ionicons name="close" size={16} color={Colors.text.inverse} />
                   </TouchableOpacity>
                 </View>
               ))}
-              {selectedPriceRange && (
-                <View style={styles.activeFilterChip}>
-                  <Text style={styles.activeFilterChipText}>{selectedPriceRange}</Text>
-                  <TouchableOpacity onPress={() => setSelectedPriceRange('')}>
-                    <Ionicons name="close" size={12} color={Colors.text.inverse} />
-                  </TouchableOpacity>
-                </View>
-              )}
+
             </View>
           </View>
         )}
 
+      </View>
+
+      {/* Scrollable Products Section */}
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Products Grid */}
         <View style={styles.productsSection}>
           <FlatList
@@ -433,12 +426,21 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background.primary,
   },
+  stickyHeader: {
+    backgroundColor: Colors.background.primary,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border.light,
+    zIndex: 1000,
+  },
 
 
   scrollView: {
     flex: 1,
     paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.sm,
+    paddingTop: Spacing.md,
   },
 
           searchBar: {
@@ -659,15 +661,16 @@ const styles = StyleSheet.create({
   activeFilterChip: {
     backgroundColor: Colors.primary[500],
     borderRadius: BorderRadius.full,
-    paddingVertical: Spacing.xs,
-    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.xs,
+    gap: Spacing.sm,
   },
   activeFilterChipText: {
-    ...TextStyles.body.small,
+    ...TextStyles.body.medium,
     color: Colors.text.inverse,
+    fontWeight: '500',
   },
   productsSection: {
     marginBottom: Spacing.xl,

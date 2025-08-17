@@ -154,40 +154,33 @@ export default function AnalyticsScreen() {
         <View style={styles.topItemsSection}>
           <Text style={styles.sectionTitle}>Top Performing Items</Text>
           <Card variant="filled" padding="large" style={styles.topItemsCard}>
-            <View style={styles.topItem}>
-              <View style={styles.topItemRank}>
-                <Text style={styles.rankText}>1</Text>
+            <View style={styles.activityItem}>
+              <View style={styles.activityIconContainer}>
+                <Ionicons name="star" size={20} color="#FFD700" />
               </View>
-              <View style={styles.topItemInfo}>
-                <Text style={styles.topItemName}>Canon EOS R5 Camera</Text>
-                <Text style={styles.topItemStats}>12 rentals • 4.9 rating</Text>
-              </View>
-              <View style={styles.topItemViews}>
-                <Text style={styles.viewsText}>156 views</Text>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>Canon EOS R5 Camera</Text>
+                <Text style={styles.activityTime}>12 rentals • 4.9 rating • 156 views</Text>
               </View>
             </View>
-            <View style={styles.topItem}>
-              <View style={styles.topItemRank}>
-                <Text style={styles.rankText}>2</Text>
+            
+            <View style={styles.activityItem}>
+              <View style={styles.activityIconContainer}>
+                <Ionicons name="star" size={20} color="#FFD700" />
               </View>
-              <View style={styles.topItemInfo}>
-                <Text style={styles.topItemName}>MacBook Pro M2</Text>
-                <Text style={styles.topItemStats}>8 rentals • 4.8 rating</Text>
-              </View>
-              <View style={styles.topItemViews}>
-                <Text style={styles.viewsText}>134 views</Text>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>MacBook Pro M2</Text>
+                <Text style={styles.activityTime}>8 rentals • 4.8 rating • 134 views</Text>
               </View>
             </View>
-            <View style={styles.topItem}>
-              <View style={styles.topItemRank}>
-                <Text style={styles.rankText}>3</Text>
+            
+            <View style={styles.activityItem}>
+              <View style={styles.activityIconContainer}>
+                <Ionicons name="star" size={20} color="#FFD700" />
               </View>
-              <View style={styles.topItemInfo}>
-                <Text style={styles.topItemName}>iPhone 15 Pro Max</Text>
-                <Text style={styles.topItemStats}>15 rentals • 4.7 rating</Text>
-              </View>
-              <View style={styles.topItemViews}>
-                <Text style={styles.viewsText}>98 views</Text>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>iPhone 15 Pro Max</Text>
+                <Text style={styles.activityTime}>15 rentals • 4.7 rating • 98 views</Text>
               </View>
             </View>
           </Card>
@@ -197,25 +190,33 @@ export default function AnalyticsScreen() {
         <View style={styles.insightsSection}>
           <Text style={styles.sectionTitle}>Customer Insights</Text>
           <Card variant="filled" padding="large" style={styles.insightsCard}>
-            <View style={styles.insightItem}>
-              <Ionicons name="people" size={20} color={Colors.primary[500]} />
-              <View style={styles.insightContent}>
-                <Text style={styles.insightTitle}>Most Active Time</Text>
-                <Text style={styles.insightValue}>Weekends (Fri-Sun)</Text>
+            <View style={styles.activityItem}>
+              <View style={styles.activityIconContainer}>
+                <Ionicons name="people" size={20} color={Colors.primary[500]} />
+              </View>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>Most Active Time</Text>
+                <Text style={styles.activityTime}>Weekends (Fri-Sun)</Text>
               </View>
             </View>
-            <View style={styles.insightItem}>
-              <Ionicons name="location" size={20} color={Colors.success} />
-              <View style={styles.insightContent}>
-                <Text style={styles.insightTitle}>Top Location</Text>
-                <Text style={styles.insightValue}>Cebu City (45%)</Text>
+            
+            <View style={styles.activityItem}>
+              <View style={styles.activityIconContainer}>
+                <Ionicons name="location" size={20} color={Colors.success} />
+              </View>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>Top Location</Text>
+                <Text style={styles.activityTime}>Cebu City (45%)</Text>
               </View>
             </View>
-            <View style={styles.insightItem}>
-              <Ionicons name="calendar" size={20} color={Colors.warning} />
-              <View style={styles.insightContent}>
-                <Text style={styles.insightTitle}>Peak Season</Text>
-                <Text style={styles.insightValue}>December - March</Text>
+            
+            <View style={styles.activityItem}>
+              <View style={styles.activityIconContainer}>
+                <Ionicons name="calendar" size={20} color={Colors.warning} />
+              </View>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>Peak Season</Text>
+                <Text style={styles.activityTime}>December - March</Text>
               </View>
             </View>
           </Card>
@@ -423,5 +424,33 @@ const styles = StyleSheet.create({
     ...TextStyles.body.medium,
     color: Colors.text.primary,
     fontWeight: '500',
+  },
+  // Activity item styles (same as lenders page)
+  activityItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+  },
+  activityIconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: Colors.primary[100],
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: Spacing.sm,
+  },
+  activityContent: {
+    flex: 1,
+  },
+  activityTitle: {
+    ...TextStyles.body.medium,
+    color: Colors.text.primary,
+    fontWeight: '500',
+    marginBottom: Spacing.xs,
+  },
+  activityTime: {
+    ...TextStyles.caption,
+    color: Colors.text.secondary,
   },
 });

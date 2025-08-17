@@ -1,31 +1,40 @@
-import { BorderRadius, Colors, Shadows, Spacing } from '@/constants/DesignSystem';
+import { BorderRadius, Colors, Spacing } from '@/constants/DesignSystem';
+import { useSavedItems } from '@/contexts/SavedItemsContext';
+import { useSelectedItem } from '@/contexts/SelectedItemContext';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    FlatList,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
-interface SavedItem {
-  id: string;
-  name: string;
-  price: number;
-  location: string;
-}
-
 export default function SavedItemsScreen() {
-  // Mock data - replace with actual saved items data
-  const [savedItems] = useState<SavedItem[]>([
-    // Uncomment to test with saved items
-    // { id: '1', name: 'Canon EOS R5', price: 45, location: 'Cebu City' },
-    // { id: '2', name: 'MacBook Pro M2', price: 35, location: 'Mandaue City' },
-  ]);
+  const { savedItems, removeSavedItem } = useSavedItems();
+  const { setSelectedItem } = useSelectedItem();
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const hasSavedItems = savedItems.length > 0;
+
+  const handleItemPress = async (item: any) => {
+    if (isNavigating) return; // Prevent multiple clicks
+    
+    setIsNavigating(true);
+    setSelectedItem(item);
+    
+    try {
+      await router.push('/item');
+    } catch (error) {
+      console.error('Navigation error:', error);
+    } finally {
+      // Reset after a short delay to allow navigation to complete
+      setTimeout(() => setIsNavigating(false), 1000);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -48,21 +57,36 @@ export default function SavedItemsScreen() {
       ) : (
         /* Saved Items List */
         <View style={styles.savedItemsContainer}>
-          <Text style={styles.savedItemsTitle}>Saved Items</Text>
           <FlatList
             data={savedItems}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <View style={styles.savedItemCard}>
-                <View style={styles.savedItemInfo}>
-                  <Text style={styles.savedItemName}>{item.name}</Text>
-                  <Text style={styles.savedItemLocation}>{item.location}</Text>
-                  <Text style={styles.savedItemPrice}>₱{item.price}/day</Text>
-                </View>
-                <TouchableOpacity style={styles.unsaveButton}>
+                             <TouchableOpacity 
+                 style={[styles.savedItemCard, isNavigating && styles.disabledCard]}
+                 onPress={() => handleItemPress(item)}
+                 activeOpacity={isNavigating ? 1 : 0.7}
+                 disabled={isNavigating}
+               >
+                                 <View style={styles.savedItemInfo}>
+                   <Text style={styles.savedItemName}>{item.name}</Text>
+                   <Text style={styles.savedItemLocation}>{item.location}</Text>
+                   <Text style={styles.savedItemPrice}>₱{item.price}/day</Text>
+                   {isNavigating && (
+                     <View style={styles.loadingIndicator}>
+                       <Text style={styles.loadingText}>Opening...</Text>
+                     </View>
+                   )}
+                 </View>
+                <TouchableOpacity 
+                  style={styles.unsaveButton}
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    removeSavedItem(item.id);
+                  }}
+                >
                   <Ionicons name="heart" size={20} color="#00A86B" />
                 </TouchableOpacity>
-              </View>
+              </TouchableOpacity>
             )}
             showsVerticalScrollIndicator={false}
           />
@@ -84,8 +108,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: Spacing.lg,
-    paddingVertical: 12,
-    marginBottom: 16,
+    paddingVertical: 4,
+    marginBottom: 4,
   },
   backButton: {
     padding: 4,
@@ -108,7 +132,20 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
     flexDirection: 'row',
     alignItems: 'center',
-    ...Shadows.softSm,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
+  },
+  disabledCard: {
+    opacity: 0.6,
+  },
+  loadingIndicator: {
+    marginTop: Spacing.xs,
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 12,
+    color: Colors.text.secondary,
+    fontStyle: 'italic',
   },
   emptyStateTitle: {
     fontSize: 24,
@@ -127,14 +164,9 @@ const styles = StyleSheet.create({
   savedItemsContainer: {
     flex: 1,
     paddingHorizontal: Spacing.lg,
-    paddingTop: 16,
+    paddingTop: 0,
   },
-  savedItemsTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333333',
-    marginBottom: 16,
-  },
+
   savedItemInfo: {
     flex: 1,
   },

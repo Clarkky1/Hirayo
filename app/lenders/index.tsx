@@ -25,6 +25,10 @@ export default function LendersScreen() {
     router.push('/analytics' as any);
   };
 
+  const handleMessages = () => {
+    router.push('/(tabs)/messages' as any);
+  };
+
 
 
   return (
@@ -41,7 +45,7 @@ export default function LendersScreen() {
                            <TouchableOpacity onPress={handleViewMyItems} activeOpacity={0.7} style={styles.quickActionButton}>
                 <Card variant="filled" padding="large" style={styles.quickActionCard}>
                   <View style={styles.quickActionIcon}>
-                    <Ionicons name="list-outline" size={24} color={Colors.primary[500]} />
+                    <Ionicons name="list-outline" size={20} color={Colors.primary[500]} />
                   </View>
                   <Text style={styles.quickActionTitle}>My Items</Text>
                 </Card>
@@ -50,7 +54,7 @@ export default function LendersScreen() {
               <TouchableOpacity onPress={handleEarnings} activeOpacity={0.7} style={styles.quickActionButton}>
                 <Card variant="filled" padding="large" style={styles.quickActionCard}>
                   <View style={styles.quickActionIcon}>
-                    <Ionicons name="trending-up-outline" size={24} color={Colors.success} />
+                    <Ionicons name="trending-up-outline" size={20} color={Colors.success} />
                   </View>
                   <Text style={styles.quickActionTitle}>Earnings</Text>
                 </Card>
@@ -59,9 +63,18 @@ export default function LendersScreen() {
               <TouchableOpacity onPress={handleAnalytics} activeOpacity={0.7} style={styles.quickActionButton}>
                 <Card variant="filled" padding="large" style={styles.quickActionCard}>
                   <View style={styles.quickActionIcon}>
-                    <Ionicons name="analytics-outline" size={24} color={Colors.primary[500]} />
+                    <Ionicons name="analytics-outline" size={20} color={Colors.primary[500]} />
                   </View>
                   <Text style={styles.quickActionTitle}>Analytics</Text>
+                </Card>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={handleMessages} activeOpacity={0.7} style={styles.quickActionButton}>
+                <Card variant="filled" padding="large" style={styles.quickActionCard}>
+                  <View style={styles.quickActionIcon}>
+                    <Ionicons name="chatbubbles-outline" size={20} color={Colors.primary[500]} />
+                  </View>
+                  <Text style={styles.quickActionTitle}>Messages</Text>
                 </Card>
               </TouchableOpacity>
            </View>
@@ -108,22 +121,35 @@ export default function LendersScreen() {
 
         <View style={styles.recentActivitySection}>
           <Text style={styles.sectionTitle}>Recent Activity</Text>
-          <Card variant="default" padding="large" style={styles.activityCard}>
-            <View style={styles.activityHeader}>
-              <Ionicons name="notifications" size={18} color={Colors.primary[500]} />
-              <Text style={styles.activityTitle}>Latest Updates</Text>
-            </View>
+          <Card variant="filled" padding="large" style={styles.activityCard}>
             <View style={styles.activityItem}>
-              <Text style={styles.activityText}>New rental request for Canon EOS R5</Text>
-              <Text style={styles.activityTime}>2 hours ago</Text>
+              <View style={styles.activityIconContainer}>
+                <Ionicons name="notifications" size={20} color={Colors.primary[500]} />
+              </View>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>New rental request for Canon EOS R5</Text>
+                <Text style={styles.activityTime}>2 hours ago</Text>
+              </View>
             </View>
+            
             <View style={styles.activityItem}>
-              <Text style={styles.activityText}>Payment received: ₱45 from MacBook rental</Text>
-              <Text style={styles.activityTime}>Yesterday</Text>
+              <View style={styles.activityIconContainer}>
+                <Ionicons name="wallet" size={20} color={Colors.success} />
+              </View>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>Payment received: ₱45 from MacBook rental</Text>
+                <Text style={styles.activityTime}>Yesterday</Text>
+              </View>
             </View>
+            
             <View style={styles.activityItem}>
-              <Text style={styles.activityText}>New review received: 5 stars</Text>
-              <Text style={styles.activityTime}>2 days ago</Text>
+              <View style={styles.activityIconContainer}>
+                <Ionicons name="star" size={20} color="#FFD700" />
+              </View>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>New review received: 5 stars</Text>
+                <Text style={styles.activityTime}>2 days ago</Text>
+              </View>
             </View>
           </Card>
         </View>
@@ -192,22 +218,22 @@ const styles = StyleSheet.create({
   quickActionsGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: Spacing.md,
-    paddingHorizontal: Spacing.lg,
+    gap: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
   },
   quickActionButton: {
     flex: 1,
   },
   quickActionCard: {
     alignItems: 'center',
-    height: 100,
+    height: 90,
     justifyContent: 'center',
   },
   quickActionIcon: {
-    marginBottom: Spacing.sm,
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    marginBottom: Spacing.xs,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: Colors.primary[100],
     justifyContent: 'center',
     alignItems: 'center',
@@ -226,31 +252,28 @@ const styles = StyleSheet.create({
   activityCard: {
     // Card component handles styling
   },
-  activityHeader: {
+  activityItem: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: Spacing.md,
+  },
+  activityIconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: Colors.primary[100],
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: Spacing.sm,
+  },
+  activityContent: {
+    flex: 1,
   },
   activityTitle: {
     ...TextStyles.body.medium,
     color: Colors.text.primary,
     fontWeight: '500',
-    marginLeft: Spacing.sm,
-  },
-  activityItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: Spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border.light,
-  },
-  activityText: {
-    ...TextStyles.body.medium,
-    color: Colors.text.primary,
-    fontWeight: '500',
-    flex: 1,
-    marginRight: Spacing.sm,
+    marginBottom: Spacing.xs,
   },
   activityTime: {
     ...TextStyles.caption,

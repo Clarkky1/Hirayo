@@ -166,13 +166,13 @@ export default function MyItemsScreen() {
         </View>
         
         <View style={styles.actionButtons}>
-          <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="eye" size={16} color={Colors.primary[500]} />
-            <Text style={styles.actionButtonText}>View</Text>
+          <TouchableOpacity style={styles.viewButton}>
+            <Ionicons name="eye" size={16} color={Colors.text.inverse} />
+            <Text style={styles.viewButtonText}>View</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="create" size={16} color={Colors.warning} />
-            <Text style={styles.actionButtonText}>Edit</Text>
+          <TouchableOpacity style={styles.editButton}>
+            <Ionicons name="create" size={16} color={Colors.text.inverse} />
+            <Text style={styles.editButtonText}>Edit</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -510,9 +510,41 @@ const styles = StyleSheet.create({
     borderColor: Colors.border.light,
     gap: Spacing.xs,
   },
+  viewButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    borderRadius: BorderRadius.sm,
+    backgroundColor: Colors.primary[500],
+    borderWidth: 1,
+    borderColor: Colors.primary[500],
+    gap: Spacing.xs,
+  },
+  editButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    borderRadius: BorderRadius.sm,
+    backgroundColor: Colors.warning,
+    borderWidth: 1,
+    borderColor: Colors.warning,
+    gap: Spacing.xs,
+  },
   actionButtonText: {
     ...TextStyles.body.small,
     color: Colors.text.primary,
+    fontWeight: '500',
+  },
+  viewButtonText: {
+    ...TextStyles.body.small,
+    color: Colors.text.inverse,
+    fontWeight: '500',
+  },
+  editButtonText: {
+    ...TextStyles.body.small,
+    color: Colors.text.inverse,
     fontWeight: '500',
   },
   emptyState: {

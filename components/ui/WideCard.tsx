@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
+import React, { useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { BorderRadius, Colors, Spacing, TextStyles } from '../../constants/DesignSystem';
+import { SavedItem, useSavedItems } from '../../contexts/SavedItemsContext';
 
 export interface WideCardProps {
   item: {
@@ -13,7 +14,6 @@ export interface WideCardProps {
     image?: string;
   };
   onPress: () => void;
-  onFavoritePress?: () => void;
   showFavoriteIcon?: boolean;
   style?: any;
 }
@@ -21,15 +21,48 @@ export interface WideCardProps {
 export const WideCard: React.FC<WideCardProps> = ({
   item,
   onPress,
-  onFavoritePress,
   showFavoriteIcon = true,
   style
 }) => {
+  const { addSavedItem, removeSavedItem, isItemSaved } = useSavedItems();
+  const [isNavigating, setIsNavigating] = useState(false);
+  
+  const handleFavoritePress = () => {
+    if (isItemSaved(item.id)) {
+      removeSavedItem(item.id);
+    } else {
+      const savedItem: SavedItem = {
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        rating: item.rating,
+        location: item.location,
+        image: item.image,
+      };
+      addSavedItem(savedItem);
+    }
+  };
+
+  const handleItemPress = async () => {
+    if (isNavigating) return; // Prevent multiple clicks
+    
+    setIsNavigating(true);
+    
+    try {
+      await onPress();
+    } catch (error) {
+      console.error('Navigation error:', error);
+    } finally {
+      // Reset after a short delay to allow navigation to complete
+      setTimeout(() => setIsNavigating(false), 1000);
+    }
+  };
   return (
     <TouchableOpacity 
-      style={[styles.card, style]} 
-      onPress={onPress}
-      activeOpacity={0.7}
+      style={[styles.card, style, isNavigating && styles.disabledCard]} 
+      onPress={handleItemPress}
+      activeOpacity={isNavigating ? 1 : 0.7}
+      disabled={isNavigating}
     >
       <View style={styles.imageContainer}>
         {item.image ? (
@@ -45,10 +78,14 @@ export const WideCard: React.FC<WideCardProps> = ({
             style={styles.favoriteIcon}
             onPress={(e) => {
               e.stopPropagation();
-              onFavoritePress?.();
+              handleFavoritePress();
             }}
           >
-            <Ionicons name="heart-outline" size={16} color={Colors.neutral[600]} />
+            <Ionicons 
+              name={isItemSaved(item.id) ? "heart" : "heart-outline"} 
+              size={16} 
+              color={isItemSaved(item.id) ? Colors.primary[500] : Colors.neutral[600]} 
+            />
           </TouchableOpacity>
         )}
         
@@ -180,5 +217,8 @@ const styles = StyleSheet.create({
   perDayText: {
     fontWeight: 'normal',
     color: Colors.text.secondary,
+  },
+  disabledCard: {
+    opacity: 0.6,
   },
 });

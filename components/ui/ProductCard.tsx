@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
+import React, { useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { BorderRadius, Colors, Spacing, TextStyles } from '../../constants/DesignSystem';
+import { SavedItem, useSavedItems } from '../../contexts/SavedItemsContext';
 
 export interface ProductCardProps {
   item: {
@@ -13,10 +14,7 @@ export interface ProductCardProps {
     image?: string;
   };
   onPress: () => void;
-  onFavoritePress?: () => void;
-  onChatPress?: () => void;
   showFavoriteIcon?: boolean;
-  showChatIcon?: boolean;
   variant?: 'default' | 'compact' | 'large';
   style?: any;
 }
@@ -24,13 +22,44 @@ export interface ProductCardProps {
 export const ProductCard: React.FC<ProductCardProps> = ({
   item,
   onPress,
-  onFavoritePress,
-  onChatPress,
   showFavoriteIcon = true,
-  showChatIcon = false,
   variant = 'default',
   style
 }) => {
+  const { addSavedItem, removeSavedItem, isItemSaved } = useSavedItems();
+  const [isNavigating, setIsNavigating] = useState(false);
+  
+  const handleFavoritePress = () => {
+    if (isItemSaved(item.id)) {
+      removeSavedItem(item.id);
+    } else {
+      const savedItem: SavedItem = {
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        rating: item.rating,
+        location: item.location,
+        image: item.image,
+      };
+      addSavedItem(savedItem);
+    }
+  };
+
+  const handleItemPress = async () => {
+    if (isNavigating) return; // Prevent multiple clicks
+    
+    setIsNavigating(true);
+    
+    try {
+      await onPress();
+    } catch (error) {
+      console.error('Navigation error:', error);
+    } finally {
+      // Reset after a short delay to allow navigation to complete
+      setTimeout(() => setIsNavigating(false), 1000);
+    }
+  };
+
   const getVariantStyles = () => {
     switch (variant) {
       case 'compact':
@@ -64,9 +93,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
   return (
     <TouchableOpacity 
-      style={[variantStyles.card, style]} 
-      onPress={onPress}
-      activeOpacity={0.7}
+      style={[variantStyles.card, style, isNavigating && styles.disabledCard]} 
+      onPress={handleItemPress}
+      activeOpacity={isNavigating ? 1 : 0.7}
+      disabled={isNavigating}
     >
       <View style={variantStyles.image}>
         {item.image ? (
@@ -82,22 +112,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             style={styles.favoriteIcon}
             onPress={(e) => {
               e.stopPropagation();
-              onFavoritePress?.();
+              handleFavoritePress();
             }}
           >
-            <Ionicons name="heart-outline" size={16} color={Colors.neutral[600]} />
-          </TouchableOpacity>
-        )}
-        
-        {showChatIcon && (
-          <TouchableOpacity 
-            style={styles.chatIcon}
-            onPress={(e) => {
-              e.stopPropagation();
-              onChatPress?.();
-            }}
-          >
-            <Ionicons name="chatbubble-outline" size={16} color={Colors.primary[500]} />
+            <Ionicons 
+              name={isItemSaved(item.id) ? "heart" : "heart-outline"} 
+              size={16} 
+              color={isItemSaved(item.id) ? Colors.primary[500] : Colors.neutral[600]} 
+            />
           </TouchableOpacity>
         )}
       </View>
@@ -252,16 +274,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border.light,
   },
-  chatIcon: {
-    position: 'absolute',
-    top: Spacing.sm,
-    left: Spacing.sm,
-    backgroundColor: Colors.background.primary,
-    borderRadius: BorderRadius.full,
-    padding: Spacing.xs,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
-  },
   ratingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -280,5 +292,8 @@ const styles = StyleSheet.create({
   perDayText: {
     fontWeight: 'normal',
     color: Colors.text.secondary,
+  },
+  disabledCard: {
+    opacity: 0.6,
   },
 });

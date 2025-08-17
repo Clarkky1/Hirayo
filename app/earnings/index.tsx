@@ -175,36 +175,60 @@ export default function EarningsScreen() {
         <View style={styles.transactionsSection}>
           <Text style={styles.sectionTitle}>Recent Transactions</Text>
           <Card variant="filled" padding="large" style={styles.transactionsCard}>
-            {renderTransactionItem(
-              'Canon EOS R5 Rental',
-              'Today, 2:30 PM',
-              '+₱45',
-              'completed'
-            )}
-            {renderTransactionItem(
-              'MacBook Pro Rental',
-              'Yesterday, 10:15 AM',
-              '+₱35',
-              'completed'
-            )}
-            {renderTransactionItem(
-              'iPhone 15 Pro Max',
-              '2 days ago',
-              '+₱25',
-              'pending'
-            )}
-            {renderTransactionItem(
-              'DJI Mavic 3 Drone',
-              '3 days ago',
-              '+₱55',
-              'completed'
-            )}
-            {renderTransactionItem(
-              'Gaming PC RTX 4080',
-              '1 week ago',
-              '+₱40',
-              'completed'
-            )}
+            <View style={styles.activityItem}>
+              <View style={styles.activityIconContainer}>
+                <Ionicons name="checkmark-circle" size={20} color={Colors.success} />
+              </View>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>Canon EOS R5 Rental</Text>
+                <Text style={styles.activityTime}>Today, 2:30 PM</Text>
+              </View>
+              <Text style={styles.activityTransactionAmount}>+₱45</Text>
+            </View>
+            
+            <View style={styles.activityItem}>
+              <View style={styles.activityIconContainer}>
+                <Ionicons name="checkmark-circle" size={20} color={Colors.success} />
+              </View>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>MacBook Pro Rental</Text>
+                <Text style={styles.activityTime}>Yesterday, 10:15 AM</Text>
+              </View>
+              <Text style={styles.activityTransactionAmount}>+₱35</Text>
+            </View>
+            
+            <View style={styles.activityItem}>
+              <View style={styles.activityIconContainer}>
+                <Ionicons name="time" size={20} color={Colors.warning} />
+              </View>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>iPhone 15 Pro Max</Text>
+                <Text style={styles.activityTime}>2 days ago</Text>
+              </View>
+              <Text style={styles.activityTransactionAmount}>+₱25</Text>
+            </View>
+            
+            <View style={styles.activityItem}>
+              <View style={styles.activityIconContainer}>
+                <Ionicons name="checkmark-circle" size={20} color={Colors.success} />
+              </View>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>DJI Mavic 3 Drone</Text>
+                <Text style={styles.activityTime}>3 days ago</Text>
+              </View>
+              <Text style={styles.activityTransactionAmount}>+₱55</Text>
+            </View>
+            
+            <View style={styles.activityItem}>
+              <View style={styles.activityIconContainer}>
+                <Ionicons name="checkmark-circle" size={20} color={Colors.success} />
+              </View>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>Gaming PC RTX 4080</Text>
+                <Text style={styles.activityTime}>1 week ago</Text>
+              </View>
+              <Text style={styles.activityTransactionAmount}>+₱40</Text>
+            </View>
           </Card>
         </View>
 
@@ -212,64 +236,53 @@ export default function EarningsScreen() {
         <View style={styles.breakdownSection}>
           <Text style={styles.sectionTitle}>Earnings Breakdown</Text>
           <Card variant="filled" padding="large" style={styles.breakdownCard}>
-            <View style={styles.breakdownItem}>
-              <View style={styles.breakdownLeft}>
-                <View style={[styles.categoryIcon, { backgroundColor: Colors.primary[100] }]}>
-                  <Ionicons name="camera" size={16} color={Colors.primary[500]} />
-                </View>
-                <Text style={styles.categoryName}>Cameras</Text>
+            <View style={styles.activityItem}>
+              <View style={styles.activityIconContainer}>
+                <Ionicons name="camera" size={20} color={Colors.primary[500]} />
               </View>
-              <View style={styles.breakdownRight}>
-                <Text style={styles.categoryAmount}>₱2,340</Text>
-                <Text style={styles.categoryPercentage}>27%</Text>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>Cameras</Text>
+                <Text style={styles.activityTime}>₱2,340 • 27%</Text>
               </View>
             </View>
-            <View style={styles.breakdownItem}>
-              <View style={styles.breakdownLeft}>
-                <View style={[styles.categoryIcon, { backgroundColor: Colors.success[100] }]}>
-                  <Ionicons name="laptop" size={16} color={Colors.success} />
-                </View>
-                <Text style={styles.categoryName}>Laptops</Text>
+            
+            <View style={styles.activityItem}>
+              <View style={styles.activityIconContainer}>
+                <Ionicons name="laptop" size={20} color={Colors.success} />
               </View>
-              <View style={styles.breakdownRight}>
-                <Text style={styles.categoryAmount}>₱1,960</Text>
-                <Text style={styles.categoryPercentage}>22%</Text>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>Laptops</Text>
+                <Text style={styles.activityTime}>₱1,960 • 22%</Text>
               </View>
             </View>
-            <View style={styles.breakdownItem}>
-              <View style={styles.breakdownLeft}>
-                <View style={[styles.categoryIcon, { backgroundColor: Colors.warning[100] }]}>
-                  <Ionicons name="phone-portrait" size={16} color={Colors.warning} />
-                </View>
-                <Text style={styles.categoryName}>Phones</Text>
+            
+            <View style={styles.activityItem}>
+              <View style={styles.activityIconContainer}>
+                <Ionicons name="phone-portrait" size={20} color={Colors.warning} />
               </View>
-              <View style={styles.breakdownRight}>
-                <Text style={styles.categoryAmount}>₱1,750</Text>
-                <Text style={styles.categoryPercentage}>20%</Text>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>Phones</Text>
+                <Text style={styles.activityTime}>₱1,750 • 20%</Text>
               </View>
             </View>
-            <View style={styles.breakdownItem}>
-              <View style={styles.breakdownLeft}>
-                <View style={[styles.categoryIcon, { backgroundColor: Colors.info[100] }]}>
-                  <Ionicons name="airplane" size={16} color={Colors.info} />
-                </View>
-                <Text style={styles.categoryName}>Drones</Text>
+            
+            <View style={styles.activityItem}>
+              <View style={styles.activityIconContainer}>
+                <Ionicons name="airplane" size={20} color={Colors.info} />
               </View>
-              <View style={styles.breakdownRight}>
-                <Text style={styles.categoryAmount}>₱1,400</Text>
-                <Text style={styles.categoryPercentage}>16%</Text>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>Drones</Text>
+                <Text style={styles.activityTime}>₱1,400 • 16%</Text>
               </View>
             </View>
-            <View style={styles.breakdownItem}>
-              <View style={styles.breakdownLeft}>
-                <View style={[styles.categoryIcon, { backgroundColor: Colors.neutral[100] }]}>
-                  <Ionicons name="game-controller" size={16} color={Colors.neutral[600]} />
-                </View>
-                <Text style={styles.categoryName}>Others</Text>
+            
+            <View style={styles.activityItem}>
+              <View style={styles.activityIconContainer}>
+                <Ionicons name="game-controller" size={20} color={Colors.neutral[600]} />
               </View>
-              <View style={styles.breakdownRight}>
-                <Text style={styles.categoryAmount}>₱1,300</Text>
-                <Text style={styles.categoryPercentage}>15%</Text>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>Others</Text>
+                <Text style={styles.activityTime}>₱1,300 • 15%</Text>
               </View>
             </View>
           </Card>
@@ -279,21 +292,25 @@ export default function EarningsScreen() {
         <View style={styles.paymentMethodsSection}>
           <Text style={styles.sectionTitle}>Payment Methods</Text>
           <Card variant="filled" padding="large" style={styles.paymentMethodsCard}>
-            <View style={styles.paymentMethodItem}>
-              <View style={styles.paymentMethodLeft}>
+            <View style={styles.activityItem}>
+              <View style={styles.activityIconContainer}>
                 <Ionicons name="card" size={20} color={Colors.primary[500]} />
-                <Text style={styles.paymentMethodName}>Bank Transfer</Text>
               </View>
-              <Text style={styles.paymentMethodStatus}>Default</Text>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>Bank Transfer</Text>
+                <Text style={styles.activityTime}>Default payment method</Text>
+              </View>
             </View>
-            <View style={styles.paymentMethodItem}>
-              <View style={styles.paymentMethodLeft}>
+            
+            <View style={styles.activityItem}>
+              <View style={styles.activityIconContainer}>
                 <Ionicons name="wallet" size={20} color={Colors.success} />
-                <Text style={styles.paymentMethodName}>E-Wallet</Text>
               </View>
-              <Text style={styles.paymentMethodStatus}>Available</Text>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>E-Wallet</Text>
+                <Text style={styles.activityTime}>Available for transactions</Text>
+              </View>
             </View>
-
           </Card>
         </View>
       </ScrollView>
@@ -509,5 +526,37 @@ const styles = StyleSheet.create({
     color: Colors.success,
     fontWeight: '500',
   },
-
+  // Activity item styles (same as lenders page)
+  activityItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+  },
+  activityIconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: Colors.primary[100],
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: Spacing.sm,
+  },
+  activityContent: {
+    flex: 1,
+  },
+  activityTitle: {
+    ...TextStyles.body.medium,
+    color: Colors.text.primary,
+    fontWeight: '500',
+    marginBottom: Spacing.xs,
+  },
+  activityTime: {
+    ...TextStyles.caption,
+    color: Colors.text.secondary,
+  },
+  activityTransactionAmount: {
+    ...TextStyles.body.medium,
+    color: Colors.success,
+    fontWeight: '600',
+  },
 });

@@ -1,4 +1,5 @@
-import { BorderRadius, Colors, Shadows, Spacing } from '@/constants/DesignSystem';
+import { BorderRadius, Colors, Spacing } from '@/constants/DesignSystem';
+import { useSelectedItem } from '@/contexts/SelectedItemContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
@@ -13,8 +14,19 @@ import {
 } from 'react-native';
 
 export default function ItemDetailScreen() {
+  const { selectedItem } = useSelectedItem();
   const [activeTab, setActiveTab] = useState<'description' | 'review'>('description');
   const [showMore, setShowMore] = useState(false);
+  
+  // Use selected item data if available, otherwise use default data
+  const item = selectedItem || {
+    id: '1',
+    name: 'Canon EOS 90D DSLR Camera',
+    price: 1253,
+    rating: 4.76,
+    location: 'Cebu City',
+    category: 'camera'
+  };
   
   // Check if description is long enough to show "Show more" button
   const descriptionText = "Capture high-resolution photos and 4K video with this versatile DSLR. Perfect for events, travel, or content creation. Rent it for a day or a week — no strings attached.";
@@ -37,9 +49,9 @@ export default function ItemDetailScreen() {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Product Header */}
         <View style={styles.productHeader}>
-          <Text style={styles.productName}>Canon EOS 90D DSLR Camera</Text>
+          <Text style={styles.productName}>{item.name}</Text>
           <View style={styles.priceContainer}>
-            <Text style={styles.price}>P1,253</Text>
+            <Text style={styles.price}>₱{item.price}</Text>
             <Text style={styles.rentalPeriod}>for a day</Text>
           </View>
         </View>
@@ -96,7 +108,7 @@ export default function ItemDetailScreen() {
           <View style={styles.reviewContent}>
             {/* Review Summary */}
             <View style={styles.reviewSummary}>
-              <Text style={styles.reviewSummaryText}>★ 4.76 · 12 reviews</Text>
+              <Text style={styles.reviewSummaryText}>★ {item.rating} · 12 reviews</Text>
             </View>
 
             {/* Individual Reviews */}
@@ -505,7 +517,8 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.lg,
     marginBottom: Spacing.lg,
     overflow: 'hidden',
-    ...Shadows.sm,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
   },
   actionButton: {
     backgroundColor: Colors.primary[500],
@@ -513,6 +526,7 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.lg,
     alignItems: 'center',
     marginTop: Spacing.lg,
-    ...Shadows.button,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
   },
 });

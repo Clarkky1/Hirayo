@@ -56,38 +56,59 @@ const popularItems: ExploreItem[] = [
 
 export default function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const handleSearch = () => {
     console.log('Searching for:', searchQuery);
   };
 
+  const preventMultipleNavigation = async (navigationFunction: () => void) => {
+    if (isNavigating) return;
+    
+    setIsNavigating(true);
+    
+    try {
+      await navigationFunction();
+    } catch (error) {
+      console.error('Navigation error:', error);
+    } finally {
+      setTimeout(() => setIsNavigating(false), 1000);
+    }
+  };
+
   const handleCategoryPress = (category: CategoryItem) => {
-    router.push({
-      pathname: '/discover',
-      params: { category: category.name.toLowerCase() }
-    });
+    preventMultipleNavigation(() => 
+      router.push({
+        pathname: '/discover',
+        params: { category: category.name.toLowerCase() }
+      })
+    );
   };
 
   const handleExploreItemPress = (item: ExploreItem) => {
-    router.push('/item');
+    preventMultipleNavigation(() => router.push('/item'));
   };
 
   const handleMessageLender = (item: ExploreItem) => {
     // Navigate to messages with item context
-    router.push({
-      pathname: '/messages',
-      params: { 
-        itemId: item.id,
-        itemName: item.name,
-        lenderLocation: item.location
-      }
-    });
+    preventMultipleNavigation(() => 
+      router.push({
+        pathname: '/messages',
+        params: { 
+          itemId: item.id,
+          itemName: item.name,
+          lenderLocation: item.location
+        }
+      })
+    );
   };
 
   const renderCategoryItem = ({ item }: { item: CategoryItem }) => (
     <TouchableOpacity 
-      style={styles.categoryItem} 
+      style={[styles.categoryItem, isNavigating && styles.disabledItem]} 
       onPress={() => handleCategoryPress(item)}
+      disabled={isNavigating}
+      activeOpacity={isNavigating ? 1 : 0.7}
     >
       <View style={styles.categoryIconContainer}>
         <Ionicons name={item.icon} size={24} color={Colors.primary[500]} />
@@ -428,7 +449,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary[50],
     borderRadius: BorderRadius.lg,
     padding: Spacing.lg,
-    marginTop: Spacing.md,
+    marginTop: Spacing.xs,
     borderWidth: 1,
     borderColor: Colors.border.light,
   },
@@ -462,5 +483,8 @@ const styles = StyleSheet.create({
     color: Colors.text.inverse,
     fontWeight: 'bold',
     marginRight: Spacing.xs,
+  },
+  disabledItem: {
+    opacity: 0.6,
   },
 });
