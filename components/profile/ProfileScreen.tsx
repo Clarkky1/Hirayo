@@ -1,110 +1,23 @@
-import { BorderRadius, Colors, Spacing } from '@/constants/DesignSystem';
+import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
+import { useAuth } from '@/hooks/useAuth';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  FlatList,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Alert,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Switch,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
+import { Card } from '../ui/Card';
 
-interface ProfileMenuItem {
-  id: string;
-  title: string;
-  icon: keyof typeof Ionicons.glyphMap;
-  subtitle?: string;
-  hasArrow?: boolean;
-  isDestructive?: boolean;
-}
 
-const profileMenuItems: ProfileMenuItem[] = [
-  {
-    id: '1',
-    title: 'Personal Information',
-    icon: 'person-outline',
-    subtitle: 'View your profile details',
-    hasArrow: true,
-  },
-  {
-    id: '2',
-    title: 'Payment Methods',
-    icon: 'card-outline',
-    subtitle: 'Manage your payment options',
-    hasArrow: true,
-  },
 
-  {
-    id: '3',
-    title: 'Notifications',
-    icon: 'notifications-outline',
-    subtitle: 'Manage your notifications',
-    hasArrow: true,
-  },
-  {
-    id: '4',
-    title: 'Privacy & Security',
-    icon: 'shield-outline',
-    subtitle: 'Manage your privacy settings',
-    hasArrow: true,
-  },
-  {
-    id: '5',
-    title: 'Help & Support',
-    icon: 'help-circle-outline',
-    subtitle: 'Get help and contact support',
-    hasArrow: true,
-  },
-  {
-    id: '6',
-    title: 'About',
-    icon: 'information-circle-outline',
-    subtitle: 'App version and legal information',
-    hasArrow: true,
-  },
-  {
-    id: '7',
-    title: 'Log Out',
-    icon: 'log-out-outline',
-    isDestructive: true,
-  },
-];
 
-const ProfileMenuItemComponent: React.FC<{ item: ProfileMenuItem; onPress: () => void }> = ({ item, onPress }) => {
-  return (
-    <TouchableOpacity style={styles.menuItem} onPress={onPress}>
-      <View style={styles.menuItemLeft}>
-        <View style={[
-          styles.iconContainer,
-          item.isDestructive && styles.destructiveIconContainer
-        ]}>
-          <Ionicons 
-            name={item.icon} 
-            size={20} 
-            color={item.isDestructive ? '#FF6B6B' : '#0066CC'} 
-          />
-        </View>
-        <View style={styles.menuItemContent}>
-          <Text style={[
-            styles.menuItemTitle,
-            item.isDestructive && styles.destructiveText
-          ]}>
-            {item.title}
-          </Text>
-          {item.subtitle && (
-            <Text style={styles.menuItemSubtitle}>{item.subtitle}</Text>
-          )}
-        </View>
-      </View>
-      {item.hasArrow && (
-        <Ionicons name="chevron-forward" size={16} color="#999999" />
-      )}
-    </TouchableOpacity>
-  );
-};
 
 export default function ProfileScreen() {
   const [userData] = useState({
@@ -114,47 +27,92 @@ export default function ProfileScreen() {
     memberSince: 'August 2024',
   });
 
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [emailNotifications, setEmailNotifications] = useState(true);
 
+  const { logout } = useAuth();
 
-  const handleMenuItemPress = (item: ProfileMenuItem) => {
-    switch (item.title) {
-      case 'Personal Information':
-        console.log('Navigating to personal information...');
-        router.push('/personal-information' as any);
-        break;
-      case 'Payment Methods':
-        console.log('Navigating to payment methods...');
-        router.push('/payment-methods' as any);
-        break;
-      case 'Notifications':
-        console.log('Navigating to notifications...');
-        router.push('/notifications' as any);
-        break;
-      case 'Privacy & Security':
-        console.log('Navigating to privacy & security...');
-        router.push('/privacy-security' as any);
-        break;
-      case 'Help & Support':
-        console.log('Navigating to help & support...');
-        router.push('/help-support' as any);
-        break;
-      case 'About':
-        console.log('Navigating to about...');
-        router.push('/about' as any);
-        break;
-      case 'Log Out':
-        console.log('Log out pressed');
-        break;
-      default:
-        console.log('Menu item pressed:', item.title);
-    }
+  const handleEditProfile = () => {
+    router.push('/personal-information' as any);
   };
+
+  const handlePaymentMethods = () => {
+    router.push('/payment-methods' as any);
+  };
+
+  const handleNotifications = () => {
+    router.push('/notifications' as any);
+  };
+
+  const handlePrivacy = () => {
+    router.push('/privacy-security' as any);
+  };
+
+  const handleHelp = () => {
+    router.push('/help-support' as any);
+  };
+
+  const handleAbout = () => {
+    router.push('/about' as any);
+  };
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Logout', style: 'destructive', onPress: () => logout() }
+      ]
+    );
+  };
+
+  const renderSettingItem = (
+    icon: keyof typeof Ionicons.glyphMap,
+    title: string,
+    subtitle?: string,
+    onPress?: () => void,
+    showArrow: boolean = true,
+    showSwitch?: boolean,
+    switchValue?: boolean,
+    onSwitchChange?: (value: boolean) => void
+  ) => (
+    <TouchableOpacity 
+      onPress={onPress}
+      disabled={!onPress}
+    >
+      <Card variant="filled" padding="large" style={styles.settingItem}>
+        <View style={styles.settingItemLeft}>
+          <View style={styles.settingIconContainer}>
+            <Ionicons name={icon} size={20} color={Colors.primary[500]} />
+          </View>
+          <View style={styles.settingTextContainer}>
+            <Text style={styles.settingTitle}>{title}</Text>
+            {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
+          </View>
+        </View>
+        
+        <View style={styles.settingItemRight}>
+          {showSwitch && onSwitchChange && (
+            <Switch
+              value={switchValue}
+              onValueChange={onSwitchChange}
+              trackColor={{ false: Colors.neutral[300], true: Colors.primary[300] }}
+              thumbColor={switchValue ? Colors.primary[500] : Colors.neutral[500]}
+            />
+          )}
+          {showArrow && (
+            <Ionicons name="chevron-forward" size={20} color={Colors.text.tertiary} />
+          )}
+        </View>
+      </Card>
+    </TouchableOpacity>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
-
-
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        {/* Profile Section */}
         <View style={styles.profileSection}>
           <View style={styles.avatarContainer}>
             <View style={styles.avatar}>
@@ -172,6 +130,7 @@ export default function ProfileScreen() {
           </View>
         </View>
 
+        {/* Stats Section */}
         <View style={styles.statsSection}>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>12</Text>
@@ -189,24 +148,66 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-
-
-        <View style={styles.menuSection}>
-          <FlatList
-            data={profileMenuItems}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <ProfileMenuItemComponent item={item} onPress={() => handleMenuItemPress(item)} />
-            )}
-            scrollEnabled={false}
-          />
+        {/* Profile Settings Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Profile</Text>
+          {renderSettingItem('person-outline', 'Personal Information', 'Update your personal information', handleEditProfile)}
+          {renderSettingItem('card-outline', 'Payment Methods', 'Manage your payment options', handlePaymentMethods)}
         </View>
 
+        {/* Notifications Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Notifications</Text>
+          {renderSettingItem(
+            'notifications-outline', 
+            'Push Notifications', 
+            'Receive notifications about bookings and messages',
+            undefined,
+            false,
+            true,
+            notificationsEnabled,
+            setNotificationsEnabled
+          )}
+          {renderSettingItem(
+            'mail-outline', 
+            'Email Notifications', 
+            'Get updates via email',
+            undefined,
+            false,
+            true,
+            emailNotifications,
+            setEmailNotifications
+          )}
+        </View>
 
+        {/* Security & Privacy Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Security & Privacy</Text>
+          {renderSettingItem('shield-outline', 'Privacy & Security', 'Control your data and visibility', handlePrivacy)}
+        </View>
 
-        <View style={styles.bottomSpacing} />
+        {/* Support Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Support</Text>
+          {renderSettingItem('help-circle-outline', 'Help & Support', 'Get help and contact support', handleHelp)}
+          {renderSettingItem('information-circle-outline', 'About', 'App version and legal information', handleAbout)}
+        </View>
+
+        {/* Logout Section */}
+        <View style={styles.section}>
+          <TouchableOpacity onPress={handleLogout}>
+            <Card variant="filled" padding="large" style={styles.logoutButton}>
+              <Ionicons name="log-out-outline" size={20} color={Colors.error} />
+              <Text style={styles.logoutText}>Logout</Text>
+            </Card>
+          </TouchableOpacity>
+        </View>
+
+        {/* App Version */}
+        <View style={styles.versionContainer}>
+          <Text style={styles.versionText}>App Version 1.0.0</Text>
+        </View>
       </ScrollView>
-
     </SafeAreaView>
   );
 }
@@ -305,55 +306,73 @@ const styles = StyleSheet.create({
 
 
 
-  menuSection: {
-    backgroundColor: '#ffffff',
-    paddingHorizontal: Spacing.lg,
-    marginBottom: 12,
+  section: {
+    marginBottom: Spacing.lg,
   },
-  menuItem: {
-    backgroundColor: Colors.background.secondary,
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.sm,
+  sectionTitle: {
+    ...TextStyles.heading.h3,
+    color: Colors.text.primary,
+    fontWeight: '600',
     marginBottom: Spacing.sm,
+    marginTop: Spacing.md,
+  },
+  settingItem: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: Spacing.sm,
   },
-  menuItemLeft: {
+  settingItemLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
   },
-  iconContainer: {
+  settingIconContainer: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F0F8FF',
+    borderRadius: BorderRadius.full,
+    backgroundColor: Colors.primary[50],
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 10,
+    marginRight: Spacing.md,
   },
-  destructiveIconContainer: {
-    backgroundColor: '#FFF5F5',
-  },
-  menuItemContent: {
+  settingTextContainer: {
     flex: 1,
   },
-  menuItemTitle: {
-    fontSize: 16,
+  settingTitle: {
+    ...TextStyles.body.medium,
+    color: Colors.text.primary,
     fontWeight: '500',
-    color: '#333333',
-    marginBottom: 2,
+    marginBottom: Spacing.xs,
   },
-  menuItemSubtitle: {
-    fontSize: 12,
-    color: '#999999',
+  settingSubtitle: {
+    ...TextStyles.caption,
+    color: Colors.text.secondary,
+    lineHeight: 16,
   },
-  destructiveText: {
-    color: '#FF6B6B',
+  settingItemRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-
-  bottomSpacing: {
-    height: 16,
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: Spacing.sm,
+  },
+  logoutText: {
+    ...TextStyles.body.medium,
+    color: Colors.error,
+    fontWeight: '600',
+    marginLeft: Spacing.sm,
+  },
+  versionContainer: {
+    alignItems: 'center',
+    paddingVertical: Spacing.xl,
+  },
+  versionText: {
+    ...TextStyles.caption,
+    color: Colors.text.tertiary,
   },
 
 

@@ -3,24 +3,26 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 export default function ItemDetailScreen() {
   const [activeTab, setActiveTab] = useState<'description' | 'review'>('description');
   const [showMore, setShowMore] = useState(false);
+  
+  // Check if description is long enough to show "Show more" button
+  const descriptionText = "Capture high-resolution photos and 4K video with this versatile DSLR. Perfect for events, travel, or content creation. Rent it for a day or a week — no strings attached.";
+  const isDescriptionLong = descriptionText.length > 100; // Show button if description is longer than 100 characters
 
 
 
-  const handleFavorite = () => {
-    console.log('Favorite pressed');
-  };
+
 
   const handleRent = () => {
     router.push('/period');
@@ -45,16 +47,11 @@ export default function ItemDetailScreen() {
         {/* Product Image/Carousel Section */}
         <View style={styles.imageSection}>
           <View style={styles.imagePlaceholder}>
-            <TouchableOpacity style={styles.favoriteIcon} onPress={handleFavorite}>
-              <Ionicons name="heart-outline" size={24} color="#666" />
-            </TouchableOpacity>
           </View>
           
           {/* Image Indicators */}
           <View style={styles.imageIndicators}>
             <View style={[styles.indicator, styles.activeIndicator]} />
-            <View style={styles.indicator} />
-            <View style={styles.indicator} />
             <View style={styles.indicator} />
             <View style={styles.indicator} />
           </View>
@@ -86,9 +83,11 @@ export default function ItemDetailScreen() {
             <Text style={styles.descriptionText}>
               Capture high-resolution photos and 4K video with this versatile DSLR. Perfect for events, travel, or content creation. Rent it for a day or a week — no strings attached.
             </Text>
-            <TouchableOpacity style={styles.showMoreButton} onPress={handleShowMore}>
-              <Text style={styles.showMoreText}>Show more</Text>
-            </TouchableOpacity>
+            {isDescriptionLong && (
+              <TouchableOpacity style={styles.showMoreButton} onPress={handleShowMore}>
+                <Text style={styles.showMoreText}>Show more</Text>
+              </TouchableOpacity>
+            )}
           </View>
         )}
 
@@ -105,13 +104,13 @@ export default function ItemDetailScreen() {
               {/* First Review */}
               <View style={styles.reviewItem}>
                 <View style={styles.reviewHeader}>
-                  <View style={styles.starsRow}>
-                    <Ionicons name="star" size={16} color="#000" />
-                    <Ionicons name="star" size={16} color="#000" />
-                    <Ionicons name="star" size={16} color="#000" />
-                    <Ionicons name="star" size={16} color="#000" />
-                    <Ionicons name="star" size={16} color="#000" />
-                  </View>
+                                     <View style={styles.starsRow}>
+                     <Ionicons name="star" size={16} color="#FFD700" />
+                     <Ionicons name="star" size={16} color="#FFD700" />
+                     <Ionicons name="star" size={16} color="#FFD700" />
+                     <Ionicons name="star" size={16} color="#FFD700" />
+                     <Ionicons name="star" size={16} color="#FFD700" />
+                   </View>
                   <Text style={styles.reviewDate}>January 12, 2025</Text>
                 </View>
                 <Text style={styles.reviewText}>
@@ -128,12 +127,12 @@ export default function ItemDetailScreen() {
 
               {/* Second Review */}
               <View style={styles.reviewItem}>
-                <View style={styles.reviewHeader}>
-                  <View style={styles.starsRow}>
-                    <Ionicons name="star" size={16} color="#000" />
-                    <Ionicons name="star" size={16} color="#000" />
-                    <Ionicons name="star" size={16} color="#000" />
-                  </View>
+                                 <View style={styles.reviewHeader}>
+                   <View style={styles.starsRow}>
+                     <Ionicons name="star" size={16} color="#FFD700" />
+                     <Ionicons name="star" size={16} color="#FFD700" />
+                     <Ionicons name="star" size={16} color="#FFD700" />
+                   </View>
                   <Text style={styles.reviewDate}>January 10, 2025</Text>
                 </View>
                 <Text style={styles.reviewText}>
@@ -166,13 +165,13 @@ export default function ItemDetailScreen() {
             </View>
             <View style={styles.statItem}>
               <Text style={styles.statNumber}>5.0</Text>
-              <View style={styles.starsContainer}>
-                <Ionicons name="star" size={16} color="#000" />
-                <Ionicons name="star" size={16} color="#000" />
-                <Ionicons name="star" size={16} color="#000" />
-                <Ionicons name="star" size={16} color="#000" />
-                <Ionicons name="star" size={16} color="#000" />
-              </View>
+                             <View style={styles.starsContainer}>
+                 <Ionicons name="star" size={16} color="#FFD700" />
+                 <Ionicons name="star" size={16} color="#FFD700" />
+                 <Ionicons name="star" size={16} color="#FFD700" />
+                 <Ionicons name="star" size={16} color="#FFD700" />
+                 <Ionicons name="star" size={16} color="#FFD700" />
+               </View>
             </View>
           </View>
         )}
@@ -183,7 +182,19 @@ export default function ItemDetailScreen() {
             <Text style={styles.ownerLabel}>Owner</Text>
             <View style={styles.ownerInfo}>
               <View style={styles.ownerAvatar} />
-                             <Text style={styles.ownerName}>Lorenz Aguirre</Text>
+              <Text style={styles.ownerName}>Lorenz Aguirre</Text>
+              <TouchableOpacity style={styles.ownerChatIcon} onPress={() => router.push({
+                pathname: '/(tabs)/messages',
+                params: {
+                  openConversation: 'true',
+                  itemId: '1',
+                  itemName: 'Canon EOS 90D DSLR Camera',
+                  ownerName: 'Lorenz Aguirre',
+                  ownerLocation: 'Cebu City'
+                }
+              })}>
+                <Ionicons name="chatbubble-outline" size={20} color={Colors.primary[500]} />
+              </TouchableOpacity>
             </View>
           </View>
         )}
@@ -252,14 +263,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     position: 'relative',
   },
-  favoriteIcon: {
-    position: 'absolute',
-    top: 15,
-    right: 15,
-    backgroundColor: '#ffffff',
-    borderRadius: 20,
-    padding: 8,
-  },
+
   imageIndicators: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -313,7 +317,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 12,
     paddingHorizontal: 20,
-    alignSelf: 'flex-start',
+    alignSelf: 'center',
   },
   showMoreText: {
     fontSize: 14,
@@ -356,6 +360,7 @@ const styles = StyleSheet.create({
   ownerInfo: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
   ownerAvatar: {
     width: 40,
@@ -368,6 +373,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#00A86B',
+    flex: 1,
+  },
+  ownerChatIcon: {
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
+    padding: 8,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
   },
   bottomSpacing: {
     height: 100,

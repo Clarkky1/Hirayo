@@ -1,4 +1,4 @@
-import { BorderRadius, Colors, Shadows, Spacing, TextStyles } from '@/constants/DesignSystem';
+import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -12,6 +12,7 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import { ProductCard } from '../ui/ProductCard';
 
 interface ProductItem {
   id: string;
@@ -219,25 +220,15 @@ export default function DiscoverScreen() {
   const filteredProducts = getFilteredProducts();
 
   const renderProductItem = ({ item }: { item: ProductItem }) => (
-    <TouchableOpacity style={styles.productCard} onPress={() => router.push('/item')}>
-      <View style={styles.productImagePlaceholder}>
-        <TouchableOpacity style={styles.favoriteIcon}>
-          <Ionicons name="heart-outline" size={16} color={Colors.neutral[600]} />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.productDetails}>
-        <Text style={styles.productName} numberOfLines={2}>{item.name}</Text>
-        <View style={styles.ratingContainer}>
-          <Ionicons name="star" size={12} color="#FFD700" />
-          <Text style={styles.ratingText}>{item.rating}</Text>
-        </View>
-        <Text style={styles.locationText}>{item.location}</Text>
-        <Text style={styles.priceText}>
-          ₱{item.price.toLocaleString()} <Text style={styles.perDayText}>for a day</Text>
-        </Text>
-      </View>
-    </TouchableOpacity>
+    <ProductCard
+      item={item}
+      onPress={() => router.push('/item')}
+      showFavoriteIcon={true}
+      variant="default"
+    />
   );
+
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -458,11 +449,8 @@ const styles = StyleSheet.create({
           flexDirection: 'row',
           alignItems: 'center',
           marginBottom: Spacing.md,
-          shadowColor: '#6B7280',
-          shadowOffset: { width: 0, height: 1 },
-          shadowOpacity: 0.03,
-          shadowRadius: 3,
-          elevation: 1,
+          borderWidth: 1,
+          borderColor: Colors.border.light,
         },
   searchInput: {
     flex: 1,
@@ -478,7 +466,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: Spacing.sm,
-    ...Shadows.softSm,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
   },
   controlsContainer: {
     flexDirection: 'row',
@@ -508,7 +497,8 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.lg,
     padding: Spacing.sm,
     marginTop: Spacing.xs,
-    ...Shadows.softLg,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
   },
   dropdownItem: {
     flexDirection: 'row',
@@ -536,7 +526,6 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
     borderWidth: 1,
     borderColor: Colors.border.light,
-    ...Shadows.base,
   },
   filterSection: {
     padding: Spacing.md,
@@ -647,7 +636,8 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.base,
     paddingVertical: Spacing.md,
     alignItems: 'center',
-    ...Shadows.base,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
   },
   applyButtonText: {
     ...TextStyles.button.medium,
@@ -695,7 +685,8 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.lg,
     overflow: 'hidden',
     width: '48%',
-    ...Shadows.sm,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
   },
   productImagePlaceholder: {
     width: '100%',
@@ -712,7 +703,18 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background.primary,
     borderRadius: BorderRadius.full,
     padding: Spacing.xs,
-    ...Shadows.sm,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
+  },
+  chatIcon: {
+    position: 'absolute',
+    top: Spacing.sm,
+    left: Spacing.sm,
+    backgroundColor: Colors.background.primary,
+    borderRadius: BorderRadius.full,
+    padding: Spacing.xs,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
   },
   productDetails: {
     padding: Spacing.md,
@@ -758,6 +760,7 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
     marginRight: Spacing.sm,
     marginBottom: Spacing.sm,
-    ...Shadows.xs,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
   },
 });

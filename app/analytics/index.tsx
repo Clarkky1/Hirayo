@@ -1,14 +1,15 @@
-import { BorderRadius, Colors, Shadows, Spacing, TextStyles } from '@/constants/DesignSystem';
+import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
+import { Card } from '../../components/ui/Card';
 
 export default function AnalyticsScreen() {
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'year'>('month');
@@ -21,7 +22,7 @@ export default function AnalyticsScreen() {
     changeType: 'positive' | 'negative' | 'neutral',
     color: string
   ) => (
-    <View style={styles.metricCard}>
+    <Card variant="filled" padding="large" style={styles.metricCard}>
       <View style={styles.metricHeader}>
         <View style={[styles.metricIcon, { backgroundColor: color + '20' }]}>
           <Ionicons name={icon} size={20} color={color} />
@@ -44,11 +45,11 @@ export default function AnalyticsScreen() {
           {change}
         </Text>
       </View>
-    </View>
+    </Card>
   );
 
   const renderChartPlaceholder = (title: string, description: string) => (
-    <View style={styles.chartCard}>
+    <Card variant="filled" padding="large" style={styles.chartCard}>
       <View style={styles.chartHeader}>
         <Text style={styles.chartTitle}>{title}</Text>
         <TouchableOpacity style={styles.viewDetailsButton}>
@@ -59,7 +60,7 @@ export default function AnalyticsScreen() {
         <Ionicons name="analytics-outline" size={48} color={Colors.neutral[400]} />
         <Text style={styles.chartPlaceholderText}>{description}</Text>
       </View>
-    </View>
+    </Card>
   );
 
   return (
@@ -152,7 +153,7 @@ export default function AnalyticsScreen() {
         {/* Top Performing Items */}
         <View style={styles.topItemsSection}>
           <Text style={styles.sectionTitle}>Top Performing Items</Text>
-          <View style={styles.topItemsCard}>
+          <Card variant="filled" padding="large" style={styles.topItemsCard}>
             <View style={styles.topItem}>
               <View style={styles.topItemRank}>
                 <Text style={styles.rankText}>1</Text>
@@ -189,13 +190,13 @@ export default function AnalyticsScreen() {
                 <Text style={styles.viewsText}>98 views</Text>
               </View>
             </View>
-          </View>
+          </Card>
         </View>
 
         {/* Customer Insights */}
         <View style={styles.insightsSection}>
           <Text style={styles.sectionTitle}>Customer Insights</Text>
-          <View style={styles.insightsCard}>
+          <Card variant="filled" padding="large" style={styles.insightsCard}>
             <View style={styles.insightItem}>
               <Ionicons name="people" size={20} color={Colors.primary[500]} />
               <View style={styles.insightContent}>
@@ -217,7 +218,7 @@ export default function AnalyticsScreen() {
                 <Text style={styles.insightValue}>December - March</Text>
               </View>
             </View>
-          </View>
+          </Card>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -274,14 +275,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   metricCard: {
-    backgroundColor: Colors.background.secondary,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
     width: '48%',
     marginBottom: Spacing.sm,
-    ...Shadows.softSm,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
   },
   metricHeader: {
     flexDirection: 'row',
@@ -322,13 +317,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
   },
   chartCard: {
-    backgroundColor: Colors.background.secondary,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
     marginBottom: Spacing.md,
-    ...Shadows.softSm,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
   },
   chartHeader: {
     flexDirection: 'row',
@@ -364,12 +353,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
   },
   topItemsCard: {
-    backgroundColor: Colors.background.secondary,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    ...Shadows.softSm,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
+    // Card component handles styling
   },
   topItem: {
     flexDirection: 'row',
@@ -417,12 +401,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
   },
   insightsCard: {
-    backgroundColor: Colors.background.secondary,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    ...Shadows.softSm,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
+    // Card component handles styling
   },
   insightItem: {
     flexDirection: 'row',

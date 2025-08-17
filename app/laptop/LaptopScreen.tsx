@@ -1,16 +1,16 @@
-import { Spacing } from '@/constants/DesignSystem';
+import { BorderRadius, Colors, Spacing } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  FlatList,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
+    FlatList,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
 } from 'react-native';
 
 interface ProductItem {
@@ -20,15 +20,16 @@ interface ProductItem {
   location: string;
   price: number;
   category: string;
+  image?: string;
 }
 
 const products: ProductItem[] = [
-  { id: '1', name: 'MacBook Pro 16" M2', price: 2499, rating: 4.9, image: 'https://via.placeholder.com/150x150?text=MacBook+Pro+16', category: 'laptop' },
-  { id: '2', name: 'Dell XPS 13 Plus', price: 1299, rating: 4.7, image: 'https://via.placeholder.com/150x150?text=Dell+XPS+13', category: 'laptop' },
-  { id: '3', name: 'Lenovo ThinkPad X1', price: 1599, rating: 4.6, image: 'https://via.placeholder.com/150x150?text=ThinkPad+X1', category: 'laptop' },
-  { id: '4', name: 'HP Spectre x360', price: 1199, rating: 4.5, image: 'https://via.placeholder.com/150x150?text=HP+Spectre', category: 'laptop' },
-  { id: '5', name: 'ASUS ROG Strix', price: 1899, rating: 4.4, image: 'https://via.placeholder.com/150x150?text=ROG+Strix', category: 'laptop' },
-  { id: '6', name: 'Acer Swift 3', price: 699, rating: 4.3, image: 'https://via.placeholder.com/150x150?text=Acer+Swift+3', category: 'laptop' },
+  { id: '1', name: 'MacBook Pro 16" M2', price: 2499, rating: 4.9, image: 'https://via.placeholder.com/150x150?text=MacBook+Pro+16', category: 'laptop', location: 'Cebu City' },
+  { id: '2', name: 'Dell XPS 13 Plus', price: 1299, rating: 4.7, image: 'https://via.placeholder.com/150x150?text=Dell+XPS+13', category: 'laptop', location: 'Mandaue City' },
+  { id: '3', name: 'Lenovo ThinkPad X1', price: 1599, rating: 4.6, image: 'https://via.placeholder.com/150x150?text=ThinkPad+X1', category: 'laptop', location: 'Lapu-Lapu City' },
+  { id: '4', name: 'HP Spectre x360', price: 1199, rating: 4.5, image: 'https://via.placeholder.com/150x150?text=HP+Spectre', category: 'laptop', location: 'Talisay, Cebu' },
+  { id: '5', name: 'ASUS ROG Strix', price: 1899, rating: 4.4, image: 'https://via.placeholder.com/150x150?text=ROG+Strix', category: 'laptop', location: 'Cebu City' },
+  { id: '6', name: 'Acer Swift 3', price: 699, rating: 4.3, image: 'https://via.placeholder.com/150x150?text=Acer+Swift+3', category: 'laptop', location: 'Mandaue City' },
 ];
 
 const sortOptions = [
@@ -161,6 +162,17 @@ export default function LaptopScreen() {
     console.log('Product pressed:', item.name);
   };
 
+  const handleMessageLender = (item: ProductItem) => {
+    // Navigate to messages with item context
+    router.push({
+      pathname: '/messages',
+      params: { 
+        itemId: item.id,
+        itemName: item.name,
+        lenderLocation: item.location
+      }
+    });
+  };
 
 
   const getSortedProducts = () => {
@@ -213,6 +225,15 @@ export default function LaptopScreen() {
       <View style={styles.imagePlaceholder}>
         <TouchableOpacity style={styles.favoriteIcon}>
           <Ionicons name="heart-outline" size={20} color="#666" />
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.chatIcon}
+          onPress={(e) => {
+            e.stopPropagation();
+            handleMessageLender(item);
+          }}
+        >
+          <Ionicons name="chatbubble-outline" size={20} color={Colors.primary[500]} />
         </TouchableOpacity>
       </View>
       <View style={styles.cardDetails}>
@@ -450,11 +471,8 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     paddingHorizontal: 14,
     paddingVertical: 8,
-    shadowColor: '#6B7280',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 2,
-    elevation: 1,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
   },
   searchIcon: {
     marginRight: 10,
@@ -485,11 +503,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
-    shadowColor: '#6B7280',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.02,
-    shadowRadius: 1,
-    elevation: 1,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
     gap: 6,
   },
   controlButtonText: {
@@ -505,11 +520,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 12,
     paddingVertical: 6,
-    shadowColor: '#6B7280',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
     zIndex: 1000,
   },
   dropdownItem: {
@@ -538,11 +550,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 12,
     paddingVertical: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 8,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
     zIndex: 1000,
   },
   filterSection: {
@@ -687,11 +696,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 12,
     width: '48%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
   },
   imagePlaceholder: {
     width: '100%',
@@ -705,19 +711,23 @@ const styles = StyleSheet.create({
   },
   favoriteIcon: {
     position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    width: 24,
-    height: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
+    top: Spacing.sm,
+    right: Spacing.sm,
+    backgroundColor: Colors.background.primary,
+    borderRadius: BorderRadius.full,
+    padding: Spacing.xs,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
+  },
+  chatIcon: {
+    position: 'absolute',
+    top: Spacing.sm,
+    left: Spacing.sm,
+    backgroundColor: Colors.background.primary,
+    borderRadius: BorderRadius.full,
+    padding: Spacing.xs,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
   },
   cardDetails: {
     gap: 4,

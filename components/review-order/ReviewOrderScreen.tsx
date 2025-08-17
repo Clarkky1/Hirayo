@@ -1,4 +1,4 @@
-import { BorderRadius, Colors, Shadows, Spacing, TextStyles } from '@/constants/DesignSystem';
+import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
@@ -12,14 +12,6 @@ import {
 } from 'react-native';
 
 export default function ReviewOrderScreen() {
-  const handleStartDatePress = () => {
-    console.log('Start date pressed');
-  };
-
-  const handleReturnDatePress = () => {
-    console.log('Return date pressed');
-  };
-
   const handleShowReviews = () => {
     console.log('Show reviews pressed');
   };
@@ -54,9 +46,12 @@ export default function ReviewOrderScreen() {
           </View>
         </View>
 
-        {/* Rental Period Details */}
+        {/* Rental Period Confirmation */}
         <View style={styles.rentalPeriodSection}>
-          <Text style={styles.sectionTitle}>Rental Period</Text>
+          <View style={styles.confirmationHeader}>
+            <Ionicons name="checkmark-circle" size={24} color={Colors.success} />
+            <Text style={styles.sectionTitle}>Rental Period Confirmation</Text>
+          </View>
           <View style={styles.rentalRow}>
             {/* Start Date */}
             <View style={styles.dateColumn}>
@@ -64,15 +59,12 @@ export default function ReviewOrderScreen() {
                 <Ionicons name="calendar-outline" size={20} color={Colors.primary[500]} />
                 <Text style={styles.dateLabel}>Start Date</Text>
               </View>
-              <TouchableOpacity style={styles.dateSelector} onPress={handleStartDatePress}>
+              <View style={styles.dateDisplay}>
                 <View style={styles.dateContent}>
                   <Text style={styles.dateValue}>08-14-2025</Text>
                   <Text style={styles.dateSubtext}>Monday</Text>
                 </View>
-                <View style={styles.chevronContainer}>
-                  <Ionicons name="chevron-down" size={20} color={Colors.primary[500]} />
-                </View>
-              </TouchableOpacity>
+              </View>
             </View>
 
             {/* Return Date */}
@@ -81,26 +73,23 @@ export default function ReviewOrderScreen() {
                 <Ionicons name="calendar-outline" size={20} color={Colors.primary[500]} />
                 <Text style={styles.dateLabel}>Return Date</Text>
               </View>
-              <TouchableOpacity style={styles.dateSelector} onPress={handleReturnDatePress}>
+              <View style={styles.dateDisplay}>
                 <View style={styles.dateContent}>
                   <Text style={styles.dateValue}>08-17-2025</Text>
                   <Text style={styles.dateSubtext}>Thursday</Text>
                 </View>
-                <View style={styles.chevronContainer}>
-                  <Ionicons name="chevron-down" size={20} color={Colors.primary[500]} />
-                </View>
-              </TouchableOpacity>
+              </View>
             </View>
           </View>
           
           {/* Duration Summary */}
           <View style={styles.durationSummary}>
             <View style={styles.durationItem}>
-              <Ionicons name="time-outline" size={18} color={Colors.text.secondary} />
+              <Ionicons name="checkmark-circle" size={18} color={Colors.success} />
               <Text style={styles.durationText}>4 days rental</Text>
             </View>
             <View style={styles.durationItem}>
-              <Ionicons name="information-circle-outline" size={18} color={Colors.text.secondary} />
+              <Ionicons name="checkmark-circle" size={18} color={Colors.success} />
               <Text style={styles.durationText}>Free pickup & return</Text>
             </View>
           </View>
@@ -135,7 +124,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background.primary,
-    ...Shadows.card,
   },
   scrollView: {
     flex: 1,
@@ -174,16 +162,23 @@ const styles = StyleSheet.create({
   },
   rentalPeriodSection: {
     marginBottom: Spacing.lg,
-    backgroundColor: Colors.background.secondary,
+    backgroundColor: Colors.primary[50],
     borderRadius: BorderRadius.xl,
     padding: Spacing.md,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
+    borderWidth: 2,
+    borderColor: Colors.success,
+  },
+  confirmationHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: Spacing.md,
+    gap: Spacing.sm,
   },
   sectionTitle: {
     ...TextStyles.heading.h2,
     color: Colors.text.primary,
-    marginBottom: Spacing.md,
+    marginBottom: 0,
     textAlign: 'center',
   },
   rentalRow: {
@@ -205,14 +200,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.text.primary,
   },
-  dateSelector: {
+  dateDisplay: {
     backgroundColor: Colors.background.secondary,
     borderRadius: BorderRadius.lg,
     padding: Spacing.sm,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    ...Shadows.softSm,
   },
   dateContent: {
     flex: 1,
@@ -228,15 +222,14 @@ const styles = StyleSheet.create({
     color: Colors.text.secondary,
     fontStyle: 'italic',
   },
-  chevronContainer: {
-    paddingLeft: Spacing.sm,
-  },
+
   durationSummary: {
-    backgroundColor: Colors.background.secondary,
+    backgroundColor: Colors.background.primary,
     borderRadius: BorderRadius.lg,
     padding: Spacing.md,
     marginTop: Spacing.md,
-    ...Shadows.sm,
+    borderWidth: 1,
+    borderColor: Colors.success,
   },
   durationItem: {
     flexDirection: 'row',
@@ -279,7 +272,6 @@ const styles = StyleSheet.create({
     paddingBottom: 35,
     borderTopWidth: 1,
     borderTopColor: Colors.border.light,
-    ...Shadows.lg,
   },
   totalSection: {
     flex: 1,
@@ -299,7 +291,6 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.base,
     paddingVertical: Spacing.md,
     paddingHorizontal: Spacing.xl,
-    ...Shadows.base,
   },
   payButtonText: {
     ...TextStyles.button.medium,

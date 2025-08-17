@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
     FlatList,
@@ -12,7 +12,7 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import { Spacing } from '../../constants/DesignSystem';
+import { Colors, Spacing } from '../../constants/DesignSystem';
 
 interface ProductItem {
   id: string;
@@ -21,6 +21,7 @@ interface ProductItem {
   rating: number;
   image: string;
   category: string;
+  location: string;
 }
 
 const PCScreen = () => {
@@ -40,12 +41,12 @@ const PCScreen = () => {
   }, [initialCategory]);
 
   const products: ProductItem[] = [
-    { id: '1', name: 'Alienware Aurora R15', price: 2499, rating: 4.8, image: 'https://via.placeholder.com/150x150?text=Alienware+Aurora+R15', category: 'pc' },
-    { id: '2', name: 'HP Omen 30L', price: 1899, rating: 4.7, image: 'https://via.placeholder.com/150x150?text=HP+Omen+30L', category: 'pc' },
-    { id: '3', name: 'Corsair One i300', price: 3299, rating: 4.9, image: 'https://via.placeholder.com/150x150?text=Corsair+One+i300', category: 'pc' },
-    { id: '4', name: 'Lenovo Legion Tower 7i', price: 2199, rating: 4.6, image: 'https://via.placeholder.com/150x150?text=Lenovo+Legion+Tower+7i', category: 'pc' },
-    { id: '5', name: 'Dell XPS 8960', price: 1799, rating: 4.5, image: 'https://via.placeholder.com/150x150?text=Dell+XPS+8960', category: 'pc' },
-    { id: '6', name: 'ASUS ROG Strix G15', price: 1599, rating: 4.4, image: 'https://via.placeholder.com/150x150?text=ASUS+ROG+Strix+G15', category: 'pc' },
+    { id: '1', name: 'Alienware Aurora R15', price: 2499, rating: 4.8, image: 'https://via.placeholder.com/150x150?text=Alienware+Aurora+R15', category: 'pc', location: 'Cebu City' },
+    { id: '2', name: 'HP Omen 30L', price: 1899, rating: 4.7, image: 'https://via.placeholder.com/150x150?text=HP+Omen+30L', category: 'pc', location: 'Mandaue City' },
+    { id: '3', name: 'Corsair One i300', price: 3299, rating: 4.9, image: 'https://via.placeholder.com/150x150?text=Corsair+One+i300', category: 'pc', location: 'Lapu-Lapu City' },
+    { id: '4', name: 'Lenovo Legion Tower 7i', price: 2199, rating: 4.6, image: 'https://via.placeholder.com/150x150?text=Lenovo+Legion+Tower+7i', category: 'pc', location: 'Talisay, Cebu' },
+    { id: '5', name: 'Dell XPS 8960', price: 1799, rating: 4.5, image: 'https://via.placeholder.com/150x150?text=Dell+XPS+8960', category: 'pc', location: 'Cebu City' },
+    { id: '6', name: 'ASUS ROG Strix G15', price: 1599, rating: 4.4, image: 'https://via.placeholder.com/150x150?text=ASUS+ROG+Strix+G15', category: 'pc', location: 'Mandaue City' },
   ];
 
   const sortOptions = [
@@ -168,17 +169,41 @@ const PCScreen = () => {
 
   const renderProductItem = ({ item }: { item: ProductItem }) => (
     <TouchableOpacity style={styles.productItem}>
-      <Image source={{ uri: item.image }} style={styles.productImage} />
+      <View style={styles.imageContainer}>
+        <Image source={{ uri: item.image }} style={styles.productImage} />
+        <TouchableOpacity 
+          style={styles.chatIcon}
+          onPress={(e) => {
+            e.stopPropagation();
+            handleMessageLender(item);
+          }}
+        >
+          <Ionicons name="chatbubble-outline" size={16} color={Colors.primary[500]} />
+        </TouchableOpacity>
+      </View>
       <View style={styles.productInfo}>
         <Text style={styles.productName}>{item.name}</Text>
-        <Text style={styles.productPrice}>${item.price}</Text>
+        <Text style={styles.productPrice}>₱{item.price.toLocaleString()}</Text>
         <View style={styles.ratingContainer}>
           <Ionicons name="star" size={16} color="#FFD700" />
           <Text style={styles.rating}>{item.rating}</Text>
         </View>
+        <Text style={styles.locationText}>{item.location}</Text>
       </View>
     </TouchableOpacity>
   );
+
+  const handleMessageLender = (item: ProductItem) => {
+    // Navigate to messages with item context
+    router.push({
+      pathname: '/messages',
+      params: { 
+        itemId: item.id,
+        itemName: item.name,
+        lenderLocation: item.location
+      }
+    });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -473,11 +498,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 6,
-    shadowColor: '#6B7280',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 4,
-    elevation: 1,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
     zIndex: 1000,
   },
   dropdownItem: {
@@ -506,11 +528,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
     zIndex: 1000,
   },
   filterSection: {
@@ -676,17 +695,31 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 10,
-    shadowColor: '#6B7280',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 2,
-    elevation: 1,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
   },
-  productImage: {
+  imageContainer: {
+    position: 'relative',
     width: '100%',
     height: 120,
     borderRadius: 8,
     marginBottom: 12,
+    overflow: 'hidden',
+  },
+  productImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
+  },
+  chatIcon: {
+    position: 'absolute',
+    top: Spacing.sm,
+    left: Spacing.sm,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 10,
+    padding: Spacing.xs,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
   },
   productInfo: {
     flex: 1,
@@ -711,6 +744,11 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     fontSize: 14,
     color: '#666',
+  },
+  locationText: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 4,
   },
 });
 

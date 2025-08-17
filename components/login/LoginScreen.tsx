@@ -1,30 +1,50 @@
 import { BorderRadius, Colors, Shadows, Spacing } from '@/constants/DesignSystem';
+import { useAuth } from '@/hooks/useAuth';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    KeyboardAvoidingView,
-    Platform,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 export default function LoginScreen() {
+  const router = useRouter();
+  const { login } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState('');
 
   const handleContinue = () => {
     console.log('Continue with:', phoneNumber);
+    // Use authentication hook to login
+    login({ phoneNumber });
+    // Navigate to main app after successful login
+    router.push('/(tabs)');
   };
 
   const handleFacebookLogin = () => {
     console.log('Facebook login');
+    // Use authentication hook to login
+    login({ provider: 'facebook' });
+    // Navigate to main app after successful login
+    router.push('/(tabs)');
   };
 
   const handleGoogleLogin = () => {
     console.log('Google login');
+    // Use authentication hook to login
+    login({ provider: 'google' });
+    // Navigate to main app after successful login
+    router.push('/(tabs)');
+  };
+
+  const handleSignup = () => {
+    router.push('/signup');
   };
 
   return (
@@ -78,6 +98,13 @@ export default function LoginScreen() {
               <Text style={styles.socialButtonText}>Continue with Google</Text>
             </View>
           </TouchableOpacity>
+
+          <View style={styles.signupContainer}>
+            <Text style={styles.signupText}>Don&apos;t have an account? </Text>
+            <TouchableOpacity onPress={handleSignup}>
+              <Text style={styles.signupLink}>Sign up</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -174,5 +201,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#000000',
     fontWeight: '500',
+  },
+  signupContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: Spacing.lg,
+  },
+  signupText: {
+    fontSize: 14,
+    color: '#666666',
+  },
+  signupLink: {
+    fontSize: 14,
+    color: Colors.primary[500],
+    fontWeight: '600',
   },
 });

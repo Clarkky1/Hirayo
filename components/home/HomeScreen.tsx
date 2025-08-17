@@ -1,4 +1,4 @@
-import { BorderRadius, Colors, Shadows, Spacing, TextStyles } from '@/constants/DesignSystem';
+import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { WideCard } from '../ui/WideCard';
 
 interface CategoryItem {
   id: string;
@@ -71,6 +72,18 @@ export default function HomeScreen() {
     router.push('/item');
   };
 
+  const handleMessageLender = (item: ExploreItem) => {
+    // Navigate to messages with item context
+    router.push({
+      pathname: '/messages',
+      params: { 
+        itemId: item.id,
+        itemName: item.name,
+        lenderLocation: item.location
+      }
+    });
+  };
+
   const renderCategoryItem = ({ item }: { item: CategoryItem }) => (
     <TouchableOpacity 
       style={styles.categoryItem} 
@@ -84,45 +97,35 @@ export default function HomeScreen() {
   );
 
   const ExploreCard: React.FC<{ item: ExploreItem }> = ({ item }) => (
-    <TouchableOpacity style={styles.exploreCard} onPress={() => handleExploreItemPress(item)}>
-      <View style={styles.exploreImagePlaceholder}>
-        <TouchableOpacity style={styles.exploreFavoriteIcon}>
-          <Ionicons name="heart-outline" size={16} color={Colors.neutral[600]} />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.exploreCardDetails}>
-        <Text style={styles.exploreProductName} numberOfLines={2}>{item.name}</Text>
-        <View style={styles.exploreRatingContainer}>
-          <Ionicons name="star" size={12} color="#FFD700" />
-          <Text style={styles.exploreRatingText}>{item.rating}</Text>
-        </View>
-        <Text style={styles.exploreLocationText}>{item.location}</Text>
-        <Text style={styles.explorePriceText}>
-          ₱{item.price.toLocaleString()} <Text style={styles.explorePerDayText}>for a day</Text>
-        </Text>
-      </View>
-    </TouchableOpacity>
+    <WideCard
+      item={item}
+      onPress={() => handleExploreItemPress(item)}
+      showFavoriteIcon={true}
+    />
   );
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Search Bar */}
-        <View style={styles.searchBar}>
-          <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search for items to rent..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-          <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-            <Ionicons name="arrow-forward" size={20} color="#fff" />
-          </TouchableOpacity>
+        <View style={styles.searchBarContainer}>
+                    <View style={styles.searchBar}>
+            <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search for items to rent..."
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+            <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+              <Ionicons name="arrow-forward" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Categories Section */}
-        <View style={styles.categoriesSection}>
+        <View style={styles.categoriesSectionContainer}>
+          <View style={styles.categoriesSection}>
           <View style={styles.categoriesHeader}>
             <Text style={styles.categoriesTitle}>Categories</Text>
           </View>
@@ -134,9 +137,11 @@ export default function HomeScreen() {
             ))}
           </View>
         </View>
+        </View>
 
         {/* Explore Section */}
-        <View style={styles.exploreSection}>
+        <View style={styles.exploreSectionContainer}>
+          <View style={styles.exploreSection}>
           <View style={styles.exploreHeader}>
             <Text style={styles.exploreTitle}>Explore</Text>
             <TouchableOpacity onPress={() => router.push('/discover')}>
@@ -153,9 +158,11 @@ export default function HomeScreen() {
             ItemSeparatorComponent={() => <View style={{ width: Spacing.md }} />}
           />
         </View>
+        </View>
 
         {/* Popular Section */}
-        <View style={styles.popularSection}>
+        <View style={styles.popularSectionContainer}>
+          <View style={styles.popularSection}>
           <View style={styles.popularHeader}>
             <Text style={styles.popularTitle}>Popular</Text>
             <TouchableOpacity onPress={() => router.push('/discover')}>
@@ -172,9 +179,11 @@ export default function HomeScreen() {
             ItemSeparatorComponent={() => <View style={{ width: Spacing.md }} />}
           />
         </View>
+        </View>
 
         {/* Become a Lender Section */}
-        <View style={styles.lenderSection}>
+        <View style={styles.lenderSectionContainer}>
+          <View style={styles.lenderSection}>
           <View style={styles.lenderContent}>
             <Text style={styles.lenderTitle}>Become a Lender</Text>
             <Text style={styles.lenderSubtitle}>Start earning by renting out your items</Text>
@@ -183,6 +192,7 @@ export default function HomeScreen() {
               <Ionicons name="arrow-forward" size={16} color={Colors.text.inverse} />
             </TouchableOpacity>
           </View>
+        </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -196,18 +206,37 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.md,
+  },
+  searchBarContainer: {
+    paddingHorizontal: Spacing.lg,
+    marginBottom: Spacing.md,
+  },
+  categoriesSectionContainer: {
+    paddingHorizontal: Spacing.lg,
+    marginBottom: Spacing.md,
+  },
+  exploreSectionContainer: {
+    paddingHorizontal: Spacing.lg,
+    marginBottom: Spacing.md,
+  },
+  popularSectionContainer: {
+    paddingHorizontal: Spacing.lg,
+    marginBottom: Spacing.md,
+  },
+  lenderSectionContainer: {
+    paddingHorizontal: Spacing.lg,
+    marginBottom: Spacing.xl,
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
     borderRadius: 25,
-    paddingHorizontal: 12,
+    paddingHorizontal: Spacing.md,
     paddingVertical: 6,
-    marginBottom: Spacing.md,
-    ...Shadows.softBase,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
   },
   searchIcon: {
     marginRight: 8,
@@ -224,10 +253,11 @@ const styles = StyleSheet.create({
     height: 32,
     justifyContent: 'center',
     alignItems: 'center',
-    ...Shadows.softSm,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
   },
   categoriesSection: {
-    marginBottom: Spacing.md,
+    marginBottom: 0,
   },
   categoriesHeader: {
     flexDirection: 'row',
@@ -258,9 +288,6 @@ const styles = StyleSheet.create({
     height: 80,
     width: '100%',
     justifyContent: 'center',
-    ...Shadows.base,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
   },
   categoryIconContainer: {
     marginBottom: Spacing.xs,
@@ -272,7 +299,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   exploreSection: {
-    marginBottom: Spacing.md,
+    marginBottom: 0,
   },
   exploreHeader: {
     flexDirection: 'row',
@@ -290,9 +317,10 @@ const styles = StyleSheet.create({
     color: Colors.primary[500],
   },
   exploreList: {
-    paddingHorizontal: Spacing.sm,
+    paddingHorizontal: 0,
     paddingBottom: Spacing.sm,
   },
+
 
   exploreCard: {
     backgroundColor: Colors.background.secondary,
@@ -300,7 +328,8 @@ const styles = StyleSheet.create({
     width: 240,
     height: 280,
     overflow: 'hidden',
-    ...Shadows.sm,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
   },
   exploreImagePlaceholder: {
     width: '100%',
@@ -317,7 +346,18 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background.primary,
     borderRadius: BorderRadius.full,
     padding: Spacing.xs,
-    ...Shadows.sm,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
+  },
+  exploreChatIcon: {
+    position: 'absolute',
+    top: Spacing.sm,
+    left: Spacing.sm,
+    backgroundColor: Colors.background.primary,
+    borderRadius: BorderRadius.full,
+    padding: Spacing.xs,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
   },
   exploreCardDetails: {
     padding: Spacing.md,
@@ -362,10 +402,11 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
     alignItems: 'center',
     minWidth: 80,
-    ...Shadows.xs,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
   },
   popularSection: {
-    marginBottom: Spacing.md,
+    marginBottom: 0,
   },
   popularHeader: {
     flexDirection: 'row',
@@ -379,16 +420,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   popularList: {
-    paddingHorizontal: Spacing.sm,
+    paddingHorizontal: 0,
     paddingBottom: Spacing.sm,
   },
+
   lenderSection: {
     backgroundColor: Colors.primary[50],
     borderRadius: BorderRadius.lg,
     padding: Spacing.lg,
     marginTop: Spacing.md,
-    marginBottom: Spacing.xl,
-    ...Shadows.sm,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
   },
   lenderContent: {
     alignItems: 'center',
@@ -411,8 +453,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary[600],
     borderRadius: BorderRadius.md,
     paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
-    ...Shadows.sm,
+    paddingHorizontal: Spacing.lg,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
   },
   lenderButtonText: {
     ...TextStyles.body.small,

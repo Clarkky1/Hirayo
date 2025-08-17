@@ -1,4 +1,4 @@
-import { BorderRadius, Colors, Shadows, Spacing, TextStyles } from '@/constants/DesignSystem';
+import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { Card } from '../../components/ui/Card';
 
 export default function EarningsScreen() {
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'year'>('month');
@@ -21,7 +22,7 @@ export default function EarningsScreen() {
     icon: keyof typeof Ionicons.glyphMap,
     color: string
   ) => (
-    <View style={styles.earningsCard}>
+    <Card variant="filled" padding="large" style={styles.earningsCard}>
       <View style={styles.earningsCardHeader}>
         <View style={[styles.earningsIcon, { backgroundColor: color + '20' }]}>
           <Ionicons name={icon} size={20} color={color} />
@@ -44,7 +45,7 @@ export default function EarningsScreen() {
           {change}
         </Text>
       </View>
-    </View>
+    </Card>
   );
 
   const renderTransactionItem = (
@@ -98,7 +99,10 @@ export default function EarningsScreen() {
             style={[styles.periodButton, selectedPeriod === 'week' && styles.periodButtonActive]}
             onPress={() => setSelectedPeriod('week')}
           >
-            <Text style={[styles.periodButtonText, selectedPeriod === 'week' && styles.periodButtonTextActive]}>
+            <Text style={[
+              styles.periodButtonText,
+              selectedPeriod === 'week' && styles.periodButtonTextActive
+            ]}>
               Week
             </Text>
           </TouchableOpacity>
@@ -106,7 +110,10 @@ export default function EarningsScreen() {
             style={[styles.periodButton, selectedPeriod === 'month' && styles.periodButtonActive]}
             onPress={() => setSelectedPeriod('month')}
           >
-            <Text style={[styles.periodButtonText, selectedPeriod === 'month' && styles.periodButtonTextActive]}>
+            <Text style={[
+              styles.periodButtonText,
+              selectedPeriod === 'month' && styles.periodButtonTextActive
+            ]}>
               Month
             </Text>
           </TouchableOpacity>
@@ -114,7 +121,10 @@ export default function EarningsScreen() {
             style={[styles.periodButton, selectedPeriod === 'year' && styles.periodButtonActive]}
             onPress={() => setSelectedPeriod('year')}
           >
-            <Text style={[styles.periodButtonText, selectedPeriod === 'year' && styles.periodButtonTextActive]}>
+            <Text style={[
+              styles.periodButtonText,
+              selectedPeriod === 'year' && styles.periodButtonTextActive
+            ]}>
               Year
             </Text>
           </TouchableOpacity>
@@ -127,70 +137,44 @@ export default function EarningsScreen() {
             {renderEarningsCard(
               'Total Earnings',
               '₱8,750',
-              '+12%',
+              '+12.5%',
               'positive',
-              'wallet',
-              Colors.primary[500]
-            )}
-            {renderEarningsCard(
-              'This Period',
-              '₱2,450',
-              '+8%',
-              'positive',
-              'calendar',
+              'trending-up',
               Colors.success
             )}
             {renderEarningsCard(
+              'Active Rentals',
+              '₱2,340',
+              '+8.2%',
+              'positive',
+              'car',
+              Colors.primary[500]
+            )}
+            {renderEarningsCard(
               'Pending',
-              '₱680',
-              '2 items',
-              'neutral',
+              '₱450',
+              '-2.1%',
+              'negative',
               'time',
               Colors.warning
             )}
             {renderEarningsCard(
-              'Avg. per Item',
-              '₱45',
-              '+₱5',
+              'This Month',
+              '₱1,890',
+              '+15.3%',
               'positive',
-              'trending-up',
+              'calendar',
               Colors.info
             )}
           </View>
         </View>
 
-        {/* Quick Actions */}
-        <View style={styles.quickActionsSection}>
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
-          <View style={styles.actionsGrid}>
-            <TouchableOpacity style={styles.actionCard}>
-              <Ionicons name="download-outline" size={24} color={Colors.primary[500]} />
-              <Text style={styles.actionText}>Export Report</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionCard}>
-              <Ionicons name="card-outline" size={24} color={Colors.success} />
-              <Text style={styles.actionText}>Withdraw</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionCard}>
-              <Ionicons name="settings-outline" size={24} color={Colors.warning} />
-              <Text style={styles.actionText}>Payment Settings</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionCard}>
-              <Ionicons name="help-circle-outline" size={24} color={Colors.info} />
-              <Text style={styles.actionText}>Help</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+
 
         {/* Recent Transactions */}
         <View style={styles.transactionsSection}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Recent Transactions</Text>
-            <TouchableOpacity style={styles.viewAllButton}>
-              <Text style={styles.viewAllText}>View All</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.transactionsCard}>
+          <Text style={styles.sectionTitle}>Recent Transactions</Text>
+          <Card variant="filled" padding="large" style={styles.transactionsCard}>
             {renderTransactionItem(
               'Canon EOS R5 Rental',
               'Today, 2:30 PM',
@@ -221,13 +205,13 @@ export default function EarningsScreen() {
               '+₱40',
               'completed'
             )}
-          </View>
+          </Card>
         </View>
 
         {/* Earnings Breakdown */}
         <View style={styles.breakdownSection}>
           <Text style={styles.sectionTitle}>Earnings Breakdown</Text>
-          <View style={styles.breakdownCard}>
+          <Card variant="filled" padding="large" style={styles.breakdownCard}>
             <View style={styles.breakdownItem}>
               <View style={styles.breakdownLeft}>
                 <View style={[styles.categoryIcon, { backgroundColor: Colors.primary[100] }]}>
@@ -288,13 +272,13 @@ export default function EarningsScreen() {
                 <Text style={styles.categoryPercentage}>15%</Text>
               </View>
             </View>
-          </View>
+          </Card>
         </View>
 
         {/* Payment Methods */}
         <View style={styles.paymentMethodsSection}>
           <Text style={styles.sectionTitle}>Payment Methods</Text>
-          <View style={styles.paymentMethodsCard}>
+          <Card variant="filled" padding="large" style={styles.paymentMethodsCard}>
             <View style={styles.paymentMethodItem}>
               <View style={styles.paymentMethodLeft}>
                 <Ionicons name="card" size={20} color={Colors.primary[500]} />
@@ -309,11 +293,8 @@ export default function EarningsScreen() {
               </View>
               <Text style={styles.paymentMethodStatus}>Available</Text>
             </View>
-            <TouchableOpacity style={styles.addPaymentMethodButton}>
-              <Ionicons name="add-circle-outline" size={20} color={Colors.primary[500]} />
-              <Text style={styles.addPaymentMethodText}>Add Payment Method</Text>
-            </TouchableOpacity>
-          </View>
+
+          </Card>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -370,14 +351,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   earningsCard: {
-    backgroundColor: Colors.background.secondary,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
     width: '48%',
     marginBottom: Spacing.sm,
-    ...Shadows.softSm,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
   },
   earningsCardHeader: {
     flexDirection: 'row',
@@ -387,84 +362,40 @@ const styles = StyleSheet.create({
   earningsIcon: {
     width: 40,
     height: 40,
-    borderRadius: BorderRadius.full,
-    justifyContent: 'center',
+    borderRadius: 20,
     alignItems: 'center',
+    justifyContent: 'center',
     marginRight: Spacing.sm,
   },
   earningsInfo: {
     flex: 1,
   },
   earningsTitle: {
-    ...TextStyles.caption,
+    ...TextStyles.body.small,
     color: Colors.text.secondary,
-    marginBottom: Spacing.xs,
+    marginBottom: 2,
   },
   earningsAmount: {
-    ...TextStyles.heading.h2,
+    ...TextStyles.heading.h3,
     color: Colors.text.primary,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
   earningsChange: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: Spacing.sm,
   },
   changeText: {
-    ...TextStyles.caption,
-    fontWeight: '500',
-    marginLeft: Spacing.xs,
-  },
-  quickActionsSection: {
-    marginBottom: Spacing.lg,
-  },
-  actionsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  actionCard: {
-    backgroundColor: Colors.background.secondary,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    width: '48%',
-    marginBottom: Spacing.sm,
-    alignItems: 'center',
-    ...Shadows.softSm,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
-  },
-  actionText: {
     ...TextStyles.body.small,
-    color: Colors.text.primary,
+    marginLeft: Spacing.xs,
     fontWeight: '500',
-    marginTop: Spacing.sm,
-    textAlign: 'center',
   },
+
   transactionsSection: {
     marginBottom: Spacing.lg,
   },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: Spacing.md,
-  },
-  viewAllButton: {
-    paddingVertical: Spacing.xs,
-    paddingHorizontal: Spacing.sm,
-  },
-  viewAllText: {
-    ...TextStyles.body.small,
-    color: Colors.primary[500],
-    fontWeight: '500',
-  },
   transactionsCard: {
-    backgroundColor: Colors.background.secondary,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    ...Shadows.softSm,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
+    marginBottom: 0,
   },
   transactionItem: {
     flexDirection: 'row',
@@ -481,10 +412,10 @@ const styles = StyleSheet.create({
     ...TextStyles.body.medium,
     color: Colors.text.primary,
     fontWeight: '500',
-    marginBottom: Spacing.xs,
+    marginBottom: 2,
   },
   transactionDate: {
-    ...TextStyles.caption,
+    ...TextStyles.body.small,
     color: Colors.text.secondary,
   },
   transactionRight: {
@@ -494,28 +425,22 @@ const styles = StyleSheet.create({
     ...TextStyles.body.medium,
     color: Colors.success,
     fontWeight: '600',
-    marginBottom: Spacing.xs,
+    marginBottom: 2,
   },
   statusBadge: {
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: Spacing.xs,
-    borderRadius: BorderRadius.full,
+    paddingHorizontal: Spacing.xs,
+    paddingVertical: 2,
+    borderRadius: BorderRadius.sm,
   },
   statusText: {
-    ...TextStyles.caption,
-    fontWeight: '600',
-    fontSize: 10,
+    ...TextStyles.body.small,
+    fontWeight: '500',
   },
   breakdownSection: {
     marginBottom: Spacing.lg,
   },
   breakdownCard: {
-    backgroundColor: Colors.background.secondary,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    ...Shadows.softSm,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
+    marginBottom: 0,
   },
   breakdownItem: {
     flexDirection: 'row',
@@ -532,9 +457,9 @@ const styles = StyleSheet.create({
   categoryIcon: {
     width: 32,
     height: 32,
-    borderRadius: BorderRadius.full,
-    justifyContent: 'center',
+    borderRadius: 16,
     alignItems: 'center',
+    justifyContent: 'center',
     marginRight: Spacing.sm,
   },
   categoryName: {
@@ -549,22 +474,17 @@ const styles = StyleSheet.create({
     ...TextStyles.body.medium,
     color: Colors.text.primary,
     fontWeight: '600',
-    marginBottom: Spacing.xs,
+    marginBottom: 2,
   },
   categoryPercentage: {
-    ...TextStyles.caption,
+    ...TextStyles.body.small,
     color: Colors.text.secondary,
   },
   paymentMethodsSection: {
-    marginBottom: Spacing.xl,
+    marginBottom: Spacing.lg,
   },
   paymentMethodsCard: {
-    backgroundColor: Colors.background.secondary,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    ...Shadows.softSm,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
+    marginBottom: 0,
   },
   paymentMethodItem: {
     flexDirection: 'row',
@@ -585,21 +505,9 @@ const styles = StyleSheet.create({
     marginLeft: Spacing.sm,
   },
   paymentMethodStatus: {
-    ...TextStyles.caption,
+    ...TextStyles.body.small,
     color: Colors.success,
     fontWeight: '500',
   },
-  addPaymentMethodButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: Spacing.md,
-    marginTop: Spacing.sm,
-  },
-  addPaymentMethodText: {
-    ...TextStyles.body.medium,
-    color: Colors.primary[500],
-    fontWeight: '500',
-    marginLeft: Spacing.sm,
-  },
+
 });

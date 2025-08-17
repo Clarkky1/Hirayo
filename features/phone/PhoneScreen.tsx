@@ -1,0 +1,438 @@
+import { Ionicons } from '@expo/vector-icons';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import {
+    FlatList,
+    Image,
+    SafeAreaView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
+} from 'react-native';
+
+interface ProductItem {
+  id: string;
+  name: string;
+  price: number;
+  rating: number;
+  image: string;
+  category: string;
+}
+
+const products: ProductItem[] = [
+  {
+    id: '1',
+    name: 'iPhone 15 Pro Max',
+    price: 1199,
+    rating: 4.9,
+    image: 'https://via.placeholder.com/150x150?text=iPhone+15+Pro+Max',
+    category: 'phone'
+  },
+  {
+    id: '2',
+    name: 'Samsung Galaxy S24 Ultra',
+    price: 1299,
+    rating: 4.8,
+    image: 'https://via.placeholder.com/150x150?text=Galaxy+S24+Ultra',
+    category: 'phone'
+  },
+  {
+    id: '3',
+    name: 'Google Pixel 8 Pro',
+    price: 999,
+    rating: 4.7,
+    image: 'https://via.placeholder.com/150x150?text=Pixel+8+Pro',
+    category: 'phone'
+  },
+  {
+    id: '4',
+    name: 'OnePlus 12',
+    price: 799,
+    rating: 4.6,
+    image: 'https://via.placeholder.com/150x150?text=OnePlus+12',
+    category: 'phone'
+  },
+  {
+    id: '5',
+    name: 'Xiaomi 14 Ultra',
+    price: 899,
+    rating: 4.5,
+    image: 'https://via.placeholder.com/150x150?text=Xiaomi+14+Ultra',
+    category: 'phone'
+  },
+  {
+    id: '6',
+    name: 'Nothing Phone 2',
+    price: 599,
+    rating: 4.4,
+    image: 'https://via.placeholder.com/150x150?text=Nothing+Phone+2',
+    category: 'phone'
+  }
+];
+
+const sortOptions = [
+  { id: 'price-low', label: 'Price: Low to High' },
+  { id: 'price-high', label: 'Price: High to Low' },
+  { id: 'rating', label: 'Highest Rated' },
+  { id: 'name', label: 'Name A-Z' }
+];
+
+const filterCategories = [
+  { id: 'phone', label: 'Phone', icon: 'phone-portrait' },
+  { id: 'smartphone', label: 'Smartphone', icon: 'phone-portrait' },
+  { id: 'flagship', label: 'Flagship', icon: 'star' }
+];
+
+const priceRanges = [
+  { id: 'under-500', label: 'Under $500' },
+  { id: '500-800', label: '$500 - $800' },
+  { id: '800-1000', label: '$800 - $1,000' },
+  { id: 'over-1000', label: 'Over $1,000' }
+];
+
+export default function PhoneScreen() {
+  const { initialCategory } = useLocalSearchParams();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSortDropdown, setShowSortDropdown] = useState(false);
+  const [showFiltersDropdown, setShowFiltersDropdown] = useState(false);
+  const [selectedSort, setSelectedSort] = useState('rating');
+  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+  const [selectedPriceRange, setSelectedPriceRange] = useState<string>('');
+
+  useEffect(() => {
+    if (initialCategory) {
+      setSelectedFilters([initialCategory as string]);
+    }
+  }, [initialCategory]);
+
+  const handleProductPress = (product: ProductItem) => {
+    router.push(`/item/${product.id}`);
+  };
+
+  const handleSort = (sortId: string) => {
+    setSelectedSort(sortId);
+    setShowSortDropdown(false);
+  };
+
+  const handleFilterToggle = (filterId: string) => {
+    setSelectedFilters(prev => 
+      prev.includes(filterId) 
+        ? prev.filter(id => id !== filterId)
+        : [...prev, filterId]
+    );
+  };
+
+  const handlePriceRangeSelect = (rangeId: string) => {
+    setSelectedPriceRange(prev => prev === rangeId ? '' : rangeId);
+  };
+
+  const renderProductItem = ({ item }: { item: ProductItem }) => (
+    <TouchableOpacity 
+      style={styles.productCard}
+      onPress={() => handleProductPress(item)}
+    >
+      <Image source={{ uri: item.image }} style={styles.productImage} />
+      <View style={styles.productInfo}>
+        <Text style={styles.productName}>{item.name}</Text>
+        <View style={styles.ratingContainer}>
+          <Ionicons name="star" size={16} color="#FFD700" />
+          <Text style={styles.rating}>{item.rating}</Text>
+        </View>
+        <Text style={styles.productPrice}>${item.price}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Ionicons name="arrow-back" size={24} color="#000" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Phones</Text>
+        <TouchableOpacity>
+          <Ionicons name="cart-outline" size={24} color="#000" />
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.searchContainer}>
+        <View style={styles.searchBar}>
+          <Ionicons name="search" size={20} color="#666" />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search phones..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </View>
+      </View>
+
+      <View style={styles.controlsContainer}>
+        <TouchableOpacity 
+          style={styles.controlButton}
+          onPress={() => setShowSortDropdown(!showSortDropdown)}
+        >
+          <Ionicons name="funnel-outline" size={20} color="#666" />
+          <Text style={styles.controlButtonText}>Sort</Text>
+          <Ionicons name="chevron-down" size={16} color="#666" />
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.controlButton}
+          onPress={() => setShowFiltersDropdown(!showFiltersDropdown)}
+        >
+          <Ionicons name="options-outline" size={20} color="#666" />
+          <Text style={styles.controlButtonText}>Filters</Text>
+          <Ionicons name="chevron-down" size={16} color="#666" />
+        </TouchableOpacity>
+      </View>
+
+      {showSortDropdown && (
+        <View style={styles.dropdown}>
+          {sortOptions.map(option => (
+            <TouchableOpacity
+              key={option.id}
+              style={[
+                styles.dropdownItem,
+                selectedSort === option.id && styles.selectedDropdownItem
+              ]}
+              onPress={() => handleSort(option.id)}
+            >
+              <Text style={[
+                styles.dropdownItemText,
+                selectedSort === option.id && styles.selectedDropdownItemText
+              ]}>
+                {option.label}
+              </Text>
+              {selectedSort === option.id && (
+                <Ionicons name="checkmark" size={16} color="#007AFF" />
+              )}
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+
+      {showFiltersDropdown && (
+        <View style={styles.dropdown}>
+          <Text style={styles.filterSectionTitle}>Categories</Text>
+          {filterCategories.map(category => (
+            <TouchableOpacity
+              key={category.id}
+              style={[
+                styles.filterItem,
+                selectedFilters.includes(category.id) && styles.selectedFilterItem
+              ]}
+              onPress={() => handleFilterToggle(category.id)}
+            >
+              <Ionicons 
+                name={category.icon as any} 
+                size={20} 
+                color={selectedFilters.includes(category.id) ? "#007AFF" : "#666"} 
+              />
+              <Text style={[
+                styles.filterItemText,
+                selectedFilters.includes(category.id) && styles.selectedFilterItemText
+              ]}>
+                {category.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+
+          <Text style={styles.filterSectionTitle}>Price Range</Text>
+          {priceRanges.map(range => (
+            <TouchableOpacity
+              key={range.id}
+              style={[
+                styles.filterItem,
+                selectedPriceRange === range.id && styles.selectedFilterItem
+              ]}
+              onPress={() => handlePriceRangeSelect(range.id)}
+            >
+              <Text style={[
+                styles.filterItemText,
+                selectedPriceRange === range.id && styles.selectedFilterItemText
+              ]}>
+                {range.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+
+      <FlatList
+        data={products}
+        renderItem={renderProductItem}
+        keyExtractor={item => item.id}
+        numColumns={2}
+        contentContainerStyle={styles.productsList}
+        showsVerticalScrollIndicator={false}
+      />
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#000',
+  },
+  searchContainer: {
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+    borderRadius: 25,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+  },
+  searchInput: {
+    flex: 1,
+    marginLeft: 10,
+    fontSize: 16,
+    color: '#000',
+  },
+  controlsContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+  },
+  controlButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    backgroundColor: '#f8f9fa',
+  },
+  controlButtonText: {
+    marginLeft: 5,
+    marginRight: 5,
+    fontSize: 14,
+    color: '#666',
+  },
+  dropdown: {
+    position: 'absolute',
+    top: 200,
+    left: 20,
+    right: 20,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 15,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    zIndex: 1000,
+  },
+  dropdownItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f8f9fa',
+  },
+  selectedDropdownItem: {
+    backgroundColor: '#f0f8ff',
+  },
+  dropdownItemText: {
+    fontSize: 16,
+    color: '#000',
+  },
+  selectedDropdownItemText: {
+    color: '#007AFF',
+    fontWeight: '600',
+  },
+  filterSectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000',
+    marginTop: 15,
+    marginBottom: 10,
+  },
+  filterItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+    marginBottom: 5,
+  },
+  selectedFilterItem: {
+    backgroundColor: '#f0f8ff',
+  },
+  filterItemText: {
+    marginLeft: 10,
+    fontSize: 16,
+    color: '#000',
+  },
+  selectedFilterItemText: {
+    color: '#007AFF',
+    fontWeight: '600',
+  },
+  productsList: {
+    padding: 20,
+  },
+  productCard: {
+    flex: 1,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    margin: 5,
+    padding: 15,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  productImage: {
+    width: '100%',
+    height: 120,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  productInfo: {
+    flex: 1,
+  },
+  productName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#000',
+    marginBottom: 5,
+    lineHeight: 18,
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  rating: {
+    marginLeft: 5,
+    fontSize: 14,
+    color: '#666',
+  },
+  productPrice: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#007AFF',
+  },
+});

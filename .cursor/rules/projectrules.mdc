@@ -1,0 +1,238 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+Cursor Rules for Full Stack Engineering
+
+Core Principle
+
+Avoid hallucinations, assumptions, or unverified details.
+
+Do not break existing functionality. Preserve build stability.
+
+General Safety
+
+Do not delete, rename, or move files unless instructed.
+
+Do not modify working code unless a fix or improvement is specified.
+
+Keep formatting and coding style consistent.
+
+File-Specific Editing
+
+Edit only the file or section mentioned.
+
+Do not refactor unrelated code.
+
+Do not modify config files (.gitignore, package.json, requirements.txt, build files) unless instructed.
+
+Do not add or change dependencies without approval.
+
+Dependencies
+
+Prefer existing libraries or built-ins.
+
+Check if a library is already installed before suggesting or adding it.
+
+Explain the need before adding a new dependency.
+
+Use the latest stable version only.
+
+Do not use deprecated or outdated packages.
+
+Do not update versions unless instructed.
+
+Do not install unnecessary dependencies.
+
+Environment Variables
+
+Use existing environment variables instead of creating new ones.
+
+Do not modify .env unless instructed.
+
+Never expose secrets or credentials in code.
+
+Suggest new variables, do not add automatically.
+
+Error Minimization
+
+Validate syntax and logic before finalizing code.
+
+Do not introduce runtime errors.
+
+Add error handling only if relevant.
+
+Do not add unused imports, variables, or functions.
+
+Testing and Verification
+
+Do not break the build.
+
+Maintain backward compatibility.
+
+Keep frontend UI consistent.
+
+Keep backend API and database stable.
+
+Include unit or integration tests for new features.
+
+Never merge with failing tests.
+
+Use minimal, realistic test data.
+
+Branching and Git Workflow
+
+Always use feature branches with clear names (feature/login-page, fix/auth-bug).
+
+Never commit to main or production branches.
+
+Use pull requests for merges.
+
+Rebase instead of merge commits, except hotfixes.
+
+Commits
+
+Use imperative commit messages (e.g., Add login form validation).
+
+Group related changes, avoid mixing unrelated ones.
+
+Never commit secrets, credentials, or .env files.
+
+Follow Conventional Commits if semantic versioning is in use.
+
+CI/CD
+
+CI must run linting, tests, and builds on every PR.
+
+Block merges if CI fails.
+
+Deploy only from approved branches (main, release/*).
+
+Tag releases with semantic versioning (v1.2.0).
+
+Folder and File Organization
+
+Place files in the correct logical folder.
+
+Keep structure clean and consistent.
+
+Ensure files are easy to navigate.
+
+Do not scatter related code.
+
+Check for existing files before creating new ones.
+
+Commenting Rules
+
+Do not comment every line.
+
+Add short, clear comments only when helpful for navigation/debugging.
+
+Avoid redundant or obvious comments.
+
+Implementation Suggestions
+
+Suggest the exact location for changes (function, component, block).
+
+Keep implementation simple.
+
+Suggest minimal changes.
+
+UI Libraries
+
+Use the latest stable version of shadcn/ui.
+
+Pick components that fit the design and functionality.
+
+Keep UI consistent with existing style.
+
+Use Rive or approved libraries only when best fit.
+
+Do not add duplicate or unnecessary UI libraries.
+
+Do not use outdated packages.
+
+Confirm stable version in docs or changelogs.
+
+Suggest alternatives with pros and cons if multiple options exist.
+
+Code Style Consistency
+
+Follow project linting, formatting, and naming conventions.
+
+Do not introduce new styles unless requested.
+
+Respect ESLint, Prettier, and existing configs.
+
+Performance Awareness
+
+Avoid inefficient code or unnecessary loops.
+
+Use optimized patterns when needed.
+
+Do not slow down backend queries or frontend rendering.
+
+Optimize assets, queries, and build size before merging.
+
+Use caching or pagination when appropriate.
+
+Security
+
+Avoid insecure coding practices (e.g., SQL injection, unsafe eval, unescaped input).
+
+Always sanitize and validate user input.
+
+Suggest secure alternatives if needed.
+
+Follow least privilege principle in backend.
+
+Run dependency audits before release.
+
+Documentation
+
+Update README or developer docs if setup or usage changes.
+
+Add API docs for new endpoints.
+
+Document environment variables in .env.example.
+
+Keep developer notes in /docs.
+
+Monitoring and Logging
+
+Add logging for errors and critical backend events.
+
+Monitor production performance.
+
+Do not log sensitive data.
+
+Deployment Safety
+
+Support rollback in all deployments.
+
+Test migrations before production.
+
+Communication
+
+Ask for clarification if the request is unclear.
+
+Summarize intended changes before showing code.
+
+Provide the simplest working solution first.
+
+Suggest alternatives only when relevant.
+
+Collaboration Workflow
+
+Do not modify unrelated files.
+
+Keep changes isolated and minimal.
+
+Respect existing project conventions.
+
+Ask before making major architectural changes.
+
+Propose large changes via RFCs.
+
+Document decisions in PRs or /docs/decisions.

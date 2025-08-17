@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
     FlatList,
@@ -11,7 +11,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import { Spacing } from '../../constants/DesignSystem';
+import { BorderRadius, Colors, Spacing } from '../../constants/DesignSystem';
 
 interface ProductItem {
   id: string;
@@ -20,15 +20,16 @@ interface ProductItem {
   location: string;
   price: number;
   category: string;
+  image?: string;
 }
 
 const products: ProductItem[] = [
-  { id: '1', name: 'Canon EOS R5', price: 3899, rating: 4.8, image: 'https://via.placeholder.com/150x150?text=Canon+R5', category: 'camera' },
-  { id: '2', name: 'Sony A7 IV', price: 2499, rating: 4.7, image: 'https://via.placeholder.com/150x150?text=Sony+A7+IV', category: 'camera' },
-  { id: '3', name: 'Nikon Z6 II', price: 1999, rating: 4.6, image: 'https://via.placeholder.com/150x150?text=Nikon+Z6+II', category: 'camera' },
-  { id: '4', name: 'Fujifilm X-T4', price: 1699, rating: 4.5, image: 'https://via.placeholder.com/150x150?text=Fujifilm+X-T4', category: 'camera' },
-  { id: '5', name: 'Canon EOS 90D', price: 1199, rating: 4.4, image: 'https://via.placeholder.com/150x150?text=Canon+90D', category: 'camera' },
-  { id: '6', name: 'Sony A6400', price: 899, rating: 4.3, image: 'https://via.placeholder.com/150x150?text=Sony+A6400', category: 'camera' },
+  { id: '1', name: 'Canon EOS R5', price: 3899, rating: 4.8, image: 'https://via.placeholder.com/150x150?text=Canon+R5', category: 'camera', location: 'Cebu City' },
+  { id: '2', name: 'Sony A7 IV', price: 2499, rating: 4.7, image: 'https://via.placeholder.com/150x150?text=Sony+A7+IV', category: 'camera', location: 'Mandaue City' },
+  { id: '3', name: 'Nikon Z6 II', price: 1999, rating: 4.6, image: 'https://via.placeholder.com/150x150?text=Nikon+Z6+II', category: 'camera', location: 'Lapu-Lapu City' },
+  { id: '4', name: 'Fujifilm X-T4', price: 1699, rating: 4.5, image: 'https://via.placeholder.com/150x150?text=Fujifilm+X-T4', category: 'camera', location: 'Talisay, Cebu' },
+  { id: '5', name: 'Canon EOS 90D', price: 1199, rating: 4.4, image: 'https://via.placeholder.com/150x150?text=Canon+90D', category: 'camera', location: 'Cebu City' },
+  { id: '6', name: 'Sony A6400', price: 899, rating: 4.3, image: 'https://via.placeholder.com/150x150?text=Sony+A6400', category: 'camera', location: 'Mandaue City' },
 ];
 
 const sortOptions = [
@@ -162,6 +163,17 @@ export default function CameraScreen() {
     console.log('Product pressed:', item.name);
   };
 
+  const handleMessageLender = (item: ProductItem) => {
+    // Navigate to messages with item context
+    router.push({
+      pathname: '/messages',
+      params: { 
+        itemId: item.id,
+        itemName: item.name,
+        lenderLocation: item.location
+      }
+    });
+  };
 
 
   const getSortedProducts = () => {
@@ -217,6 +229,15 @@ export default function CameraScreen() {
       <View style={styles.imagePlaceholder}>
         <TouchableOpacity style={styles.favoriteIcon}>
           <Ionicons name="heart-outline" size={20} color="#666" />
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.chatIcon}
+          onPress={(e) => {
+            e.stopPropagation();
+            handleMessageLender(item);
+          }}
+        >
+          <Ionicons name="chatbubble-outline" size={20} color={Colors.primary[500]} />
         </TouchableOpacity>
       </View>
       <View style={styles.cardDetails}>
@@ -454,11 +475,6 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     paddingHorizontal: 14,
     paddingVertical: 8,
-    shadowColor: '#6B7280',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 2,
-    elevation: 1,
   },
   searchIcon: {
     marginRight: 10,
@@ -489,11 +505,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
-    shadowColor: '#6B7280',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.02,
-    shadowRadius: 1,
-    elevation: 1,
     gap: 6,
   },
   controlButtonText: {
@@ -509,12 +520,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 12,
     paddingVertical: 6,
-    shadowColor: '#6B7280',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 2,
-    zIndex: 1000,
   },
   dropdownItem: {
     flexDirection: 'row',
@@ -542,12 +547,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 12,
     paddingVertical: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 8,
-    zIndex: 1000,
   },
   filterSection: {
     marginBottom: 20,
@@ -691,11 +690,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 12,
     width: '48%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   imagePlaceholder: {
     width: '100%',
@@ -709,19 +703,19 @@ const styles = StyleSheet.create({
   },
   favoriteIcon: {
     position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    width: 24,
-    height: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
+    top: Spacing.sm,
+    right: Spacing.sm,
+    backgroundColor: Colors.background.primary,
+    borderRadius: BorderRadius.full,
+    padding: Spacing.xs,
+  },
+  chatIcon: {
+    position: 'absolute',
+    top: Spacing.sm,
+    left: Spacing.sm,
+    backgroundColor: Colors.background.primary,
+    borderRadius: BorderRadius.full,
+    padding: Spacing.xs,
   },
   cardDetails: {
     gap: 4,

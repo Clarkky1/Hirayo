@@ -1,4 +1,4 @@
-import { BorderRadius, Colors, Shadows, Spacing, TextStyles } from '@/constants/DesignSystem';
+import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
@@ -11,6 +11,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import { Card } from '../../components/ui/Card';
 
 export default function LenderSettingsScreen() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
@@ -60,33 +61,34 @@ export default function LenderSettingsScreen() {
     onSwitchChange?: (value: boolean) => void
   ) => (
     <TouchableOpacity 
-      style={styles.settingItem} 
       onPress={onPress}
       disabled={!onPress}
     >
-      <View style={styles.settingItemLeft}>
-        <View style={styles.settingIconContainer}>
-          <Ionicons name={icon} size={20} color={Colors.primary[500]} />
+      <Card variant="filled" padding="large" style={styles.settingItem}>
+        <View style={styles.settingItemLeft}>
+          <View style={styles.settingIconContainer}>
+            <Ionicons name={icon} size={20} color={Colors.primary[500]} />
+          </View>
+          <View style={styles.settingTextContainer}>
+            <Text style={styles.settingTitle}>{title}</Text>
+            {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
+          </View>
         </View>
-        <View style={styles.settingTextContainer}>
-          <Text style={styles.settingTitle}>{title}</Text>
-          {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
+        
+        <View style={styles.settingItemRight}>
+          {showSwitch && onSwitchChange && (
+            <Switch
+              value={switchValue}
+              onValueChange={onSwitchChange}
+              trackColor={{ false: Colors.neutral[300], true: Colors.primary[300] }}
+              thumbColor={switchValue ? Colors.primary[500] : Colors.neutral[500]}
+            />
+          )}
+          {showArrow && (
+            <Ionicons name="chevron-forward" size={20} color={Colors.text.tertiary} />
+          )}
         </View>
-      </View>
-      
-      <View style={styles.settingItemRight}>
-        {showSwitch && onSwitchChange && (
-          <Switch
-            value={switchValue}
-            onValueChange={onSwitchChange}
-            trackColor={{ false: Colors.neutral[300], true: Colors.primary[300] }}
-            thumbColor={switchValue ? Colors.primary[500] : Colors.neutral[500]}
-          />
-        )}
-        {showArrow && (
-          <Ionicons name="chevron-forward" size={20} color={Colors.text.tertiary} />
-        )}
-      </View>
+      </Card>
     </TouchableOpacity>
   );
 
@@ -165,9 +167,11 @@ export default function LenderSettingsScreen() {
 
         {/* Logout Section */}
         <View style={styles.section}>
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <Ionicons name="log-out-outline" size={20} color={Colors.error} />
-            <Text style={styles.logoutText}>Logout</Text>
+          <TouchableOpacity onPress={handleLogout}>
+            <Card variant="filled" padding="large" style={styles.logoutButton}>
+              <Ionicons name="log-out-outline" size={20} color={Colors.error} />
+              <Text style={styles.logoutText}>Logout</Text>
+            </Card>
           </TouchableOpacity>
         </View>
 
@@ -201,17 +205,10 @@ const styles = StyleSheet.create({
     marginTop: Spacing.md,
   },
   settingItem: {
-    backgroundColor: Colors.background.secondary,
-    borderRadius: BorderRadius.md,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: Spacing.sm,
-    ...Shadows.softXs,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
   },
   settingItemLeft: {
     flexDirection: 'row',
@@ -246,17 +243,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logoutButton: {
-    backgroundColor: Colors.background.secondary,
-    borderRadius: BorderRadius.md,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: Spacing.sm,
-    ...Shadows.softXs,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
   },
   logoutText: {
     ...TextStyles.body.medium,

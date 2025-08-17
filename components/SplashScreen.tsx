@@ -1,4 +1,5 @@
-import { Colors, Shadows, Spacing, TextStyles } from '@/constants/DesignSystem';
+import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
+import { useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
 import {
   Animated,
@@ -6,14 +7,16 @@ import {
   Image,
   StyleSheet,
   Text,
-  View,
+  View
 } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
 export default function SplashScreen() {
+  const router = useRouter();
   const fadeAnim = new Animated.Value(0);
   const scaleAnim = new Animated.Value(0.8);
+  const buttonAnim = new Animated.Value(0);
 
   useEffect(() => {
     Animated.parallel([
@@ -29,7 +32,24 @@ export default function SplashScreen() {
         useNativeDriver: true,
       }),
     ]).start();
+
+    // Animate buttons after logo animation
+    setTimeout(() => {
+      Animated.timing(buttonAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }).start();
+    }, 1200);
   }, []);
+
+  const handleLogin = () => {
+    router.push('/login');
+  };
+
+  const handleSignup = () => {
+    router.push('/signup');
+  };
 
   return (
     <View style={styles.container}>
@@ -47,18 +67,29 @@ export default function SplashScreen() {
           style={styles.logo}
           resizeMode="contain"
         />
-        <Text style={styles.appName}>Hirayo</Text>
-        <Text style={styles.tagline}>Rent Gadgets with Ease</Text>
+        <Text style={styles.appName}></Text>
+        <Text style={styles.tagline}></Text>
       </Animated.View>
       
       <Animated.View
         style={[
-          styles.loadingContainer,
+          styles.buttonContainer,
           {
-            opacity: fadeAnim,
+            opacity: buttonAnim,
+            transform: [{ translateY: buttonAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: [50, 0]
+            })}],
           },
         ]}
       >
+        {/* <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+          <Text style={styles.loginButtonText}>Log In</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.signupButton} onPress={handleSignup}>
+          <Text style={styles.signupButtonText}>Sign Up</Text>
+        </TouchableOpacity> */}
       </Animated.View>
     </View>
   );
@@ -74,7 +105,6 @@ const styles = StyleSheet.create({
   logoContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    ...Shadows.lg,
   },
   logo: {
     width: 120,
@@ -93,28 +123,39 @@ const styles = StyleSheet.create({
     opacity: 0.9,
     textAlign: 'center',
   },
-  loadingContainer: {
+  buttonContainer: {
     position: 'absolute',
     bottom: 100,
-  },
-  loadingDots: {
-    flexDirection: 'row',
+    width: '80%',
     alignItems: 'center',
   },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+  loginButton: {
     backgroundColor: Colors.text.inverse,
-    marginHorizontal: Spacing.xs,
+    borderRadius: BorderRadius.lg,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.xl,
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
   },
-  dot1: {
-    opacity: 0.4,
+  loginButtonText: {
+    color: Colors.primary[500],
+    fontSize: 16,
+    fontWeight: '600',
   },
-  dot2: {
-    opacity: 0.7,
+  signupButton: {
+    backgroundColor: 'transparent',
+    borderRadius: BorderRadius.lg,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.xl,
+    width: '100%',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: Colors.text.inverse,
   },
-  dot3: {
-    opacity: 1,
+  signupButtonText: {
+    color: Colors.text.inverse,
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

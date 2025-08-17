@@ -1,4 +1,4 @@
-import { BorderRadius, Colors, Shadows, Spacing, TextStyles } from '@/constants/DesignSystem';
+  import { Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { Card } from '../../components/ui/Card';
 
 export default function LendersScreen() {
   const handleViewMyItems = () => {
@@ -24,23 +25,68 @@ export default function LendersScreen() {
     router.push('/analytics' as any);
   };
 
-  const handleLenderSettings = () => {
-    router.push('/lender-settings' as any);
-  };
+
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Welcome Header */}
         <View style={styles.headerSection}>
           <Text style={styles.welcomeText}>Welcome, Lender!</Text>
           <Text style={styles.subtitleText}>Start earning by renting out your items</Text>
         </View>
 
-        {/* Getting Started Tips */}
+                 <View style={styles.quickActionsSection}>
+           <Text style={styles.sectionTitle}>Quick Actions</Text>
+           <View style={styles.quickActionsGrid}>
+                           <TouchableOpacity onPress={handleViewMyItems} activeOpacity={0.7} style={styles.quickActionButton}>
+                <Card variant="filled" padding="large" style={styles.quickActionCard}>
+                  <View style={styles.quickActionIcon}>
+                    <Ionicons name="list-outline" size={24} color={Colors.primary[500]} />
+                  </View>
+                  <Text style={styles.quickActionTitle}>My Items</Text>
+                </Card>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={handleEarnings} activeOpacity={0.7} style={styles.quickActionButton}>
+                <Card variant="filled" padding="large" style={styles.quickActionCard}>
+                  <View style={styles.quickActionIcon}>
+                    <Ionicons name="trending-up-outline" size={24} color={Colors.success} />
+                  </View>
+                  <Text style={styles.quickActionTitle}>Earnings</Text>
+                </Card>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={handleAnalytics} activeOpacity={0.7} style={styles.quickActionButton}>
+                <Card variant="filled" padding="large" style={styles.quickActionCard}>
+                  <View style={styles.quickActionIcon}>
+                    <Ionicons name="analytics-outline" size={24} color={Colors.primary[500]} />
+                  </View>
+                  <Text style={styles.quickActionTitle}>Analytics</Text>
+                </Card>
+              </TouchableOpacity>
+           </View>
+         </View>
+
+        <View style={styles.overviewSection}>
+          <Text style={styles.sectionTitle}>Overview</Text>
+          <View style={styles.statsRow}>
+            <Card variant="filled" padding="large" style={styles.statCard}>
+              <Ionicons name="cube-outline" size={20} color={Colors.primary[500]} />
+              <Text style={styles.statNumber}>12</Text>
+              <Text style={styles.statLabel}>Active Items</Text>
+            </Card>
+            
+            <Card variant="filled" padding="large" style={styles.statCard}>
+              <Ionicons name="wallet-outline" size={20} color={Colors.primary[500]} />
+              <Text style={styles.statNumber}>₱2,450</Text>
+              <Text style={styles.statLabel}>This Month</Text>
+            </Card>
+          </View>
+        </View>
+
         <View style={styles.tipsSection}>
           <Text style={styles.sectionTitle}>Getting Started Tips</Text>
-          <View style={styles.tipsCard}>
+          <Card variant="filled" padding="large" style={styles.tipsCard}>
             <View style={styles.tipItem}>
               <Ionicons name="checkmark-circle" size={16} color={Colors.success} />
               <Text style={styles.tipText}>Take clear photos of your items</Text>
@@ -57,71 +103,14 @@ export default function LendersScreen() {
               <Ionicons name="checkmark-circle" size={16} color={Colors.success} />
               <Text style={styles.tipText}>Keep your items in good condition</Text>
             </View>
-          </View>
+          </Card>
         </View>
 
-        {/* Overview Stats */}
-        <View style={styles.overviewSection}>
-          <Text style={styles.sectionTitle}>Overview</Text>
-          <View style={styles.statsRow}>
-            <View style={styles.statCard}>
-              <Ionicons name="cube-outline" size={24} color={Colors.primary[500]} />
-              <Text style={styles.statNumber}>12</Text>
-              <Text style={styles.statLabel}>Active Items</Text>
-            </View>
-            
-            <View style={styles.statCard}>
-              <Ionicons name="wallet-outline" size={24} color={Colors.primary[500]} />
-              <Text style={styles.statNumber}>₱2,450</Text>
-              <Text style={styles.statLabel}>This Month</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Quick Access Menu */}
-        <View style={styles.quickAccessSection}>
-          <Text style={styles.sectionTitle}>Quick Access</Text>
-          <View style={styles.menuGrid}>
-            <TouchableOpacity style={styles.menuCard} onPress={handleViewMyItems}>
-              <View style={styles.menuIconContainer}>
-                <Ionicons name="list-outline" size={24} color={Colors.primary[500]} />
-              </View>
-              <Text style={styles.menuCardTitle}>My Items</Text>
-              <Text style={styles.menuCardSubtitle}>Manage your rentals</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.menuCard} onPress={handleEarnings}>
-              <View style={styles.menuIconContainer}>
-                <Ionicons name="trending-up-outline" size={24} color={Colors.success} />
-              </View>
-              <Text style={styles.menuCardTitle}>Earnings</Text>
-              <Text style={styles.menuCardSubtitle}>View your income</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.menuCard} onPress={handleAnalytics}>
-              <View style={styles.menuIconContainer}>
-                <Ionicons name="analytics-outline" size={24} color={Colors.primary[500]} />
-              </View>
-              <Text style={styles.menuCardTitle}>Analytics</Text>
-              <Text style={styles.menuCardSubtitle}>Track performance</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.menuCard} onPress={handleLenderSettings}>
-              <View style={styles.menuIconContainer}>
-                <Ionicons name="settings-outline" size={24} color={Colors.primary[500]} />
-              </View>
-              <Text style={styles.menuCardTitle}>Settings</Text>
-              <Text style={styles.menuCardSubtitle}>Customize preferences</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Recent Activity */}
         <View style={styles.recentActivitySection}>
           <Text style={styles.sectionTitle}>Recent Activity</Text>
-          <View style={styles.activityCard}>
+          <Card variant="default" padding="large" style={styles.activityCard}>
             <View style={styles.activityHeader}>
-              <Ionicons name="notifications" size={20} color={Colors.primary[500]} />
+              <Ionicons name="notifications" size={18} color={Colors.primary[500]} />
               <Text style={styles.activityTitle}>Latest Updates</Text>
             </View>
             <View style={styles.activityItem}>
@@ -136,7 +125,7 @@ export default function LendersScreen() {
               <Text style={styles.activityText}>New review received: 5 stars</Text>
               <Text style={styles.activityTime}>2 days ago</Text>
             </View>
-          </View>
+          </Card>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -154,7 +143,7 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.md,
   },
   headerSection: {
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.xl,
     paddingVertical: Spacing.md,
   },
   welcomeText: {
@@ -168,24 +157,19 @@ const styles = StyleSheet.create({
     color: Colors.text.secondary,
   },
   quickActionsSection: {
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.xl,
   },
   overviewSection: {
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.xl,
   },
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    gap: Spacing.md,
   },
   statCard: {
-    backgroundColor: Colors.background.secondary,
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.md,
     alignItems: 'center',
-    width: '48%',
-    ...Shadows.softSm,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
+    flex: 1,
   },
   statNumber: {
     ...TextStyles.heading.h2,
@@ -205,59 +189,47 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: Spacing.md,
   },
-  quickAccessSection: {
-    marginBottom: Spacing.lg,
-  },
-  menuGrid: {
+  quickActionsGrid: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     justifyContent: 'space-between',
+    gap: Spacing.md,
+    paddingHorizontal: Spacing.lg,
   },
-  menuCard: {
-    backgroundColor: Colors.background.secondary,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
+  quickActionButton: {
+    flex: 1,
+  },
+  quickActionCard: {
     alignItems: 'center',
-    width: '48%',
-    marginBottom: Spacing.sm,
-    ...Shadows.softSm,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
+    height: 100,
+    justifyContent: 'center',
   },
-  menuIconContainer: {
+  quickActionIcon: {
+    marginBottom: Spacing.sm,
     width: 48,
     height: 48,
     borderRadius: 24,
     backgroundColor: Colors.primary[100],
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: Spacing.sm,
   },
-  menuCardTitle: {
-    ...TextStyles.body.medium,
+  quickActionTitle: {
+    ...TextStyles.body.small,
+    fontWeight: '600',
     color: Colors.text.primary,
-    fontWeight: '500',
-    marginBottom: Spacing.xs,
+    textAlign: 'center',
+    fontSize: 13,
   },
-  menuCardSubtitle: {
-    ...TextStyles.caption,
-    color: Colors.text.secondary,
-  },
+
   recentActivitySection: {
     marginBottom: Spacing['4xl'],
   },
   activityCard: {
-    backgroundColor: Colors.background.secondary,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    ...Shadows.softSm,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
+    // Card component handles styling
   },
   activityHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.md,
   },
   activityTitle: {
     ...TextStyles.body.medium,
@@ -277,21 +249,18 @@ const styles = StyleSheet.create({
     ...TextStyles.body.medium,
     color: Colors.text.primary,
     fontWeight: '500',
+    flex: 1,
+    marginRight: Spacing.sm,
   },
   activityTime: {
     ...TextStyles.caption,
     color: Colors.text.secondary,
   },
   tipsSection: {
-    marginBottom: Spacing.lg, // Changed from xl to lg to be closer to the menu grid
+    marginBottom: Spacing.xl,
   },
   tipsCard: {
-    backgroundColor: Colors.background.secondary,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    ...Shadows.softSm,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
+    // Card component handles styling
   },
   tipItem: {
     flexDirection: 'row',

@@ -1,14 +1,14 @@
 import { BorderRadius, Colors, Shadows, Spacing } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import React, { useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
-    FlatList,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 interface Message {
@@ -141,6 +141,45 @@ const MessageCard: React.FC<{ item: Message }> = ({ item }) => {
 
 export default function MessagesScreen() {
   const [searchQuery] = useState('');
+  const [hasAutoOpened, setHasAutoOpened] = useState(false);
+  const params = useLocalSearchParams();
+  
+  // Auto-open conversation if parameters are present (only once)
+  useEffect(() => {
+    if (!hasAutoOpened && params.openConversation === 'true' && params.itemId && params.ownerName) {
+      setHasAutoOpened(true);
+      
+      // Check if conversation already exists
+      const existingConversation = messages.find(msg => 
+        msg.senderName === params.ownerName && 
+        msg.itemName === params.itemName
+      );
+      
+      if (existingConversation) {
+        // Open existing conversation
+        router.push({
+          pathname: '/view-messages',
+          params: { 
+            messageId: existingConversation.id,
+            senderName: existingConversation.senderName,
+            itemName: existingConversation.itemName || ''
+          }
+        });
+      } else {
+        // Create new conversation and open it
+        const newConversationId = Date.now().toString();
+        router.push({
+          pathname: '/view-messages',
+          params: { 
+            messageId: newConversationId,
+            senderName: params.ownerName as string,
+            itemName: params.itemName as string,
+            isNewConversation: 'true'
+          }
+        });
+      }
+    }
+  }, [params, hasAutoOpened]);
 
 
 

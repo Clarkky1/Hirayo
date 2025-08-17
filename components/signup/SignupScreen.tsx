@@ -1,32 +1,40 @@
 import { BorderRadius, Colors, Shadows, Spacing } from '@/constants/DesignSystem';
+import { useAuth } from '@/hooks/useAuth';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    KeyboardAvoidingView,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 export default function SignupScreen() {
+  const router = useRouter();
+  const { signup } = useAuth();
   const [firstName, setFirstName] = useState('Kin Clark');
   const [surname, setSurname] = useState('Perez');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [email, setEmail] = useState('kinclark@gmail.com');
 
   const handleBack = () => {
-    // Handle back navigation
-    console.log('Back pressed');
+    router.back();
   };
 
   const handleAgreeAndContinue = () => {
     // Handle form submission
-    console.log('Form submitted:', { firstName, surname, dateOfBirth, email });
+    const userData = { firstName, surname, dateOfBirth, email };
+    console.log('Form submitted:', userData);
+    // Use authentication hook to signup
+    signup(userData);
+    // Navigate to main app after successful signup
+    router.push('/(tabs)');
   };
 
   const isFormValid = firstName.trim() && surname.trim() && dateOfBirth.trim() && email.trim();
@@ -126,6 +134,13 @@ export default function SignupScreen() {
             >
               <Text style={styles.continueButtonText}>Agree and continue</Text>
             </TouchableOpacity>
+
+            <View style={styles.loginContainer}>
+              <Text style={styles.loginText}>Already have an account? </Text>
+              <TouchableOpacity onPress={handleBack}>
+                <Text style={styles.loginLink}>Log in</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -225,5 +240,19 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border.light,
     ...Shadows.softXs,
+  },
+  loginContainer: {
+    flexDirection: 'row',
+    marginTop: Spacing.lg,
+    alignItems: 'center',
+  },
+  loginText: {
+    fontSize: 14,
+    color: '#666666',
+  },
+  loginLink: {
+    color: Colors.primary[500],
+    fontSize: 14,
+    fontWeight: '500',
   },
 });

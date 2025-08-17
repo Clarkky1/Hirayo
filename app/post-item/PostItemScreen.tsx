@@ -1,4 +1,4 @@
-import { Colors, Spacing } from '@/constants/DesignSystem';
+import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
@@ -14,6 +14,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { Card } from '../../components/ui/Card';
 
 interface CategoryOption {
   id: string;
@@ -114,7 +115,7 @@ export default function PostItemScreen() {
         <Ionicons 
           name={item.icon} 
           size={14} 
-          color={selectedCategory === item.id ? '#0066CC' : Colors.text.secondary} 
+          color={selectedCategory === item.id ? Colors.primary[500] : Colors.text.secondary} 
         />
       </View>
       <Text style={[
@@ -147,7 +148,7 @@ export default function PostItemScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Form Sections */}
-        <View style={styles.formSection}>
+        <Card variant="filled" padding="large" style={styles.formSection}>
           <Text style={styles.sectionTitle}>Basic Information</Text>
           
           <View style={styles.inputGroup}>
@@ -197,10 +198,10 @@ export default function PostItemScreen() {
               onChangeText={setLocation}
             />
           </View>
-        </View>
+        </Card>
 
         {/* Category Selection */}
-        <View style={styles.formSection}>
+        <Card variant="filled" padding="large" style={styles.formSection}>
           <Text style={styles.sectionTitle}>Category *</Text>
           <FlatList
             data={categories}
@@ -211,10 +212,10 @@ export default function PostItemScreen() {
             contentContainerStyle={styles.categoriesList}
             ItemSeparatorComponent={() => <View style={{ width: Spacing.md }} />}
           />
-        </View>
+        </Card>
 
         {/* Price Range */}
-        <View style={styles.formSection}>
+        <Card variant="filled" padding="large" style={styles.formSection}>
           <Text style={styles.sectionTitle}>Price Range</Text>
           <FlatList
             data={priceRanges}
@@ -225,10 +226,10 @@ export default function PostItemScreen() {
             contentContainerStyle={styles.priceRangeList}
             ItemSeparatorComponent={() => <View style={{ width: Spacing.md }} />}
           />
-        </View>
+        </Card>
 
         {/* Condition */}
-        <View style={styles.formSection}>
+        <Card variant="filled" padding="large" style={styles.formSection}>
           <Text style={styles.sectionTitle}>Condition</Text>
           <View style={styles.conditionButtons}>
             {['New', 'Like New', 'Good', 'Fair', 'Poor'].map((cond) => (
@@ -249,10 +250,10 @@ export default function PostItemScreen() {
               </TouchableOpacity>
             ))}
           </View>
-        </View>
+        </Card>
 
         {/* Images */}
-        <View style={styles.formSection}>
+        <Card variant="filled" padding="large" style={styles.formSection}>
           <Text style={styles.sectionTitle}>Images</Text>
           <Text style={styles.imageSubtitle}>Upload up to 3 images ({images.length}/3)</Text>
           
@@ -266,7 +267,7 @@ export default function PostItemScreen() {
                   style={styles.removeImageButton} 
                   onPress={() => removeImage(index)}
                 >
-                  <Ionicons name="close-circle" size={12} color="#EF4444" />
+                  <Ionicons name="close-circle" size={12} color={Colors.error} />
                 </TouchableOpacity>
               </View>
             ))}
@@ -278,11 +279,11 @@ export default function PostItemScreen() {
                 style={styles.emptyImageBox} 
                 onPress={handleAddImage}
               >
-                <Ionicons name="add" size={14} color="#94A3B8" />
+                <Ionicons name="add" size={14} color={Colors.neutral[400]} />
               </TouchableOpacity>
             ))}
           </View>
-        </View>
+        </Card>
 
         {/* Post Button */}
         <View style={styles.postButtonContainer}>
@@ -298,51 +299,40 @@ export default function PostItemScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: Colors.background.primary,
   },
   scrollView: {
     flex: 1,
     paddingHorizontal: Spacing.lg,
-    paddingTop: 12,
+    paddingTop: Spacing.md,
   },
   formSection: {
-    marginBottom: 20,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 16,
-    shadowColor: '#6B7280',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 4,
-    elevation: 1,
+    marginBottom: Spacing.lg,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1E293B',
-    marginBottom: 16,
-    letterSpacing: -0.5,
+    ...TextStyles.heading.h3,
+    color: Colors.text.primary,
+    fontWeight: '600',
+    marginBottom: Spacing.md,
   },
   inputGroup: {
-    marginBottom: 16,
+    marginBottom: Spacing.md,
   },
   inputLabel: {
-    fontSize: 14,
-    color: '#475569',
-    marginBottom: 6,
+    ...TextStyles.body.small,
+    color: Colors.text.secondary,
+    marginBottom: Spacing.xs,
     fontWeight: '600',
-    letterSpacing: 0.2,
   },
   textInput: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: '#1E293B',
-    borderWidth: 1.5,
-    borderColor: '#E2E8F0',
-    fontWeight: '500',
+    backgroundColor: Colors.background.secondary,
+    borderRadius: BorderRadius.md,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.md,
+    ...TextStyles.body.medium,
+    color: Colors.text.primary,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
   },
   textArea: {
     height: 120,
@@ -350,138 +340,103 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   categoriesList: {
-    paddingBottom: 6,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginTop: 12,
   },
   categoryItem: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: 12,
-    padding: 14,
+    backgroundColor: Colors.background.secondary,
+    borderRadius: BorderRadius.md,
+    padding: Spacing.md,
     alignItems: 'center',
     minWidth: 90,
-    borderWidth: 1.5,
-    borderColor: '#E2E8F0',
-    shadowColor: '#6B7280',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.02,
-    shadowRadius: 2,
-    elevation: 1,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
   },
   categoryItemSelected: {
-    backgroundColor: '#EFF6FF',
-    borderColor: '#0066CC',
-    shadowColor: '#0066CC',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 3,
-    elevation: 2,
+    backgroundColor: Colors.primary[100],
+    borderColor: Colors.primary[500],
   },
   categoryIconContainer: {
-    marginBottom: 6,
+    marginBottom: Spacing.xs,
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.background.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#6B7280',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.02,
-    shadowRadius: 1,
-    elevation: 1,
   },
   categoryName: {
-    fontSize: 13,
-    color: '#64748B',
+    ...TextStyles.body.small,
+    color: Colors.text.secondary,
     textAlign: 'center',
     fontWeight: '600',
-    letterSpacing: 0.2,
   },
   categoryNameSelected: {
-    color: '#0066CC',
+    color: Colors.primary[500],
     fontWeight: '700',
   },
   priceRangeList: {
     paddingBottom: 8,
   },
   priceRangeItem: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: 12,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderWidth: 1.5,
-    borderColor: '#E2E8F0',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 1,
+    backgroundColor: Colors.background.secondary,
+    borderRadius: BorderRadius.md,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
   },
   priceRangeItemSelected: {
-    backgroundColor: '#0066CC',
-    borderColor: '#0066CC',
-    shadowColor: '#0066CC',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 4,
+    backgroundColor: Colors.primary[500],
+    borderColor: Colors.primary[500],
   },
   priceRangeText: {
-    fontSize: 14,
-    color: '#475569',
+    ...TextStyles.body.small,
+    color: Colors.text.secondary,
     fontWeight: '600',
-    letterSpacing: 0.2,
   },
   priceRangeTextSelected: {
-    color: '#FFFFFF',
+    color: Colors.text.inverse,
     fontWeight: '700',
   },
   conditionButtons: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: Spacing.md,
   },
   conditionButton: {
-    backgroundColor: '#F8FAFC',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderWidth: 1.5,
-    borderColor: '#E2E8F0',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 1,
+    backgroundColor: Colors.background.secondary,
+    borderRadius: BorderRadius.md,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
   },
   conditionButtonSelected: {
-    backgroundColor: '#0066CC',
-    borderColor: '#0066CC',
-    shadowColor: '#0066CC',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 4,
+    backgroundColor: Colors.primary[500],
+    borderColor: Colors.primary[500],
   },
   conditionButtonText: {
-    fontSize: 14,
-    color: '#475569',
+    ...TextStyles.body.small,
+    color: Colors.text.secondary,
     fontWeight: '600',
-    letterSpacing: 0.2,
   },
   conditionButtonTextSelected: {
-    color: '#FFFFFF',
+    color: Colors.text.inverse,
     fontWeight: '700',
   },
   imageSubtitle: {
-    fontSize: 14,
-    color: '#64748B',
-    marginBottom: 16,
+    ...TextStyles.body.small,
+    color: Colors.text.secondary,
+    marginBottom: Spacing.md,
     fontWeight: '500',
   },
   imageGrid: {
     flexDirection: 'row',
-    gap: 12,
-    marginBottom: 16,
+    gap: Spacing.md,
+    marginBottom: Spacing.md,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -493,18 +448,18 @@ const styles = StyleSheet.create({
   selectedImage: {
     width: 100,
     height: 100,
-    borderRadius: 12,
+    borderRadius: BorderRadius.md,
     borderWidth: 2,
-    borderColor: '#E2E8F0',
+    borderColor: Colors.border.light,
   },
   emptyImageBox: {
     width: 100,
     height: 100,
-    borderRadius: 12,
+    borderRadius: BorderRadius.md,
     borderWidth: 2,
-    borderColor: '#CBD5E1',
+    borderColor: Colors.border.medium,
     borderStyle: 'dashed',
-    backgroundColor: '#F8FAFC',
+    backgroundColor: Colors.background.secondary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -512,29 +467,23 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -8,
     right: -8,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.background.primary,
     borderRadius: 10,
     padding: 2,
   },
   postButtonContainer: {
     paddingTop: 0,
-    paddingBottom: 48,
+    paddingBottom: Spacing.xl * 2,
   },
   postButton: {
-    backgroundColor: '#0066CC',
-    borderRadius: 16,
-    paddingVertical: 14,
+    backgroundColor: Colors.primary[500],
+    borderRadius: BorderRadius.lg,
+    paddingVertical: Spacing.md,
     alignItems: 'center',
-    shadowColor: '#0066CC',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 6,
   },
   postButtonText: {
-    fontSize: 18,
-    color: '#FFFFFF',
+    ...TextStyles.button.large,
+    color: Colors.text.inverse,
     fontWeight: '700',
-    letterSpacing: 0.5,
   },
 });

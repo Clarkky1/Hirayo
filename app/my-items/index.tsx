@@ -1,15 +1,16 @@
-import { BorderRadius, Colors, Shadows, Spacing, TextStyles } from '@/constants/DesignSystem';
+import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
+import { Card } from '../../components/ui/Card';
 
 interface MyItem {
   id: string;
@@ -124,7 +125,7 @@ export default function MyItemsScreen() {
   );
 
   const renderItemCard = (item: MyItem) => (
-    <View key={item.id} style={styles.itemCard}>
+    <Card key={item.id} variant="filled" padding="large" style={styles.itemCard}>
       {/* Item Header */}
       <View style={styles.itemHeader}>
         <View style={styles.itemInfo}>
@@ -175,7 +176,7 @@ export default function MyItemsScreen() {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </Card>
   );
 
   const getFilterCounts = () => {
@@ -209,21 +210,21 @@ export default function MyItemsScreen() {
 
         {/* Quick Stats */}
         <View style={styles.statsSection}>
-          <View style={styles.statCard}>
+          <Card variant="filled" padding="large" style={styles.statCard}>
             <Ionicons name="cube" size={24} color={Colors.primary[500]} />
             <Text style={styles.statNumber}>{myItems.length}</Text>
             <Text style={styles.statLabel}>Total Items</Text>
-          </View>
-          <View style={styles.statCard}>
+          </Card>
+          <Card variant="filled" padding="large" style={styles.statCard}>
             <Ionicons name="checkmark-circle" size={24} color={Colors.success} />
             <Text style={styles.statNumber}>{counts.active}</Text>
             <Text style={styles.statLabel}>Available</Text>
-          </View>
-          <View style={styles.statCard}>
+          </Card>
+          <Card variant="filled" padding="large" style={styles.statCard}>
             <Ionicons name="time" size={24} color={Colors.warning} />
             <Text style={styles.statNumber}>{counts.rented}</Text>
             <Text style={styles.statLabel}>Rented</Text>
-          </View>
+          </Card>
         </View>
 
         {/* Filter Tabs */}
@@ -276,7 +277,7 @@ export default function MyItemsScreen() {
         {/* Help Section */}
         <View style={styles.helpSection}>
           <Text style={styles.sectionTitle}>Need Help?</Text>
-          <View style={styles.helpCard}>
+          <Card variant="filled" padding="large" style={styles.helpCard}>
             <View style={styles.helpItem}>
               <Ionicons name="information-circle" size={20} color={Colors.primary[500]} />
               <Text style={styles.helpText}>Keep your item descriptions clear and accurate</Text>
@@ -289,7 +290,7 @@ export default function MyItemsScreen() {
               <Ionicons name="settings" size={20} color={Colors.warning} />
               <Text style={styles.helpText}>Update availability and pricing regularly</Text>
             </View>
-          </View>
+          </Card>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -333,7 +334,6 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
     flexDirection: 'row',
     alignItems: 'center',
-    ...Shadows.softSm,
   },
   addItemText: {
     ...TextStyles.body.small,
@@ -347,14 +347,8 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
   },
   statCard: {
-    backgroundColor: Colors.background.secondary,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
     alignItems: 'center',
     width: '30%',
-    ...Shadows.softSm,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
   },
   statNumber: {
     ...TextStyles.heading.h2,
@@ -382,18 +376,17 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background.secondary,
     borderRadius: BorderRadius.md,
     padding: Spacing.xs,
-    ...Shadows.softSm,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
+    gap: Spacing.xs,
   },
   filterButton: {
     flex: 1,
     paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.xs,
+    paddingHorizontal: Spacing.md,
     borderRadius: BorderRadius.sm,
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
+    backgroundColor: Colors.background.primary,
   },
   filterButtonActive: {
     backgroundColor: Colors.primary[500],
@@ -405,22 +398,25 @@ const styles = StyleSheet.create({
   },
   filterButtonTextActive: {
     color: Colors.text.inverse,
+    fontWeight: '600',
   },
   filterCount: {
-    backgroundColor: Colors.neutral[200],
+    backgroundColor: Colors.neutral[100],
     borderRadius: BorderRadius.full,
     paddingHorizontal: Spacing.xs,
     paddingVertical: 2,
     marginLeft: Spacing.xs,
+    minWidth: 20,
+    alignItems: 'center',
   },
   filterCountActive: {
     backgroundColor: Colors.text.inverse,
   },
   filterCountText: {
-    ...TextStyles.caption,
+    ...TextStyles.body.small,
     color: Colors.text.secondary,
     fontWeight: '600',
-    fontSize: 10,
+    fontSize: 11,
   },
   filterCountTextActive: {
     color: Colors.primary[500],
@@ -442,12 +438,7 @@ const styles = StyleSheet.create({
     gap: Spacing.md,
   },
   itemCard: {
-    backgroundColor: Colors.background.secondary,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    ...Shadows.softSm,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
+    marginBottom: Spacing.md,
   },
   itemHeader: {
     flexDirection: 'row',
@@ -556,12 +547,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
   },
   helpCard: {
-    backgroundColor: Colors.background.secondary,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    ...Shadows.softSm,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
+    // Card component handles styling
   },
   helpItem: {
     flexDirection: 'row',
