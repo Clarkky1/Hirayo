@@ -36,6 +36,18 @@ export default function PaymentScreen() {
   const [showCountdown, setShowCountdown] = useState(false);
   const [countdown, setCountdown] = useState(5);
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const isMountedRef = useRef(true);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
+        countdownRef.current = null;
+      }
+    };
+  }, []);
 
   // Rental details - in a real app this would come from navigation params or context
   const rentalDetails = {
@@ -64,6 +76,14 @@ export default function PaymentScreen() {
   };
 
   const handlePay = () => {
+    if (!isMountedRef.current) {
+      return; // Component unmounted, don't proceed
+    }
+
+    if (showCountdown) {
+      return; // Already showing countdown, don't start again
+    }
+
     if (!selectedPaymentMethod) {
       Alert.alert('Payment Method Required', 'Please select a payment method');
       return;
@@ -88,7 +108,7 @@ export default function PaymentScreen() {
 
   useEffect(() => {
     // Only start countdown when showCountdown becomes true
-    if (showCountdown) {
+    if (showCountdown && isMountedRef.current) {
       console.log('Starting countdown:', countdown); // Debug log
       
       // Clear any existing interval first
@@ -99,6 +119,15 @@ export default function PaymentScreen() {
 
       // Start the countdown
       countdownRef.current = setInterval(() => {
+        if (!isMountedRef.current) {
+          // Component unmounted, clear interval
+          if (countdownRef.current) {
+            clearInterval(countdownRef.current);
+            countdownRef.current = null;
+          }
+          return;
+        }
+
         setCountdown((prev) => {
           console.log('Countdown tick:', prev); // Debug log
           if (prev <= 1) {
@@ -110,35 +139,34 @@ export default function PaymentScreen() {
               countdownRef.current = null;
             }
             
-            // Navigate directly to receipt page
-            router.replace({
-              pathname: '/receipt',
-              params: {
-                showReceipt: 'true',
-                paymentAmount: rentalDetails.totalAmount.toString(),
-                itemName: rentalDetails.itemName,
-                renterName: rentalDetails.renterName,
-                lenderName: rentalDetails.lenderName,
-                lenderLocation: rentalDetails.lenderLocation,
-                startDate: rentalDetails.startDate,
-                endDate: rentalDetails.endDate,
-                duration: rentalDetails.duration,
-                dailyRate: rentalDetails.dailyRate.toString(),
-                subtotal: rentalDetails.subtotal.toString(),
-                taxAmount: rentalDetails.taxAmount.toString(),
-                serviceFee: rentalDetails.serviceFee.toString(),
-                totalAmount: rentalDetails.totalAmount.toString(),
-                pickupLocation: rentalDetails.pickupLocation,
-                returnLocation: rentalDetails.returnLocation,
-                paymentMethod: rentalDetails.paymentMethod,
-                transactionId: rentalDetails.transactionId
-              }
-            });
-            
-            // Reset the countdown state
-            setCountdown(5);
-            setShowCountdown(false);
-            return 5;
+            // Only navigate if component is still mounted
+            if (isMountedRef.current) {
+              // Navigate directly to receipt page
+              router.replace({
+                pathname: '/receipt',
+                params: {
+                  showReceipt: 'true',
+                  paymentAmount: rentalDetails.totalAmount.toString(),
+                  itemName: rentalDetails.itemName,
+                  renterName: rentalDetails.renterName,
+                  lenderName: rentalDetails.lenderName,
+                  lenderLocation: rentalDetails.lenderLocation,
+                  startDate: rentalDetails.startDate,
+                  endDate: rentalDetails.endDate,
+                  duration: rentalDetails.duration,
+                  dailyRate: rentalDetails.dailyRate.toString(),
+                  subtotal: rentalDetails.subtotal.toString(),
+                  taxAmount: rentalDetails.taxAmount.toString(),
+                  serviceFee: rentalDetails.serviceFee.toString(),
+                  totalAmount: rentalDetails.totalAmount.toString(),
+                  pickupLocation: rentalDetails.pickupLocation,
+                  returnLocation: rentalDetails.returnLocation,
+                  paymentMethod: rentalDetails.paymentMethod,
+                  transactionId: rentalDetails.transactionId
+                }
+              });
+            }
+            return 0;
           }
           return prev - 1;
         });
