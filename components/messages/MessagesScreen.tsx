@@ -1,4 +1,4 @@
-import { BorderRadius, Colors, Shadows, Spacing } from '@/constants/DesignSystem';
+import { BorderRadius, Colors, Spacing } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -140,7 +141,7 @@ const MessageCard: React.FC<{ item: Message }> = ({ item }) => {
 };
 
 export default function MessagesScreen() {
-  const [searchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [hasAutoOpened, setHasAutoOpened] = useState(false);
   const params = useLocalSearchParams();
   
@@ -190,14 +191,26 @@ export default function MessagesScreen() {
       )
     : messages;
 
-  return (
+    return (
     <SafeAreaView style={styles.container}>
        <View style={styles.header}>
          <View style={styles.backButton} />
          <View style={styles.searchButton} />
        </View>
 
-      
+      {/* Search Bar */}
+      <View style={styles.searchSection}>
+        <View style={styles.searchBar}>
+          <Ionicons name="search" size={20} color="#666666" style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search conversations..."
+            placeholderTextColor="#999999"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </View>
+      </View>
 
       <FlatList
         data={filteredMessages}
@@ -246,6 +259,30 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
 
+  searchSection: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: 0,
+    paddingBottom: Spacing.sm,
+    marginBottom: Spacing.sm,
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+    borderRadius: BorderRadius.lg,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  searchIcon: {
+    marginRight: Spacing.sm,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: '#333333',
+  },
   listContainer: {
     paddingHorizontal: Spacing.lg,
     paddingBottom: 80,
@@ -257,7 +294,6 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
     flexDirection: 'row',
     alignItems: 'center',
-    ...Shadows.softXs,
   },
   avatarContainer: {
     position: 'relative',

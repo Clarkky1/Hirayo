@@ -4,14 +4,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    Alert,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Switch,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { Card } from '../ui/Card';
 
@@ -130,23 +130,7 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        {/* Stats Section */}
-        <View style={styles.statsSection}>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>12</Text>
-            <Text style={styles.statLabel}>Rentals</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>4.8</Text>
-            <Text style={styles.statLabel}>Rating</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>8</Text>
-            <Text style={styles.statLabel}>Reviews</Text>
-          </View>
-        </View>
+
 
         {/* Profile Settings Section */}
         <View style={styles.section}>
@@ -278,31 +262,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#999999',
   },
-  statsSection: {
-    flexDirection: 'row',
-    backgroundColor: '#ffffff',
-    paddingVertical: 16,
-    paddingHorizontal: Spacing.lg,
-    marginBottom: 12,
-  },
-  statItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  statNumber: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#0066CC',
-    marginBottom: 3,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#666666',
-  },
-  statDivider: {
-    width: 1,
-    backgroundColor: '#E0E0E0',
-  },
+
 
 
 

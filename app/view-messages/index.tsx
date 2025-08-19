@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   FlatList,
   Keyboard,
@@ -22,7 +23,8 @@ interface ChatMessage {
 
 export default function ViewMessagesScreen() {
   const params = useLocalSearchParams();
-  const { messageId, senderName, itemName } = params;
+  const { messageId, senderName, itemName, isLenderView } = params;
+  const navigation = useNavigation();
   
   const [newMessage, setNewMessage] = useState('');
   const [keyboardHeight, setKeyboardHeight] = useState(0);
@@ -93,6 +95,15 @@ export default function ViewMessagesScreen() {
 
   const flatListRef = useRef<FlatList>(null);
 
+  // Update header title with user name only (item name shown in button below)
+  useLayoutEffect(() => {
+    if (senderName) {
+      navigation.setOptions({
+        title: senderName as string,
+      });
+    }
+  }, [senderName, navigation]);
+
   useEffect(() => {
     if (messages.length > 0) {
       setTimeout(() => {
@@ -140,22 +151,16 @@ export default function ViewMessagesScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={[styles.contentContainer, { paddingBottom: keyboardHeight }]}>
-        {/* Chat Header */}
-        <View style={styles.chatHeader}>
-          <View style={styles.userInfo}>
-            <View style={styles.avatar}>
-                          <Text style={styles.avatarText}>
-              {(senderName as string)?.split(' ').map((n: string) => n[0]).join('')}
-            </Text>
+        {/* Item Navigation Button */}
+        {itemName && (
+          <TouchableOpacity style={styles.itemButton} onPress={() => router.push('/item')}>
+            <View style={styles.itemButtonContent}>
+              <Ionicons name="cube-outline" size={20} color="#0066CC" />
+              <Text style={styles.itemButtonText}>View Item: {itemName}</Text>
+              <Ionicons name="chevron-forward" size={16} color="#666666" />
             </View>
-            <View style={styles.userDetails}>
-              <Text style={styles.userName}>{senderName}</Text>
-              {itemName && (
-                <Text style={styles.itemName}>{itemName}</Text>
-              )}
-            </View>
-          </View>
-        </View>
+          </TouchableOpacity>
+        )}
 
         {/* Messages List */}
         <FlatList
@@ -206,44 +211,7 @@ const styles = StyleSheet.create({
      contentContainer: {
      flex: 1,
    },
-  chatHeader: {
-    backgroundColor: '#ffffff',
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  userInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#0066CC',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 10,
-  },
-  avatarText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#ffffff',
-  },
-  userDetails: {
-    flex: 1,
-  },
-  userName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333333',
-    marginBottom: 2,
-  },
-  itemName: {
-    fontSize: 12,
-    color: '#666666',
-  },
+
   messagesList: {
     flex: 1,
   },
@@ -331,5 +299,26 @@ const styles = StyleSheet.create({
   },
   sendButtonDisabled: {
     backgroundColor: '#e0e0e0',
+  },
+  itemButton: {
+    backgroundColor: '#ffffff',
+    marginHorizontal: Spacing.lg,
+    marginVertical: Spacing.sm,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    padding: Spacing.md,
+  },
+  itemButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  itemButtonText: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#333333',
+    marginLeft: Spacing.sm,
   },
 });

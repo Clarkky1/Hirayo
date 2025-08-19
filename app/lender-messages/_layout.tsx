@@ -7,7 +7,7 @@ export default function LenderMessagesLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: 'Messages for Lenders',
+          title: 'Messages',
           headerShown: true,
           headerStyle: {
             backgroundColor: '#0066CC',

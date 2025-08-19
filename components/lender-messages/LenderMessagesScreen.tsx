@@ -111,7 +111,15 @@ export default function LenderMessagesScreen() {
           renderItem={({ item }) => (
             <TouchableOpacity 
               style={styles.messageCard}
-              onPress={() => router.push('/view-messages')}
+              onPress={() => router.push({
+                pathname: '/view-messages',
+                params: { 
+                  messageId: item.id,
+                  senderName: item.renterName,
+                  itemName: item.itemName,
+                  isLenderView: 'true'
+                }
+              })}
             >
               <Card variant="filled" padding="large">
                 <View style={styles.messageContent}>
