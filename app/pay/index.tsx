@@ -1,7 +1,7 @@
 import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Alert,
   SafeAreaView,
@@ -37,11 +37,24 @@ export default function PaymentScreen() {
   const [countdown, setCountdown] = useState(5);
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isMountedRef = useRef(true);
+  const countdownStartedRef = useRef(false);
+  const isNavigatingRef = useRef(false);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       isMountedRef.current = false;
+      isNavigatingRef.current = true; // Prevent any further operations
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
+        countdownRef.current = null;
+      }
+    };
+  }, []);
+
+  // Additional cleanup effect for countdown
+  useEffect(() => {
+    return () => {
       if (countdownRef.current) {
         clearInterval(countdownRef.current);
         countdownRef.current = null;
@@ -75,6 +88,95 @@ export default function PaymentScreen() {
     setSelectedPaymentMethod(methodId);
   };
 
+  const navigateToReceipt = useCallback(() => {
+    if (isNavigatingRef.current || !isMountedRef.current) {
+      return;
+    }
+    
+    isNavigatingRef.current = true;
+    
+    // Clear any existing interval
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current);
+      countdownRef.current = null;
+    }
+    
+    // Navigate to receipt page
+    router.replace({
+      pathname: '/receipt',
+      params: {
+        showReceipt: 'true',
+        paymentAmount: rentalDetails.totalAmount.toString(),
+        itemName: rentalDetails.itemName,
+        renterName: rentalDetails.renterName,
+        lenderName: rentalDetails.lenderName,
+        lenderLocation: rentalDetails.lenderLocation,
+        startDate: rentalDetails.startDate,
+        endDate: rentalDetails.endDate,
+        duration: rentalDetails.duration,
+        dailyRate: rentalDetails.dailyRate.toString(),
+        subtotal: rentalDetails.subtotal.toString(),
+        taxAmount: rentalDetails.taxAmount.toString(),
+        serviceFee: rentalDetails.serviceFee.toString(),
+        totalAmount: rentalDetails.totalAmount.toString(),
+        pickupLocation: rentalDetails.pickupLocation,
+        returnLocation: rentalDetails.returnLocation,
+        paymentMethod: rentalDetails.paymentMethod,
+        transactionId: rentalDetails.transactionId
+      }
+    });
+  }, [rentalDetails]);
+
+  const startCountdown = useCallback(() => {
+    if (countdownStartedRef.current || !isMountedRef.current || isNavigatingRef.current) {
+      return;
+    }
+    
+    countdownStartedRef.current = true;
+    console.log('Starting countdown:', countdown);
+    
+    // Clear any existing interval first
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current);
+      countdownRef.current = null;
+    }
+
+    // Start the countdown
+    countdownRef.current = setInterval(() => {
+      if (!isMountedRef.current || isNavigatingRef.current) {
+        // Component unmounted or navigating, clear interval
+        if (countdownRef.current) {
+          clearInterval(countdownRef.current);
+          countdownRef.current = null;
+        }
+        return;
+      }
+
+      setCountdown((prev) => {
+        // Safety check - don't update state if navigating or unmounted
+        if (!isMountedRef.current || isNavigatingRef.current) {
+          return prev;
+        }
+        
+        console.log('Countdown tick:', prev);
+        if (prev <= 1) {
+          console.log('Countdown finished, navigating to receipt');
+          
+          // Clear the interval
+          if (countdownRef.current) {
+            clearInterval(countdownRef.current);
+            countdownRef.current = null;
+          }
+          
+          // Navigate to receipt
+          navigateToReceipt();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }, [countdown, navigateToReceipt]);
+
   const handlePay = () => {
     if (!isMountedRef.current) {
       return; // Component unmounted, don't proceed
@@ -97,89 +199,17 @@ export default function PaymentScreen() {
       }
     }
 
-    console.log('Payment successful, starting countdown'); // Debug log
+    console.log('Payment successful, starting countdown');
     
     // Show payment success and start countdown
     setShowCountdown(true);
-    setCountdown(5); // Reset countdown to 5 seconds
+    setCountdown(5);
     
-    console.log('Countdown state set to:', 5); // Debug log
+    // Use setTimeout to defer countdown start to next tick
+    setTimeout(() => {
+      startCountdown();
+    }, 0);
   };
-
-  useEffect(() => {
-    // Only start countdown when showCountdown becomes true
-    if (showCountdown && isMountedRef.current) {
-      console.log('Starting countdown:', countdown); // Debug log
-      
-      // Clear any existing interval first
-      if (countdownRef.current) {
-        clearInterval(countdownRef.current);
-        countdownRef.current = null;
-      }
-
-      // Start the countdown
-      countdownRef.current = setInterval(() => {
-        if (!isMountedRef.current) {
-          // Component unmounted, clear interval
-          if (countdownRef.current) {
-            clearInterval(countdownRef.current);
-            countdownRef.current = null;
-          }
-          return;
-        }
-
-        setCountdown((prev) => {
-          console.log('Countdown tick:', prev); // Debug log
-          if (prev <= 1) {
-            console.log('Countdown finished, navigating to receipt'); // Debug log
-            
-            // Clear the interval
-            if (countdownRef.current) {
-              clearInterval(countdownRef.current);
-              countdownRef.current = null;
-            }
-            
-            // Only navigate if component is still mounted
-            if (isMountedRef.current) {
-              // Navigate directly to receipt page
-              router.replace({
-                pathname: '/receipt',
-                params: {
-                  showReceipt: 'true',
-                  paymentAmount: rentalDetails.totalAmount.toString(),
-                  itemName: rentalDetails.itemName,
-                  renterName: rentalDetails.renterName,
-                  lenderName: rentalDetails.lenderName,
-                  lenderLocation: rentalDetails.lenderLocation,
-                  startDate: rentalDetails.startDate,
-                  endDate: rentalDetails.endDate,
-                  duration: rentalDetails.duration,
-                  dailyRate: rentalDetails.dailyRate.toString(),
-                  subtotal: rentalDetails.subtotal.toString(),
-                  taxAmount: rentalDetails.taxAmount.toString(),
-                  serviceFee: rentalDetails.serviceFee.toString(),
-                  totalAmount: rentalDetails.totalAmount.toString(),
-                  pickupLocation: rentalDetails.pickupLocation,
-                  returnLocation: rentalDetails.returnLocation,
-                  paymentMethod: rentalDetails.paymentMethod,
-                  transactionId: rentalDetails.transactionId
-                }
-              });
-            }
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-
-    return () => {
-      if (countdownRef.current) {
-        clearInterval(countdownRef.current);
-        countdownRef.current = null;
-      }
-    };
-  }, [showCountdown]); // Only depend on showCountdown
 
   const renderPaymentMethod = (method: PaymentMethod) => (
     <TouchableOpacity
