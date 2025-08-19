@@ -237,6 +237,9 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: Spacing.md,
   },
+  scrollViewContent: {
+    paddingBottom: 100, // Add padding to the bottom of the ScrollView
+  },
   searchBarContainer: {
     paddingHorizontal: Spacing.lg,
     marginBottom: Spacing.md,
@@ -255,7 +258,8 @@ const styles = StyleSheet.create({
   },
   lenderSectionContainer: {
     paddingHorizontal: Spacing.lg,
-    marginBottom: Spacing.xl,
+    marginBottom: Spacing['6xl'],
+    marginTop: Spacing.xs,
   },
   searchBar: {
     flexDirection: 'row',

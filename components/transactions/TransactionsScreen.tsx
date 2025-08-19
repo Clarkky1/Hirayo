@@ -2,12 +2,12 @@ import { BorderRadius, Colors, Spacing } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
-  FlatList,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    FlatList,
+    SafeAreaView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 
 interface Transaction {
@@ -22,15 +22,6 @@ interface Transaction {
 }
 
 const transactions: Transaction[] = [
-  {
-    id: '1',
-    itemName: 'Canon EOS 90D DSLR Camera',
-    ownerName: 'John Smith',
-    amount: 5012,
-    status: 'completed',
-    date: 'Aug 14-17, 2025',
-    duration: '4 days',
-  },
   {
     id: '2',
     itemName: 'MacBook Pro 16" M2',

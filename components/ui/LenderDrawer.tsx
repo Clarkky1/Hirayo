@@ -1,10 +1,10 @@
 import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
+  Animated,
   Dimensions,
-  Modal,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -27,9 +27,27 @@ const lenderProfile = {
 };
 
 export const LenderDrawer: React.FC<LenderDrawerProps> = ({ isVisible, onClose }) => {
+  const slideAnim = useRef(new Animated.Value(Dimensions.get('window').width)).current;
+
+  useEffect(() => {
+    if (isVisible) {
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(slideAnim, {
+        toValue: Dimensions.get('window').width,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [isVisible, slideAnim]);
+
   const handleLenderProfilePress = () => {
     onClose();
-    router.push('/lenders');
+    router.push('/lenders' as any);
   };
 
   const handleQuickActionPress = (route: string) => {
@@ -37,134 +55,158 @@ export const LenderDrawer: React.FC<LenderDrawerProps> = ({ isVisible, onClose }
     router.push(route as any);
   };
 
+  if (!isVisible) return null;
+
   return (
-    <Modal
-      visible={isVisible}
-      transparent={true}
-      animationType="slide"
-      onRequestClose={onClose}
-    >
+    <View style={styles.modalOverlay}>
       <TouchableOpacity 
-        style={styles.modalOverlay} 
+        style={styles.backdrop} 
         activeOpacity={1} 
         onPress={onClose}
+      />
+      <Animated.View 
+        style={[
+          styles.drawerContainer,
+          {
+            transform: [{ translateX: slideAnim }]
+          }
+        ]}
       >
-        <View style={styles.drawerContainer}>
-          <TouchableOpacity 
-            activeOpacity={1} 
-            onPress={() => {}}
-          >
-            {/* Close Button */}
-            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-              <Ionicons name="close" size={24} color={Colors.text.primary} />
+        <TouchableOpacity 
+          activeOpacity={1} 
+          onPress={() => {}}
+        >
+          {/* Close Button */}
+          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+            <Ionicons name="close" size={24} color={Colors.text.primary} />
+          </TouchableOpacity>
+
+          {/* Lender Profile Section */}
+          <View style={styles.profileSection}>
+            <View style={styles.avatarContainer}>
+              <View style={styles.profileAvatar}>
+                <Text style={styles.profileInitials}>
+                  {lenderProfile.firstName.split(' ').map(n => n[0]).join('')}
+                </Text>
+              </View>
+              <View style={styles.onlineIndicator} />
+            </View>
+            <Text style={styles.profileName}>{lenderProfile.firstName} {lenderProfile.surname}</Text>
+            <Text style={styles.profileEmail}>{lenderProfile.email}</Text>
+            <Text style={styles.profileMemberSince}>Member since {lenderProfile.memberSince}</Text>
+          </View>
+
+          {/* Quick Actions Section */}
+          <View style={styles.quickActionsSection}>
+            <Text style={styles.sectionTitle}>Quick Actions</Text>
+            
+            <TouchableOpacity 
+              style={styles.actionButton} 
+              onPress={handleLenderProfilePress}
+            >
+              <Ionicons name="person-outline" size={24} color={Colors.primary[500]} />
+              <Text style={styles.actionText}>Lender Profile</Text>
+              <Ionicons name="chevron-forward" size={16} color={Colors.text.tertiary} />
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.actionButton} 
+              onPress={() => handleQuickActionPress('/post-item')}
+            >
+              <Ionicons name="add-circle-outline" size={24} color={Colors.primary[500]} />
+              <Text style={styles.actionText}>Post New Item</Text>
+              <Ionicons name="chevron-forward" size={16} color={Colors.text.tertiary} />
             </TouchableOpacity>
 
-            {/* Lender Profile Section */}
-            <View style={styles.profileSection}>
-              <View style={styles.avatarContainer}>
-                <View style={styles.profileAvatar}>
-                  <Text style={styles.profileInitials}>
-                    {lenderProfile.firstName.split(' ').map(n => n[0]).join('')}
-                  </Text>
-                </View>
-                <View style={styles.onlineIndicator} />
-              </View>
-              <Text style={styles.profileName}>{lenderProfile.firstName} {lenderProfile.surname}</Text>
-              <Text style={styles.profileEmail}>{lenderProfile.email}</Text>
-              <Text style={styles.profileMemberSince}>Member since {lenderProfile.memberSince}</Text>
+            <TouchableOpacity 
+              style={styles.actionButton} 
+              onPress={() => handleQuickActionPress('/my-items')}
+            >
+              <Ionicons name="cube-outline" size={24} color={Colors.primary[500]} />
+              <Text style={styles.actionText}>My Items</Text>
+              <Ionicons name="chevron-forward" size={16} color={Colors.text.tertiary} />
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.actionButton} 
+              onPress={() => handleQuickActionPress('/earnings')}
+            >
+              <Ionicons name="trending-up-outline" size={24} color={Colors.primary[500]} />
+              <Text style={styles.actionText}>Earnings</Text>
+              <Ionicons name="chevron-forward" size={16} color={Colors.text.tertiary} />
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.actionButton} 
+              onPress={() => handleQuickActionPress('/lender-messages')}
+            >
+              <Ionicons name="chatbubble-outline" size={24} color={Colors.primary[500]} />
+              <Text style={styles.actionText}>Messages</Text>
+              <Ionicons name="chevron-forward" size={16} color={Colors.text.tertiary} />
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.actionButton} 
+              onPress={() => handleQuickActionPress('/lender-settings')}
+            >
+              <Ionicons name="settings-outline" size={24} color={Colors.primary[500]} />
+              <Text style={styles.actionText}>Lender Settings</Text>
+              <Ionicons name="chevron-forward" size={16} color={Colors.text.tertiary} />
+            </TouchableOpacity>
+          </View>
+
+          {/* Stats Section */}
+          <View style={styles.statsSection}>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{lenderProfile.totalItems}</Text>
+              <Text style={styles.statLabel}>Items</Text>
             </View>
-
-            {/* Quick Actions Section */}
-            <View style={styles.quickActionsSection}>
-              <Text style={styles.sectionTitle}>Quick Actions</Text>
-              
-              <TouchableOpacity 
-                style={styles.actionButton} 
-                onPress={handleLenderProfilePress}
-              >
-                <Ionicons name="person-outline" size={24} color={Colors.primary[500]} />
-                <Text style={styles.actionText}>Lender Profile</Text>
-                <Ionicons name="chevron-forward" size={16} color={Colors.text.tertiary} />
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.actionButton} 
-                onPress={() => handleQuickActionPress('/post-item')}
-              >
-                <Ionicons name="add-circle-outline" size={24} color={Colors.primary[500]} />
-                <Text style={styles.actionText}>Post New Item</Text>
-                <Ionicons name="chevron-forward" size={16} color={Colors.text.tertiary} />
-              </TouchableOpacity>
-
-              <TouchableOpacity 
-                style={styles.actionButton} 
-                onPress={() => handleQuickActionPress('/my-items')}
-              >
-                <Ionicons name="cube-outline" size={24} color={Colors.primary[500]} />
-                <Text style={styles.actionText}>My Items</Text>
-                <Ionicons name="chevron-forward" size={16} color={Colors.text.tertiary} />
-              </TouchableOpacity>
-
-              <TouchableOpacity 
-                style={styles.actionButton} 
-                onPress={() => handleQuickActionPress('/earnings')}
-              >
-                <Ionicons name="trending-up-outline" size={24} color={Colors.primary[500]} />
-                <Text style={styles.actionText}>Earnings</Text>
-                <Ionicons name="chevron-forward" size={16} color={Colors.text.tertiary} />
-              </TouchableOpacity>
-
-              <TouchableOpacity 
-                style={styles.actionButton} 
-                onPress={() => handleQuickActionPress('/lender-messages')}
-              >
-                <Ionicons name="chatbubble-outline" size={24} color={Colors.primary[500]} />
-                <Text style={styles.actionText}>Messages</Text>
-                <Ionicons name="chevron-forward" size={16} color={Colors.text.tertiary} />
-              </TouchableOpacity>
-
-              <TouchableOpacity 
-                style={styles.actionButton} 
-                onPress={() => handleQuickActionPress('/lender-settings')}
-              >
-                <Ionicons name="settings-outline" size={24} color={Colors.primary[500]} />
-                <Text style={styles.actionText}>Lender Settings</Text>
-                <Ionicons name="chevron-forward" size={16} color={Colors.text.tertiary} />
-              </TouchableOpacity>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{lenderProfile.totalEarnings}</Text>
+              <Text style={styles.statLabel}>Earnings</Text>
             </View>
-
-            {/* Stats Section */}
-            <View style={styles.statsSection}>
-              <View style={styles.statItem}>
-                <Text style={styles.statNumber}>{lenderProfile.totalItems}</Text>
-                <Text style={styles.statLabel}>Items</Text>
-              </View>
-              <View style={styles.statDivider} />
-              <View style={styles.statItem}>
-                <Text style={styles.statNumber}>{lenderProfile.totalEarnings}</Text>
-                <Text style={styles.statLabel}>Earnings</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-        </View>
-      </TouchableOpacity>
-    </Modal>
+          </View>
+        </TouchableOpacity>
+      </Animated.View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   modalOverlay: {
-    flex: 1,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 1000,
+  },
+  backdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-start',
-    alignItems: 'flex-end',
   },
   drawerContainer: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
     width: Dimensions.get('window').width * 0.8,
     height: '100%',
     backgroundColor: Colors.background.primary,
     paddingTop: 60,
     paddingHorizontal: Spacing.lg,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: -2,
+      height: 0,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   closeButton: {
     position: 'absolute',

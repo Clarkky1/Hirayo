@@ -52,13 +52,17 @@ export default function PaymentScreen() {
       }
     }
 
+    // Show payment success alert
     Alert.alert(
-      'Payment Processing',
-      'Your payment is being processed. You will receive a confirmation shortly.',
+      'Payment Successful!',
+      'Your payment has been processed successfully. You will be redirected to your transactions.',
       [
         {
-          text: 'OK',
-          onPress: () => router.push('/transactions'),
+          text: 'View Transactions',
+          onPress: () => {
+            // Navigate to transactions page
+            router.push('/transactions');
+          },
         },
       ]
     );

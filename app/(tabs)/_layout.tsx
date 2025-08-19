@@ -24,17 +24,17 @@ export default function TabLayout() {
           ios: {
             position: 'absolute',
             backgroundColor: '#ffffff',
-            borderTopWidth: 1,
+            borderTopWidth: 0.5,
             borderTopColor: '#E0E0E0',
-            paddingBottom: 20,
-            paddingTop: 10,
+            paddingBottom: 40,
+            paddingTop: 5,
           },
           default: {
             backgroundColor: '#ffffff',
-            borderTopWidth: 1,
+            borderTopWidth: 0.5,
             borderTopColor: '#E0E0E0',
-            paddingBottom: 20,
-            paddingTop: 10,
+            paddingBottom: 40,
+            paddingTop: 5,
           },
         }),
       }}>
