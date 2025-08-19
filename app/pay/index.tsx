@@ -1,4 +1,4 @@
-import { BorderRadius, Colors, Shadows, Spacing, TextStyles } from '@/constants/DesignSystem';
+import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.lg,
     padding: Spacing.md,
     marginBottom: Spacing.md,
-    ...Shadows.sm,
+
   },
   sectionTitle: {
     ...TextStyles.heading.h3,
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     borderWidth: 2,
     borderColor: Colors.border.light,
-    ...Shadows.sm,
+    
   },
   selectedPaymentMethod: {
     borderColor: Colors.primary[500],
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.lg,
     padding: Spacing.md,
     marginBottom: Spacing.sm,
-    ...Shadows.sm,
+
   },
   inputGroup: {
     marginBottom: Spacing.sm,
@@ -339,14 +339,14 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
     borderTopWidth: 1,
     borderTopColor: Colors.border.light,
-    ...Shadows.lg,
+ 
   },
   payButton: {
     backgroundColor: Colors.primary[500],
     borderRadius: BorderRadius.lg,
     paddingVertical: Spacing.md,
     alignItems: 'center',
-    ...Shadows.button,
+
   },
   payButtonText: {
     ...TextStyles.button.large,

@@ -95,13 +95,6 @@ export default function ReviewOrderScreen() {
           </View>
         </View>
 
-        {/* Reviews Button */}
-        <TouchableOpacity style={styles.reviewsButton} onPress={handleShowReviews}>
-          <Text style={styles.reviewsButtonText}>Show all 12 reviews</Text>
-        </TouchableOpacity>
-
-
-
         {/* Bottom spacing for footer */}
         <View style={styles.bottomSpacing} />
       </ScrollView>
