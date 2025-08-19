@@ -44,6 +44,7 @@ export default function RootLayout() {
             <Stack.Screen name="signup" options={{ headerShown: false }} />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="lenders" options={{ headerShown: false }} />
+            <Stack.Screen name="lender-messages" options={{ headerShown: false }} />
             <Stack.Screen name="my-items" options={{ headerShown: false }} />
             <Stack.Screen name="lender-settings" options={{ headerShown: false }} />
             <Stack.Screen name="analytics" options={{ headerShown: false }} />

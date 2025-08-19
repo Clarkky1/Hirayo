@@ -26,7 +26,7 @@ export default function LendersScreen() {
   };
 
   const handleMessages = () => {
-    router.push('/(tabs)/messages' as any);
+    router.push('/lender-messages' as any);
   };
 
 
