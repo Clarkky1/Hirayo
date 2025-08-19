@@ -33,6 +33,30 @@ export default function PaymentScreen() {
   const [expiryDate, setExpiryDate] = useState('');
   const [cvv, setCvv] = useState('');
   const [cardholderName, setCardholderName] = useState('');
+  const [showCountdown, setShowCountdown] = useState(false);
+  const [countdown, setCountdown] = useState(3);
+
+  // Rental details - in a real app this would come from navigation params or context
+  const rentalDetails = {
+    itemName: 'Canon EOS 90D DSLR Camera',
+    itemImage: 'https://via.placeholder.com/150x150?text=Canon+90D',
+    renterName: 'John Doe',
+    lenderName: 'Sarah Johnson',
+    lenderLocation: 'Cebu City, Philippines',
+    startDate: '2025-08-14',
+    endDate: '2025-08-17',
+    duration: '4 days',
+    dailyRate: 1253,
+    subtotal: 5012,
+    taxRate: 0.12, // 12% tax
+    taxAmount: 601.44,
+    serviceFee: 100,
+    totalAmount: 5713.44,
+    pickupLocation: 'Cebu City Center',
+    returnLocation: 'Cebu City Center',
+    paymentMethod: 'Credit Card',
+    transactionId: 'TXN-' + Date.now().toString().slice(-8)
+  };
 
   const handlePaymentMethodSelect = (methodId: string) => {
     setSelectedPaymentMethod(methodId);
@@ -52,20 +76,43 @@ export default function PaymentScreen() {
       }
     }
 
-    // Show payment success alert
-    Alert.alert(
-      'Payment Successful!',
-      'Your payment has been processed successfully. You will be redirected to your transactions.',
-      [
-        {
-          text: 'View Transactions',
-          onPress: () => {
-            // Navigate to transactions page
-            router.push('/transactions');
-          },
-        },
-      ]
-    );
+    // Show payment success and start countdown
+    setShowCountdown(true);
+    
+    // Start countdown
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          // Navigate to transactions page with comprehensive rental details
+          router.push({
+            pathname: '/transactions',
+            params: { 
+              showReceipt: 'true', 
+              paymentAmount: rentalDetails.totalAmount.toString(),
+              itemName: rentalDetails.itemName,
+              renterName: rentalDetails.renterName,
+              lenderName: rentalDetails.lenderName,
+              lenderLocation: rentalDetails.lenderLocation,
+              startDate: rentalDetails.startDate,
+              endDate: rentalDetails.endDate,
+              duration: rentalDetails.duration,
+              dailyRate: rentalDetails.dailyRate.toString(),
+              subtotal: rentalDetails.subtotal.toString(),
+              taxAmount: rentalDetails.taxAmount.toString(),
+              serviceFee: rentalDetails.serviceFee.toString(),
+              totalAmount: rentalDetails.totalAmount.toString(),
+              pickupLocation: rentalDetails.pickupLocation,
+              returnLocation: rentalDetails.returnLocation,
+              paymentMethod: rentalDetails.paymentMethod,
+              transactionId: rentalDetails.transactionId
+            }
+          });
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
   };
 
   const renderPaymentMethod = (method: PaymentMethod) => (
@@ -97,16 +144,59 @@ export default function PaymentScreen() {
         {/* Order Summary */}
         <View style={styles.orderSummarySection}>
           <Text style={styles.sectionTitle}>Order Summary</Text>
+          
+          {/* Item Details */}
           <View style={styles.orderItem}>
             <View style={styles.orderItemInfo}>
-              <Text style={styles.orderItemName}>Canon EOS 90D DSLR Camera</Text>
-              <Text style={styles.orderItemPeriod}>4 days rental</Text>
+              <Text style={styles.orderItemName}>{rentalDetails.itemName}</Text>
+              <Text style={styles.orderItemPeriod}>{rentalDetails.duration} rental</Text>
+              <Text style={styles.orderItemDates}>
+                {new Date(rentalDetails.startDate).toLocaleDateString()} - {new Date(rentalDetails.endDate).toLocaleDateString()}
+              </Text>
             </View>
-            <Text style={styles.orderItemPrice}>₱5,012</Text>
+            <Text style={styles.orderItemPrice}>₱{rentalDetails.dailyRate.toLocaleString()}/day</Text>
           </View>
+
+          {/* Pricing Breakdown */}
+          <View style={styles.pricingBreakdown}>
+            <View style={styles.pricingRow}>
+              <Text style={styles.pricingLabel}>Daily Rate × {rentalDetails.duration.split(' ')[0]} days</Text>
+              <Text style={styles.pricingValue}>₱{rentalDetails.subtotal.toLocaleString()}</Text>
+            </View>
+            <View style={styles.pricingRow}>
+              <Text style={styles.pricingLabel}>Tax (12%)</Text>
+              <Text style={styles.pricingValue}>₱{rentalDetails.taxAmount.toLocaleString()}</Text>
+            </View>
+            <View style={styles.pricingRow}>
+              <Text style={styles.pricingLabel}>Service Fee</Text>
+              <Text style={styles.pricingValue}>₱{rentalDetails.serviceFee.toLocaleString()}</Text>
+            </View>
+          </View>
+
+          {/* Total */}
           <View style={styles.orderTotal}>
             <Text style={styles.totalLabel}>Total Amount</Text>
-            <Text style={styles.totalAmount}>₱5,012</Text>
+            <Text style={styles.totalAmount}>₱{rentalDetails.totalAmount.toLocaleString()}</Text>
+          </View>
+
+          {/* Rental Details */}
+          <View style={styles.rentalDetails}>
+            <View style={styles.rentalDetailRow}>
+              <Ionicons name="person-outline" size={16} color={Colors.text.secondary} />
+              <Text style={styles.rentalDetailText}>Renter: {rentalDetails.renterName}</Text>
+            </View>
+            <View style={styles.rentalDetailRow}>
+              <Ionicons name="business-outline" size={16} color={Colors.text.secondary} />
+              <Text style={styles.rentalDetailText}>Lender: {rentalDetails.lenderName}</Text>
+            </View>
+            <View style={styles.rentalDetailRow}>
+              <Ionicons name="location-outline" size={16} color={Colors.text.secondary} />
+              <Text style={styles.rentalDetailText}>Location: {rentalDetails.lenderLocation}</Text>
+            </View>
+            <View style={styles.rentalDetailRow}>
+              <Ionicons name="car-outline" size={16} color={Colors.text.secondary} />
+              <Text style={styles.rentalDetailText}>Pickup: {rentalDetails.pickupLocation}</Text>
+            </View>
           </View>
         </View>
 
@@ -182,9 +272,25 @@ export default function PaymentScreen() {
       {/* Payment Button */}
       <View style={styles.footer}>
         <TouchableOpacity style={styles.payButton} onPress={handlePay}>
-          <Text style={styles.payButtonText}>Pay ₱5,012</Text>
+          <Text style={styles.payButtonText}>Pay ₱{rentalDetails.totalAmount.toLocaleString()}</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Payment Success Countdown Overlay */}
+      {showCountdown && (
+        <View style={styles.countdownOverlay}>
+          <View style={styles.countdownContent}>
+            <Ionicons name="checkmark-circle" size={80} color={Colors.success} />
+            <Text style={styles.successTitle}>Payment Successful!</Text>
+            <Text style={styles.successMessage}>
+              Redirecting to transactions in {countdown} seconds...
+            </Text>
+            <View style={styles.countdownCircle}>
+              <Text style={styles.countdownText}>{countdown}</Text>
+            </View>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -229,8 +335,31 @@ const styles = StyleSheet.create({
     ...TextStyles.caption,
     color: Colors.text.secondary,
   },
+  orderItemDates: {
+    ...TextStyles.caption,
+    color: Colors.text.secondary,
+    marginTop: Spacing.xs,
+  },
   orderItemPrice: {
     ...TextStyles.heading.h3,
+    color: Colors.text.primary,
+    fontWeight: '600',
+  },
+  pricingBreakdown: {
+    marginTop: Spacing.sm,
+    marginBottom: Spacing.sm,
+  },
+  pricingRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: Spacing.xs,
+  },
+  pricingLabel: {
+    ...TextStyles.body.small,
+    color: Colors.text.secondary,
+  },
+  pricingValue: {
+    ...TextStyles.body.medium,
     color: Colors.text.primary,
     fontWeight: '600',
   },
@@ -250,6 +379,22 @@ const styles = StyleSheet.create({
     ...TextStyles.heading.h2,
     color: Colors.primary[500],
     fontWeight: '700',
+  },
+  rentalDetails: {
+    marginTop: Spacing.sm,
+    paddingTop: Spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border.light,
+  },
+  rentalDetailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Spacing.xs,
+  },
+  rentalDetailText: {
+    ...TextStyles.body.small,
+    color: Colors.text.secondary,
+    marginLeft: Spacing.sm,
   },
   paymentMethodsSection: {
     marginBottom: Spacing.sm,
@@ -355,5 +500,46 @@ const styles = StyleSheet.create({
   payButtonText: {
     ...TextStyles.button.large,
     color: Colors.text.inverse,
+  },
+  countdownOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  countdownContent: {
+    backgroundColor: Colors.background.primary,
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.xl,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  successTitle: {
+    ...TextStyles.heading.h2,
+    color: Colors.text.primary,
+    marginTop: Spacing.md,
+    marginBottom: Spacing.sm,
+  },
+  successMessage: {
+    ...TextStyles.body.medium,
+    color: Colors.text.secondary,
+    marginBottom: Spacing.md,
+  },
+  countdownCircle: {
+    backgroundColor: Colors.primary[50],
+    borderRadius: BorderRadius.full,
+    width: 100,
+    height: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  countdownText: {
+    ...TextStyles.heading.h1,
+    color: Colors.primary[500],
   },
 });

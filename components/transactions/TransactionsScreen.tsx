@@ -1,13 +1,14 @@
-import { BorderRadius, Colors, Spacing } from '@/constants/DesignSystem';
+import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    FlatList,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
 interface Transaction {
@@ -60,7 +61,7 @@ const transactions: Transaction[] = [
   },
 ];
 
-const TransactionCard: React.FC<{ item: Transaction }> = ({ item }) => {
+const TransactionCard: React.FC<{ item: Transaction; onPress: (item: Transaction) => void }> = ({ item, onPress }) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
@@ -88,7 +89,7 @@ const TransactionCard: React.FC<{ item: Transaction }> = ({ item }) => {
   };
 
   return (
-    <TouchableOpacity style={styles.transactionCard}>
+    <TouchableOpacity style={styles.transactionCard} onPress={() => onPress(item)}>
       {/* Item Image Placeholder */}
       <View style={styles.itemImage} />
       
@@ -127,12 +128,77 @@ const TransactionCard: React.FC<{ item: Transaction }> = ({ item }) => {
 
 export default function TransactionsScreen() {
   const [activeFilter, setActiveFilter] = useState<'all' | 'completed' | 'active' | 'cancelled'>('all');
-
-
+  const params = useLocalSearchParams();
+  
+  // We'll use these params to enhance the receipt when coming from payment
+  const showReceipt = params.showReceipt === 'true';
+  const paymentAmount = Array.isArray(params.paymentAmount) ? params.paymentAmount[0] : params.paymentAmount;
+  const itemName = Array.isArray(params.itemName) ? params.itemName[0] : params.itemName;
+  const renterName = Array.isArray(params.renterName) ? params.renterName[0] : params.renterName;
+  const lenderName = Array.isArray(params.lenderName) ? params.lenderName[0] : params.lenderName;
+  const lenderLocation = Array.isArray(params.lenderLocation) ? params.lenderLocation[0] : params.lenderLocation;
+  const startDate = Array.isArray(params.startDate) ? params.startDate[0] : params.startDate;
+  const endDate = Array.isArray(params.endDate) ? params.endDate[0] : params.endDate;
+  const duration = Array.isArray(params.duration) ? params.duration[0] : params.duration;
+  const dailyRate = Array.isArray(params.dailyRate) ? params.dailyRate[0] : params.dailyRate;
+  const subtotal = Array.isArray(params.subtotal) ? params.subtotal[0] : params.subtotal;
+  const taxAmount = Array.isArray(params.taxAmount) ? params.taxAmount[0] : params.taxAmount;
+  const serviceFee = Array.isArray(params.serviceFee) ? params.serviceFee[0] : params.serviceFee;
+  const totalAmount = Array.isArray(params.totalAmount) ? params.totalAmount[0] : params.totalAmount;
+  const pickupLocation = Array.isArray(params.pickupLocation) ? params.pickupLocation[0] : params.pickupLocation;
+  const returnLocation = Array.isArray(params.returnLocation) ? params.returnLocation[0] : params.returnLocation;
+  const paymentMethod = Array.isArray(params.paymentMethod) ? params.paymentMethod[0] : params.paymentMethod;
+  const transactionId = Array.isArray(params.transactionId) ? params.transactionId[0] : params.transactionId;
 
   const filteredTransactions = activeFilter === 'all' 
     ? transactions 
     : transactions.filter(t => t.status === activeFilter);
+
+  const handleTransactionPress = (transaction: Transaction) => {
+    // Check if this is the enhanced receipt transaction (from payment)
+    const isEnhancedReceipt = showReceipt && transaction.itemName === itemName;
+    
+    if (isEnhancedReceipt) {
+      // Navigate to receipt page with all payment details
+      router.push({
+        pathname: '/receipt',
+        params: {
+          showReceipt: 'true',
+          paymentAmount,
+          itemName,
+          renterName,
+          lenderName,
+          lenderLocation,
+          startDate,
+          endDate,
+          duration,
+          dailyRate,
+          subtotal,
+          taxAmount,
+          serviceFee,
+          totalAmount,
+          pickupLocation,
+          returnLocation,
+          paymentMethod,
+          transactionId
+        }
+      });
+    } else {
+      // Navigate to receipt page with basic transaction details
+      router.push({
+        pathname: '/receipt',
+        params: {
+          showReceipt: 'false',
+          itemName: transaction.itemName,
+          paymentAmount: transaction.amount.toString(),
+          transactionId: transaction.id,
+          startDate: transaction.date,
+          duration: transaction.duration,
+          lenderName: transaction.ownerName
+        }
+      });
+    }
+  };
 
   const renderFilterButton = (filter: 'all' | 'completed' | 'active' | 'cancelled', label: string) => (
     <TouchableOpacity
@@ -147,11 +213,11 @@ export default function TransactionsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-             {/* Header */}
-       <View style={styles.header}>
-         <View style={styles.backButton} />
-         <View style={styles.searchButton} />
-       </View>
+      {/* Header */}
+      <View style={styles.header}>
+        <View style={styles.backButton} />
+        <View style={styles.searchButton} />
+      </View>
 
       {/* Filter Buttons */}
       <View style={styles.filterContainer}>
@@ -165,7 +231,9 @@ export default function TransactionsScreen() {
       <FlatList
         data={filteredTransactions}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <TransactionCard item={item} />}
+        renderItem={({ item }) => (
+          <TransactionCard item={item} onPress={handleTransactionPress} />
+        )}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContainer}
         ListEmptyComponent={
@@ -178,7 +246,6 @@ export default function TransactionsScreen() {
           </View>
         }
       />
-
     </SafeAreaView>
   );
 }
@@ -312,10 +379,8 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   emptyStateSubtext: {
-    fontSize: 14,
+    ...TextStyles.body.small,
     color: '#999999',
-    marginTop: 8,
     textAlign: 'center',
   },
-
 });
