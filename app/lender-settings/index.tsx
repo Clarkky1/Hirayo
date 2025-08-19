@@ -2,14 +2,13 @@ import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSys
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
-    Alert,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Switch,
-    Text,
-    TouchableOpacity,
-    View
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { Card } from '../../components/ui/Card';
 
@@ -37,17 +36,6 @@ export default function LenderSettingsScreen() {
 
   const handleHelp = () => {
     console.log('Help & Support');
-  };
-
-  const handleLogout = () => {
-    Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Logout', style: 'destructive', onPress: () => console.log('Logout') }
-      ]
-    );
   };
 
   const renderSettingItem = (
@@ -163,16 +151,6 @@ export default function LenderSettingsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Support</Text>
           {renderSettingItem('help-circle-outline', 'Help & Support', 'Get help and contact support', handleHelp)}
-        </View>
-
-        {/* Logout Section */}
-        <View style={styles.section}>
-          <TouchableOpacity onPress={handleLogout}>
-            <Card variant="filled" padding="large" style={styles.logoutButton}>
-              <Ionicons name="log-out-outline" size={20} color={Colors.error} />
-              <Text style={styles.logoutText}>Logout</Text>
-            </Card>
-          </TouchableOpacity>
         </View>
 
         {/* App Version */}

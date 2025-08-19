@@ -1,4 +1,5 @@
 import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
+import { useLender } from '@/contexts/LenderContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
@@ -57,6 +58,7 @@ const popularItems: ExploreItem[] = [
 export default function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isNavigating, setIsNavigating] = useState(false);
+  const { setHasClickedGetStarted } = useLender();
 
   const handleSearch = () => {
     console.log('Searching for:', searchQuery);
@@ -208,7 +210,13 @@ export default function HomeScreen() {
           <View style={styles.lenderContent}>
             <Text style={styles.lenderTitle}>Become a Lender</Text>
             <Text style={styles.lenderSubtitle}>Start earning by renting out your items</Text>
-            <TouchableOpacity style={styles.lenderButton} onPress={() => router.push('/lenders' as any)}>
+            <TouchableOpacity 
+              style={styles.lenderButton} 
+              onPress={() => {
+                setHasClickedGetStarted(true);
+                router.push('/lenders' as any);
+              }}
+            >
               <Text style={styles.lenderButtonText}>Get Started</Text>
               <Ionicons name="arrow-forward" size={16} color={Colors.text.inverse} />
             </TouchableOpacity>

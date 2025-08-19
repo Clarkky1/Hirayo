@@ -1,8 +1,10 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, ReactNode, useContext, useState } from 'react';
 
 interface LenderContextType {
   isLender: boolean;
   setIsLender: (value: boolean) => void;
+  hasClickedGetStarted: boolean;
+  setHasClickedGetStarted: (value: boolean) => void;
 }
 
 const LenderContext = createContext<LenderContextType | undefined>(undefined);
@@ -21,9 +23,15 @@ interface LenderProviderProps {
 
 export const LenderProvider: React.FC<LenderProviderProps> = ({ children }) => {
   const [isLender, setIsLender] = useState(false);
+  const [hasClickedGetStarted, setHasClickedGetStarted] = useState(false);
 
   return (
-    <LenderContext.Provider value={{ isLender, setIsLender }}>
+    <LenderContext.Provider value={{ 
+      isLender, 
+      setIsLender, 
+      hasClickedGetStarted, 
+      setHasClickedGetStarted 
+    }}>
       {children}
     </LenderContext.Provider>
   );

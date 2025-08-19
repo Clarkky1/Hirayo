@@ -26,7 +26,7 @@ export const LenderMenu: React.FC<LenderMenuProps> = ({ visible, onClose }) => {
         router.push('/analytics');
         break;
                         case 'messages':
-                    router.push('/lenders-messages');
+                    router.push('/lender-messages' as any);
                     break;
       default:
         break;

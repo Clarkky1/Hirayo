@@ -196,7 +196,6 @@ export default function RentalPeriodScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Select Rental Period</Text>
         <Text style={styles.subtitle}>Choose your start and end dates</Text>
       </View>
 

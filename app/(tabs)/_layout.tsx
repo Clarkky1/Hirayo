@@ -1,11 +1,17 @@
+import { LenderDrawer } from '@/components/ui';
+import { useLender } from '@/contexts/LenderContext';
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import React, { useState } from 'react';
+import { Platform, TouchableOpacity } from 'react-native';
 
 export default function TabLayout() {
+  const { hasClickedGetStarted } = useLender();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  
   return (
-    <Tabs
+    <>
+      <Tabs
       screenOptions={{
         tabBarActiveTintColor: '#0066CC',
         tabBarInactiveTintColor: '#666666',
@@ -37,6 +43,14 @@ export default function TabLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <Ionicons name="search" size={20} color={color} />,
+          headerRight: hasClickedGetStarted ? () => (
+            <TouchableOpacity 
+              style={{ marginRight: 16 }}
+              onPress={() => setIsDrawerOpen(true)}
+            >
+              <Ionicons name="menu" size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+          ) : undefined,
         }}
       />
       <Tabs.Screen
@@ -68,5 +82,12 @@ export default function TabLayout() {
         }}
       />
     </Tabs>
+    
+    {/* Lender Drawer */}
+    <LenderDrawer 
+      isVisible={isDrawerOpen} 
+      onClose={() => setIsDrawerOpen(false)} 
+    />
+    </>
   );
 }

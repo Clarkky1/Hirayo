@@ -1,1 +1,3 @@
-export { default } from './LenderMessagesScreen';
+import LenderMessagesScreen from './LenderMessagesScreen';
+export default LenderMessagesScreen;
+

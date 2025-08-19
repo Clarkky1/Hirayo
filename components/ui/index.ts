@@ -3,4 +3,5 @@ export { IconSymbol } from './IconSymbol';
 export { ProductCard } from './ProductCard';
 export { TabBarBackground } from './TabBarBackground';
 export { WideCard } from './WideCard';
+export { LenderDrawer } from './LenderDrawer';
 
