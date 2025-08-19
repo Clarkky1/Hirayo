@@ -3,12 +3,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import {
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 
 export default function ReviewOrderScreen() {
@@ -20,7 +20,7 @@ export default function ReviewOrderScreen() {
     console.log('Pay button pressed!');
     console.log('Attempting to navigate to /pay');
     try {
-      router.push('/pay' as any);
+      router.replace('/pay' as any);
       console.log('Navigation successful');
     } catch (error) {
       console.error('Navigation error:', error);

@@ -4,14 +4,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    KeyboardAvoidingView,
+    Platform,
+    SafeAreaView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 
 export default function LoginScreen() {
@@ -24,7 +24,7 @@ export default function LoginScreen() {
     // Use authentication hook to login
     login({ phoneNumber });
     // Navigate to main app after successful login
-    router.push('/(tabs)');
+    router.replace('/(tabs)');
   };
 
   const handleFacebookLogin = () => {
@@ -32,7 +32,7 @@ export default function LoginScreen() {
     // Use authentication hook to login
     login({ provider: 'facebook' });
     // Navigate to main app after successful login
-    router.push('/(tabs)');
+    router.replace('/(tabs)');
   };
 
   const handleGoogleLogin = () => {
@@ -40,7 +40,7 @@ export default function LoginScreen() {
     // Use authentication hook to login
     login({ provider: 'google' });
     // Navigate to main app after successful login
-    router.push('/(tabs)');
+    router.replace('/(tabs)');
   };
 
   const handleSignup = () => {

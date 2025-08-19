@@ -1,4 +1,4 @@
-import { BorderRadius, Colors, Shadows, Spacing } from '@/constants/DesignSystem';
+import { Colors, Shadows, Spacing } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useMemo, useState } from 'react';
@@ -79,7 +79,7 @@ export default function RentalPeriodScreen() {
       Alert.alert('Selection Required', 'Please select both start and end dates');
       return;
     }
-    router.push('/review-order');
+    router.replace('/review-order');
   };
 
   const resetSelection = () => {
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
   },
   calendarContainer: {
     backgroundColor: Colors.background.primary,
-    borderRadius: BorderRadius.xl,
+    borderRadius: 12,
     padding: 24,
     marginBottom: 40,
     ...Shadows.lg,
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
   },
   navButton: {
     padding: 12,
-    borderRadius: BorderRadius.full,
+    borderRadius: 8,
     backgroundColor: Colors.background.tertiary,
   },
   monthText: {
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 2,
     backgroundColor: Colors.background.secondary,
-    borderRadius: BorderRadius.lg,
+    borderRadius: 8,
     position: 'relative',
     ...Shadows.xs,
   },
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
   },
   selectedDate: {
     backgroundColor: Colors.primary[500],
-    borderRadius: BorderRadius.full,
+    borderRadius: 8,
   },
   selectedDateText: {
     color: Colors.text.inverse,
@@ -382,7 +382,7 @@ const styles = StyleSheet.create({
   },
   rangeDate: {
     backgroundColor: Colors.primary[100],
-    borderRadius: 0,
+    borderRadius: 4,
   },
   rangeDateText: {
     color: Colors.primary[700],
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
     padding: 16,
     backgroundColor: Colors.background.secondary,
-    borderRadius: BorderRadius.lg,
+    borderRadius: 12,
     alignItems: 'center',
   },
   selectionLabel: {
@@ -419,7 +419,7 @@ const styles = StyleSheet.create({
   resetButton: {
     paddingVertical: 8,
     paddingHorizontal: 16,
-    borderRadius: BorderRadius.base,
+    borderRadius: 6,
     backgroundColor: Colors.neutral[200],
   },
   resetButtonText: {
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
   },
   continueButton: {
     backgroundColor: Colors.primary[500],
-    borderRadius: BorderRadius.lg,
+    borderRadius: 12,
     paddingVertical: 18,
     alignItems: 'center',
     marginTop: 'auto',

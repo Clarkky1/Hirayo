@@ -1,7 +1,7 @@
 import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Alert,
   SafeAreaView,
@@ -34,7 +34,8 @@ export default function PaymentScreen() {
   const [cvv, setCvv] = useState('');
   const [cardholderName, setCardholderName] = useState('');
   const [showCountdown, setShowCountdown] = useState(false);
-  const [countdown, setCountdown] = useState(3);
+  const [countdown, setCountdown] = useState(5);
+  const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Rental details - in a real app this would come from navigation params or context
   const rentalDetails = {
@@ -76,44 +77,81 @@ export default function PaymentScreen() {
       }
     }
 
+    console.log('Payment successful, starting countdown'); // Debug log
+    
     // Show payment success and start countdown
     setShowCountdown(true);
+    setCountdown(5); // Reset countdown to 5 seconds
     
-    // Start countdown
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          // Navigate to transactions page with comprehensive rental details
-          router.push({
-            pathname: '/transactions',
-            params: { 
-              showReceipt: 'true', 
-              paymentAmount: rentalDetails.totalAmount.toString(),
-              itemName: rentalDetails.itemName,
-              renterName: rentalDetails.renterName,
-              lenderName: rentalDetails.lenderName,
-              lenderLocation: rentalDetails.lenderLocation,
-              startDate: rentalDetails.startDate,
-              endDate: rentalDetails.endDate,
-              duration: rentalDetails.duration,
-              dailyRate: rentalDetails.dailyRate.toString(),
-              subtotal: rentalDetails.subtotal.toString(),
-              taxAmount: rentalDetails.taxAmount.toString(),
-              serviceFee: rentalDetails.serviceFee.toString(),
-              totalAmount: rentalDetails.totalAmount.toString(),
-              pickupLocation: rentalDetails.pickupLocation,
-              returnLocation: rentalDetails.returnLocation,
-              paymentMethod: rentalDetails.paymentMethod,
-              transactionId: rentalDetails.transactionId
-            }
-          });
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    console.log('Countdown state set to:', 5); // Debug log
   };
+
+  useEffect(() => {
+    // Only start countdown when showCountdown becomes true
+    if (showCountdown) {
+      console.log('Starting countdown:', countdown); // Debug log
+      
+      // Clear any existing interval first
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
+        countdownRef.current = null;
+      }
+
+      // Start the countdown
+      countdownRef.current = setInterval(() => {
+        setCountdown((prev) => {
+          console.log('Countdown tick:', prev); // Debug log
+          if (prev <= 1) {
+            console.log('Countdown finished, navigating to receipt'); // Debug log
+            
+            // Clear the interval
+            if (countdownRef.current) {
+              clearInterval(countdownRef.current);
+              countdownRef.current = null;
+            }
+            
+            // Navigate directly to receipt page
+            router.replace({
+              pathname: '/receipt',
+              params: {
+                showReceipt: 'true',
+                paymentAmount: rentalDetails.totalAmount.toString(),
+                itemName: rentalDetails.itemName,
+                renterName: rentalDetails.renterName,
+                lenderName: rentalDetails.lenderName,
+                lenderLocation: rentalDetails.lenderLocation,
+                startDate: rentalDetails.startDate,
+                endDate: rentalDetails.endDate,
+                duration: rentalDetails.duration,
+                dailyRate: rentalDetails.dailyRate.toString(),
+                subtotal: rentalDetails.subtotal.toString(),
+                taxAmount: rentalDetails.taxAmount.toString(),
+                serviceFee: rentalDetails.serviceFee.toString(),
+                totalAmount: rentalDetails.totalAmount.toString(),
+                pickupLocation: rentalDetails.pickupLocation,
+                returnLocation: rentalDetails.returnLocation,
+                paymentMethod: rentalDetails.paymentMethod,
+                transactionId: rentalDetails.transactionId
+              }
+            });
+            
+            // Reset the countdown state
+            setCountdown(5);
+            setShowCountdown(false);
+            return 5;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
+        countdownRef.current = null;
+      }
+    };
+  }, [showCountdown]); // Only depend on showCountdown
 
   const renderPaymentMethod = (method: PaymentMethod) => (
     <TouchableOpacity
@@ -283,11 +321,8 @@ export default function PaymentScreen() {
             <Ionicons name="checkmark-circle" size={80} color={Colors.success} />
             <Text style={styles.successTitle}>Payment Successful!</Text>
             <Text style={styles.successMessage}>
-              Redirecting to transactions in {countdown} seconds...
+              Redirecting to receipt in {countdown} seconds...
             </Text>
-            <View style={styles.countdownCircle}>
-              <Text style={styles.countdownText}>{countdown}</Text>
-            </View>
           </View>
         </View>
       )}

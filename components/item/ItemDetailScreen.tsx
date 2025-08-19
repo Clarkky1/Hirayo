@@ -4,13 +4,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  Platform,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Platform,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 
 export default function ItemDetailScreen() {
@@ -37,7 +37,7 @@ export default function ItemDetailScreen() {
 
 
   const handleRent = () => {
-    router.push('/period');
+    router.replace('/period');
   };
 
   const handleShowMore = () => {

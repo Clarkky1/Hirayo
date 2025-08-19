@@ -1,6 +1,6 @@
 import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import {
   SafeAreaView,
@@ -11,11 +11,11 @@ import {
   View,
 } from 'react-native';
 
-export default function ReceiptPage() {
+export default function ReceiptScreen() {
   const params = useLocalSearchParams();
-  
+
   // Extract all receipt details from navigation params
-  const showReceipt = params.showReceipt === 'true';
+  const showReceipt = Array.isArray(params.showReceipt) ? params.showReceipt[0] : params.showReceipt;
   const paymentAmount = Array.isArray(params.paymentAmount) ? params.paymentAmount[0] : params.paymentAmount;
   const itemName = Array.isArray(params.itemName) ? params.itemName[0] : params.itemName;
   const renterName = Array.isArray(params.renterName) ? params.renterName[0] : params.renterName;
@@ -44,6 +44,11 @@ export default function ReceiptPage() {
     console.log('Sharing receipt...');
   };
 
+  const handleBackPress = () => {
+    // Navigate to home page instead of going back to payment page
+    router.replace('/(tabs)');
+  };
+
   return (
     <>
       <Stack.Screen 
@@ -53,6 +58,11 @@ export default function ReceiptPage() {
             backgroundColor: '#0066CC',
           },
           headerTintColor: '#ffffff',
+          headerLeft: () => (
+            <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
+              <Ionicons name="arrow-back" size={24} color="#ffffff" />
+            </TouchableOpacity>
+          ),
         }}
       />
       <SafeAreaView style={styles.container}>
@@ -481,5 +491,8 @@ const styles = StyleSheet.create({
   },
   bottomSpacing: {
     height: 100,
+  },
+  backButton: {
+    paddingHorizontal: Spacing.sm,
   },
 });

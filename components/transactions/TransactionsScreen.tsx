@@ -160,7 +160,7 @@ export default function TransactionsScreen() {
     
     if (isEnhancedReceipt) {
       // Navigate to receipt page with all payment details
-      router.push({
+      router.replace({
         pathname: '/receipt',
         params: {
           showReceipt: 'true',
@@ -185,7 +185,7 @@ export default function TransactionsScreen() {
       });
     } else {
       // Navigate to receipt page with basic transaction details
-      router.push({
+      router.replace({
         pathname: '/receipt',
         params: {
           showReceipt: 'false',
