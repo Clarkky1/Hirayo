@@ -70,9 +70,6 @@ export default function ReceiptPage() {
                   <Text style={styles.companyTagline}>Rent Anything, Anywhere</Text>
                 </View>
               </View>
-              <View style={styles.receiptType}>
-                <Text style={styles.receiptTypeText}>PAYMENT RECEIPT</Text>
-              </View>
             </View>
 
             {/* Transaction ID and Date */}
@@ -295,17 +292,6 @@ const styles = StyleSheet.create({
   companyTagline: {
     ...TextStyles.caption,
     color: Colors.text.secondary,
-  },
-  receiptType: {
-    backgroundColor: Colors.primary[500],
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: Spacing.xs,
-    borderRadius: BorderRadius.base,
-  },
-  receiptTypeText: {
-    color: Colors.text.inverse,
-    fontSize: 12,
-    fontWeight: 'bold',
   },
   transactionInfo: {
     marginBottom: Spacing.lg,
