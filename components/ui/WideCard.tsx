@@ -111,7 +111,7 @@ export const WideCard: React.FC<WideCardProps> = ({
         
         <Text style={styles.priceText}>
           ₱{item.price.toLocaleString()} 
-          <Text style={styles.perDayText}> for a day</Text>
+          <Text style={styles.perDayText}> per day</Text>
         </Text>
       </View>
     </TouchableOpacity>

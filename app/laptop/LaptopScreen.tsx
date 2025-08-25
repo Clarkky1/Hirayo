@@ -49,10 +49,16 @@ const filterCategories = [
 ];
 
 const priceRanges = [
-  '0-500',
-  '500-1000',
-  '1000-2000',
-  '2000+'
+  '500-1500',
+  '1500-2500',
+  '2500-3500',
+  '3500-4500',
+  '4500-5500',
+  '5500-6500',
+  '6500-7500',
+  '7500-8500',
+  '8500-9500',
+  '9500-10000'
 ];
 
 export default function LaptopScreen() {
@@ -210,9 +216,6 @@ export default function LaptopScreen() {
     if (selectedPriceRange) {
       const [minPrice, maxPrice] = selectedPriceRange.split('-').map(Number);
       filteredProducts = filteredProducts.filter(product => {
-        if (selectedPriceRange === '2000+') {
-          return product.price >= 2000;
-        }
         return product.price >= minPrice && product.price <= maxPrice;
       });
     }
@@ -244,7 +247,7 @@ export default function LaptopScreen() {
         </View>
         <Text style={styles.locationText}>{item.location}</Text>
         <Text style={styles.priceText}>
-          ₱{item.price.toLocaleString()} <Text style={styles.perDayText}>for a day</Text>
+          ₱{item.price.toLocaleString()} <Text style={styles.perDayText}>per day</Text>
         </Text>
       </View>
     </TouchableOpacity>
@@ -301,6 +304,41 @@ export default function LaptopScreen() {
     return null;
   };
 
+  const renderFilterChips = () => {
+    return (
+      <View style={styles.filterChipsContainer}>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.filterChipsScroll}
+        >
+          {filterCategories.map((category) => (
+            <TouchableOpacity
+              key={category.id}
+                              style={[
+                  styles.filterChip,
+                  selectedCategories.includes(category.id) && styles.filterChipActive
+                ]}
+                onPress={() => handleCategoryToggle(category.id)}
+              >
+                <Ionicons 
+                  name={category.icon as any} 
+                  size={16} 
+                  color={selectedCategories.includes(category.id) ? '#fff' : '#333'} 
+                />
+                <Text style={[
+                  styles.filterChipText,
+                  selectedCategories.includes(category.id) && styles.filterChipTextActive
+                ]}>
+                  {category.label}
+                </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
@@ -338,6 +376,8 @@ export default function LaptopScreen() {
             <Ionicons name="chevron-down" size={16} color="#333" />
           </TouchableOpacity>
         </View>
+
+
 
         {/* Sort Dropdown */}
         {showSortDropdown && (
@@ -762,5 +802,37 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'normal',
     color: '#666',
+  },
+  filterChipsContainer: {
+    paddingHorizontal: Spacing.lg,
+    marginBottom: 16,
+  },
+  filterChipsScroll: {
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  filterChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    marginRight: 8,
+    gap: 6,
+  },
+  filterChipText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#333',
+  },
+  filterChipActive: {
+    backgroundColor: '#007AFF',
+    borderColor: '#007AFF',
+  },
+  filterChipTextActive: {
+    color: '#fff',
   },
 });

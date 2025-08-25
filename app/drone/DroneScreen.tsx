@@ -62,10 +62,16 @@ const DroneScreen = () => {
   ];
 
   const priceRanges = [
-    { id: '0-500', label: 'Under $500' },
-    { id: '500-1000', label: '$500 - $1,000' },
-    { id: '1000-2000', label: '$1,000 - $2,000' },
-    { id: '2000+', label: '$2,000+' },
+    { id: '500-1500', label: '₱500 - ₱1,500' },
+    { id: '1500-2500', label: '₱1,500 - ₱2,500' },
+    { id: '2500-3500', label: '₱2,500 - ₱3,500' },
+    { id: '3500-4500', label: '₱3,500 - ₱4,500' },
+    { id: '4500-5500', label: '₱4,500 - ₱5,500' },
+    { id: '5500-6500', label: '₱5,500 - ₱6,500' },
+    { id: '6500-7500', label: '₱6,500 - ₱7,500' },
+    { id: '7500-8500', label: '₱7,500 - ₱8,500' },
+    { id: '8500-9500', label: '₱8,500 - ₱9,500' },
+    { id: '9500-10000', label: '₱9,500 - ₱10,000' },
   ];
 
   const handleSortBy = () => {
@@ -164,7 +170,7 @@ const DroneScreen = () => {
       <Image source={{ uri: item.image }} style={styles.productImage} />
       <View style={styles.productInfo}>
         <Text style={styles.productName}>{item.name}</Text>
-        <Text style={styles.productPrice}>${item.price}</Text>
+        <Text style={styles.productPrice}>₱{item.price.toLocaleString()} per day</Text>
         <View style={styles.ratingContainer}>
           <Ionicons name="star" size={16} color="#FFD700" />
           <Text style={styles.rating}>{item.rating}</Text>
@@ -172,6 +178,92 @@ const DroneScreen = () => {
       </View>
     </TouchableOpacity>
   );
+
+  const renderActiveFilters = () => {
+    const activeFilters = [];
+    
+    if (selectedCategories.length > 0) {
+      selectedCategories.forEach(category => {
+        const categoryInfo = filterCategories.find(c => c.id === category);
+        if (categoryInfo) {
+          activeFilters.push(
+            <TouchableOpacity
+              key={`cat-${category}`}
+              style={styles.activeFilterChip}
+              onPress={() => handleCategoryToggle(category)}
+            >
+              <Text style={styles.activeFilterText}>{categoryInfo.label}</Text>
+              <Ionicons name="close" size={16} color="#fff" />
+            </TouchableOpacity>
+          );
+        }
+      });
+    }
+    
+    if (selectedPriceRange) {
+      activeFilters.push(
+        <TouchableOpacity
+          key="price"
+          style={styles.activeFilterChip}
+          onPress={() => setSelectedPriceRange('')}
+        >
+          <Text style={styles.activeFilterText}>₱{selectedPriceRange}</Text>
+          <Ionicons name="close" size={16} color="#fff" />
+        </TouchableOpacity>
+      );
+    }
+    
+    if (activeFilters.length > 0) {
+      return (
+        <View style={styles.activeFiltersContainer}>
+          <Text style={styles.activeFiltersTitle}>Active Filters:</Text>
+          <View style={styles.activeFiltersList}>
+            {activeFilters}
+          </View>
+          <TouchableOpacity style={styles.clearAllButton} onPress={handleClearFilters}>
+            <Text style={styles.clearAllText}>Clear All</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+    
+    return null;
+  };
+
+  const renderFilterChips = () => {
+    return (
+      <View style={styles.filterChipsContainer}>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.filterChipsScroll}
+        >
+          {filterCategories.map((category) => (
+            <TouchableOpacity
+              key={category.id}
+              style={[
+                styles.filterChip,
+                selectedCategories.includes(category.id) && styles.filterChipActive
+              ]}
+              onPress={() => handleCategoryToggle(category.id)}
+            >
+              <Ionicons 
+                name={category.icon as any} 
+                size={16} 
+                color={selectedCategories.includes(category.id) ? '#fff' : '#333'} 
+              />
+              <Text style={[
+                styles.filterChipText,
+                selectedCategories.includes(category.id) && styles.filterChipTextActive
+              ]}>
+                {category.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -206,6 +298,8 @@ const DroneScreen = () => {
             <Ionicons name="chevron-down" size={16} color="#333" />
           </TouchableOpacity>
         </View>
+
+
 
         {showSortDropdown && (
           <View style={styles.dropdown}>
@@ -297,37 +391,7 @@ const DroneScreen = () => {
           </View>
         )}
 
-        {(selectedCategories.length > 0 || selectedPriceRange) && (
-          <View style={styles.activeFiltersContainer}>
-            <Text style={styles.activeFiltersTitle}>Active Filters:</Text>
-            <View style={styles.activeFiltersChips}>
-              {selectedCategories.map((categoryId) => {
-                const category = filterCategories.find(c => c.id === categoryId);
-                return (
-                  <TouchableOpacity
-                    key={categoryId}
-                    style={styles.activeFilterChip}
-                    onPress={() => handleCategoryToggle(categoryId)}
-                  >
-                    <Text style={styles.activeFilterChipText}>{category?.label}</Text>
-                    <Ionicons name="close" size={16} color="#fff" />
-                  </TouchableOpacity>
-                );
-              })}
-              {selectedPriceRange && (
-                <TouchableOpacity
-                  style={styles.activeFilterChip}
-                  onPress={() => setSelectedPriceRange('')}
-                >
-                  <Text style={styles.activeFilterChipText}>
-                    {priceRanges.find(r => r.id === selectedPriceRange)?.label}
-                  </Text>
-                  <Ionicons name="close" size={16} color="#fff" />
-                </TouchableOpacity>
-              )}
-            </View>
-          </View>
-        )}
+        {renderActiveFilters()}
 
         <View style={styles.productsContainer}>
           <Text style={styles.productsTitle}>
@@ -556,7 +620,7 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 12,
   },
-  activeFiltersChips: {
+  activeFiltersList: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
@@ -569,11 +633,57 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 16,
   },
-  activeFilterChipText: {
+  activeFilterText: {
     color: '#fff',
     fontSize: 14,
     fontWeight: '500',
     marginRight: 6,
+  },
+  clearAllButton: {
+    marginTop: 12,
+    padding: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    alignItems: 'center',
+  },
+  clearAllText: {
+    fontSize: 16,
+    color: '#666',
+    fontWeight: '500',
+  },
+  filterChipsContainer: {
+    padding: 20,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+  },
+  filterChipsScroll: {
+    alignItems: 'center',
+  },
+  filterChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    marginRight: 10,
+  },
+  filterChipActive: {
+    backgroundColor: '#007AFF',
+    borderColor: '#007AFF',
+  },
+  filterChipText: {
+    fontSize: 14,
+    color: '#333',
+    fontWeight: '500',
+    marginLeft: 8,
+  },
+  filterChipTextActive: {
+    color: '#fff',
   },
   productsContainer: {
     padding: 20,

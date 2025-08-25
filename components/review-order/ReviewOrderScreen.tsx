@@ -42,7 +42,7 @@ export default function ReviewOrderScreen() {
           {/* Price per Day */}
           <View style={styles.priceContainer}>
             <Text style={styles.price}>₱1,253</Text>
-            <Text style={styles.pricePeriod}>for a day</Text>
+            <Text style={styles.pricePeriod}>per day</Text>
           </View>
         </View>
 

@@ -3,14 +3,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  FlatList,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    FlatList,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { ProductCard } from '../ui/ProductCard';
 
@@ -34,7 +34,7 @@ const products: ProductItem[] = [
   { id: '8', name: 'Sony WH-1000XM5 Headphones', rating: 4.6, location: 'Talisay, Cebu', price: 15, category: 'audio' },
 ];
 
-const sortOptions = ['Under ₱500', '₱500 - ₱1,000', '₱1,000 - ₱2,000', '₱2,000+'];
+  const sortOptions = ['₱500 - ₱1,500', '₱1,500 - ₱2,500', '₱2,500 - ₱3,500', '₱3,500 - ₱4,500', '₱4,500 - ₱5,500', '₱5,500 - ₱6,500', '₱6,500 - ₱7,500', '₱7,500 - ₱8,500', '₱8,500 - ₱9,500', '₱9,500 - ₱10,000'];
 const filterCategories = ['Camera', 'Laptop', 'Phone', 'Tablet/iPad', 'Drone', 'PC', 'Gaming', 'Audio'];
 
 
@@ -203,14 +203,26 @@ export default function DiscoverScreen() {
     if (selectedSort) {
       sorted = sorted.filter(product => {
         switch (selectedSort) {
-          case 'Under ₱500':
-            return product.price < 500;
-          case '₱500 - ₱1,000':
-            return product.price >= 500 && product.price <= 1000;
-          case '₱1,000 - ₱2,000':
-            return product.price > 1000 && product.price <= 2000;
-          case '₱2,000+':
-            return product.price > 2000;
+          case '₱500 - ₱1,500':
+            return product.price >= 500 && product.price <= 1500;
+          case '₱1,500 - ₱2,500':
+            return product.price >= 1500 && product.price <= 2500;
+          case '₱2,500 - ₱3,500':
+            return product.price >= 2500 && product.price <= 3500;
+          case '₱3,500 - ₱4,500':
+            return product.price >= 3500 && product.price <= 4500;
+          case '₱4,500 - ₱5,500':
+            return product.price >= 4500 && product.price <= 5500;
+          case '₱5,500 - ₱6,500':
+            return product.price >= 5500 && product.price <= 6500;
+          case '₱6,500 - ₱7,500':
+            return product.price >= 6500 && product.price <= 7500;
+          case '₱7,500 - ₱8,500':
+            return product.price >= 7500 && product.price <= 8500;
+          case '₱8,500 - ₱9,500':
+            return product.price >= 8500 && product.price <= 9500;
+          case '₱9,500 - ₱10,000':
+            return product.price >= 9500 && product.price <= 10000;
           default:
             return true;
         }

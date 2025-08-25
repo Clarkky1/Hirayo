@@ -1,5 +1,4 @@
-import { useRouter } from 'expo-router';
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, ReactNode, useContext, useState } from 'react';
 
 interface User {
   phoneNumber?: string;
@@ -32,6 +31,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const logout = () => {
     setUser(null);
     setIsAuthenticated(false);
+    // Navigate to login page after logout
+    // Note: This will be handled by the component using the hook
   };
 
   const signup = (userData: User) => {

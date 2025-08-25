@@ -3,16 +3,16 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  Alert,
-  FlatList,
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
+    Alert,
+    FlatList,
+    Image,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import { Card } from '../../components/ui/Card';
 
@@ -34,11 +34,16 @@ const categories: CategoryOption[] = [
 ];
 
 const priceRanges = [
-  { id: '0-50', label: '₱0 - ₱50' },
-  { id: '51-100', label: '₱51 - ₱100' },
-  { id: '101-200', label: '₱101 - ₱200' },
-  { id: '201-500', label: '₱201 - ₱500' },
-  { id: '500+', label: '₱500+' },
+  { id: '500-1500', label: '₱500 - ₱1,500' },
+  { id: '1500-2500', label: '₱1,500 - ₱2,500' },
+  { id: '2500-3500', label: '₱2,500 - ₱3,500' },
+  { id: '3500-4500', label: '₱3,500 - ₱4,500' },
+  { id: '4500-5500', label: '₱4,500 - ₱5,500' },
+  { id: '5500-6500', label: '₱5,500 - ₱6,500' },
+  { id: '6500-7500', label: '₱6,500 - ₱7,500' },
+  { id: '7500-8500', label: '₱7,500 - ₱8,500' },
+  { id: '8500-9500', label: '₱8,500 - ₱9,500' },
+  { id: '9500-10000', label: '₱9,500 - ₱10,000' }
 ];
 
 export default function PostItemScreen() {

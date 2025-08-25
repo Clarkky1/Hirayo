@@ -19,15 +19,16 @@ interface ProductItem {
   location: string;
   price: number;
   category: string;
+  image?: string;
 }
 
 const products: ProductItem[] = [
-  { id: '1', name: 'iPhone 15 Pro Max', price: 1199, rating: 4.9, image: 'https://via.placeholder.com/150x150?text=iPhone+15+Pro+Max', category: 'phone' },
-  { id: '2', name: 'Samsung Galaxy S24', price: 999, rating: 4.7, image: 'https://via.placeholder.com/150x150?text=Galaxy+S24', category: 'phone' },
-  { id: '3', name: 'Google Pixel 8 Pro', price: 899, rating: 4.6, image: 'https://via.placeholder.com/150x150?text=Pixel+8+Pro', category: 'phone' },
-  { id: '4', name: 'OnePlus 12', price: 799, rating: 4.5, image: 'https://via.placeholder.com/150x150?text=OnePlus+12', category: 'phone' },
-  { id: '5', name: 'Xiaomi 14 Ultra', price: 699, rating: 4.4, image: 'https://via.placeholder.com/150x150?text=Xiaomi+14+Ultra', category: 'phone' },
-  { id: '6', name: 'Nothing Phone 2', price: 599, rating: 4.3, image: 'https://via.placeholder.com/150x150?text=Nothing+Phone+2', category: 'phone' },
+  { id: '1', name: 'iPhone 15 Pro Max', price: 1199, rating: 4.9, image: 'https://via.placeholder.com/150x150?text=iPhone+15+Pro+Max', category: 'phone', location: 'Cebu City' },
+  { id: '2', name: 'Samsung Galaxy S24', price: 999, rating: 4.7, image: 'https://via.placeholder.com/150x150?text=Galaxy+S24', category: 'phone', location: 'Mandaue City' },
+  { id: '3', name: 'Google Pixel 8 Pro', price: 899, rating: 4.6, image: 'https://via.placeholder.com/150x150?text=Pixel+8+Pro', category: 'phone', location: 'Lapu-Lapu City' },
+  { id: '4', name: 'OnePlus 12', price: 799, rating: 4.5, image: 'https://via.placeholder.com/150x150?text=OnePlus+12', category: 'phone', location: 'Talisay, Cebu' },
+  { id: '5', name: 'Xiaomi 14 Ultra', price: 699, rating: 4.4, image: 'https://via.placeholder.com/150x150?text=Xiaomi+14+Ultra', category: 'phone', location: 'Cebu City' },
+  { id: '6', name: 'Nothing Phone 2', price: 599, rating: 4.3, image: 'https://via.placeholder.com/150x150?text=Nothing+Phone+2', category: 'phone', location: 'Mandaue City' },
 ];
 
 const sortOptions = [
@@ -47,10 +48,16 @@ const filterCategories = [
 ];
 
 const priceRanges = [
-  '0-300',
-  '300-600',
-  '600-1000',
-  '1000+'
+  '500-1500',
+  '1500-2500',
+  '2500-3500',
+  '3500-4500',
+  '4500-5500',
+  '5500-6500',
+  '6500-7500',
+  '7500-8500',
+  '8500-9500',
+  '9500-10000'
 ];
 
 export default function PhoneScreen() {
@@ -158,9 +165,6 @@ export default function PhoneScreen() {
     if (selectedPriceRange) {
       const [minPrice, maxPrice] = selectedPriceRange.split('-').map(Number);
       filteredProducts = filteredProducts.filter(product => {
-        if (selectedPriceRange === '1000+') {
-          return product.price >= 1000;
-        }
         return product.price >= minPrice && product.price <= maxPrice;
       });
     }
@@ -183,7 +187,7 @@ export default function PhoneScreen() {
         </View>
         <Text style={styles.locationText}>{item.location}</Text>
         <Text style={styles.priceText}>
-          ₱{item.price.toLocaleString()} <Text style={styles.perDayText}>for a day</Text>
+          ₱{item.price.toLocaleString()} <Text style={styles.perDayText}>per day</Text>
         </Text>
       </View>
     </TouchableOpacity>
@@ -240,6 +244,41 @@ export default function PhoneScreen() {
     return null;
   };
 
+  const renderFilterChips = () => {
+    return (
+      <View style={styles.filterChipsContainer}>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.filterChipsScroll}
+        >
+          {filterCategories.map((category) => (
+            <TouchableOpacity
+              key={category.id}
+              style={[
+                styles.filterChip,
+                selectedCategories.includes(category.id) && styles.filterChipActive
+              ]}
+              onPress={() => handleCategoryToggle(category.id)}
+            >
+              <Ionicons 
+                name={category.icon as any} 
+                size={16} 
+                color={selectedCategories.includes(category.id) ? '#fff' : '#333'} 
+              />
+              <Text style={[
+                styles.filterChipText,
+                selectedCategories.includes(category.id) && styles.filterChipTextActive
+              ]}>
+                {category.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
@@ -277,6 +316,8 @@ export default function PhoneScreen() {
             <Ionicons name="chevron-down" size={16} color="#333" />
           </TouchableOpacity>
         </View>
+
+
 
         {/* Sort Dropdown */}
         {showSortDropdown && (
@@ -708,5 +749,37 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'normal',
     color: '#666',
+  },
+  filterChipsContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  filterChipsScroll: {
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  filterChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+    marginRight: 8,
+  },
+  filterChipActive: {
+    backgroundColor: '#007AFF',
+    borderColor: '#007AFF',
+  },
+  filterChipText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#333',
+    marginLeft: 6,
+  },
+  filterChipTextActive: {
+    color: '#fff',
   },
 });

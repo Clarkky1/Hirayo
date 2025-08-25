@@ -87,10 +87,16 @@ const filterCategories = [
 ];
 
 const priceRanges = [
-  { id: 'under-500', label: 'Under $500' },
-  { id: '500-800', label: '$500 - $800' },
-  { id: '800-1000', label: '$800 - $1,000' },
-  { id: 'over-1000', label: 'Over $1,000' }
+  { id: '500-1500', label: '₱500 - ₱1,500' },
+  { id: '1500-2500', label: '₱1,500 - ₱2,500' },
+  { id: '2500-3500', label: '₱2,500 - ₱3,500' },
+  { id: '3500-4500', label: '₱3,500 - ₱4,500' },
+  { id: '4500-5500', label: '₱4,500 - ₱5,500' },
+  { id: '5500-6500', label: '₱5,500 - ₱6,500' },
+  { id: '6500-7500', label: '₱6,500 - ₱7,500' },
+  { id: '7500-8500', label: '₱7,500 - ₱8,500' },
+  { id: '8500-9500', label: '₱8,500 - ₱9,500' },
+  { id: '9500-10000', label: '₱9,500 - ₱10,000' }
 ];
 
 export default function PhoneScreen() {
@@ -174,17 +180,35 @@ export default function PhoneScreen() {
     
     if (selectedPriceRange) {
       switch (selectedPriceRange) {
-        case 'under-500':
-          filtered = filtered.filter(product => product.price < 500);
+        case '500-1500':
+          filtered = filtered.filter(product => product.price >= 500 && product.price <= 1500);
           break;
-        case '500-800':
-          filtered = filtered.filter(product => product.price >= 500 && product.price <= 800);
+        case '1500-2500':
+          filtered = filtered.filter(product => product.price >= 1500 && product.price <= 2500);
           break;
-        case '800-1000':
-          filtered = filtered.filter(product => product.price >= 800 && product.price <= 1000);
+        case '2500-3500':
+          filtered = filtered.filter(product => product.price >= 2500 && product.price <= 3500);
           break;
-        case 'over-1000':
-          filtered = filtered.filter(product => product.price > 1000);
+        case '3500-4500':
+          filtered = filtered.filter(product => product.price >= 3500 && product.price <= 4500);
+          break;
+        case '4500-5500':
+          filtered = filtered.filter(product => product.price >= 4500 && product.price <= 5500);
+          break;
+        case '5500-6500':
+          filtered = filtered.filter(product => product.price >= 5500 && product.price <= 6500);
+          break;
+        case '6500-7500':
+          filtered = filtered.filter(product => product.price >= 6500 && product.price <= 7500);
+          break;
+        case '7500-8500':
+          filtered = filtered.filter(product => product.price >= 7500 && product.price <= 8500);
+          break;
+        case '8500-9500':
+          filtered = filtered.filter(product => product.price >= 8500 && product.price <= 9500);
+          break;
+        case '9500-10000':
+          filtered = filtered.filter(product => product.price >= 9500 && product.price <= 10000);
           break;
       }
     }

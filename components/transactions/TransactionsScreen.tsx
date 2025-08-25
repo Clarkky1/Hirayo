@@ -128,6 +128,7 @@ const TransactionCard: React.FC<{ item: Transaction; onPress: (item: Transaction
 
 export default function TransactionsScreen() {
   const [activeFilter, setActiveFilter] = useState<'all' | 'completed' | 'active' | 'cancelled'>('all');
+  const [showFiltersDropdown, setShowFiltersDropdown] = useState(false);
   const params = useLocalSearchParams();
   
   // We'll use these params to enhance the receipt when coming from payment
@@ -200,16 +201,14 @@ export default function TransactionsScreen() {
     }
   };
 
-  const renderFilterButton = (filter: 'all' | 'completed' | 'active' | 'cancelled', label: string) => (
-    <TouchableOpacity
-      style={[styles.filterButton, activeFilter === filter && styles.activeFilterButton]}
-      onPress={() => setActiveFilter(filter)}
-    >
-      <Text style={[styles.filterText, activeFilter === filter && styles.activeFilterText]}>
-        {label}
-      </Text>
-    </TouchableOpacity>
-  );
+  const handleFilterSelect = (filter: 'all' | 'completed' | 'active' | 'cancelled') => {
+    setActiveFilter(filter);
+    setShowFiltersDropdown(false);
+  };
+
+  const toggleFiltersDropdown = () => {
+    setShowFiltersDropdown(!showFiltersDropdown);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -219,12 +218,68 @@ export default function TransactionsScreen() {
         <View style={styles.searchButton} />
       </View>
 
-      {/* Filter Buttons */}
+      {/* Filter Dropdown */}
       <View style={styles.filterContainer}>
-        {renderFilterButton('all', 'All')}
-        {renderFilterButton('active', 'Active')}
-        {renderFilterButton('completed', 'Completed')}
-        {renderFilterButton('cancelled', 'Cancelled')}
+        <TouchableOpacity style={styles.filterDropdownButton} onPress={toggleFiltersDropdown}>
+          <Text style={styles.filterDropdownText}>
+            {activeFilter === 'all' ? 'All' : 
+             activeFilter === 'active' ? 'Active' : 
+             activeFilter === 'completed' ? 'Completed' : 'Cancelled'}
+          </Text>
+          <Ionicons name="chevron-down" size={16} color="#333" />
+        </TouchableOpacity>
+        
+        {showFiltersDropdown && (
+          <View style={styles.filtersDropdown}>
+            <TouchableOpacity 
+              style={[styles.filterOption, activeFilter === 'all' && styles.activeFilterOption]} 
+              onPress={() => handleFilterSelect('all')}
+            >
+              <Text style={[styles.filterOptionText, activeFilter === 'all' && styles.activeFilterOptionText]}>
+                All
+              </Text>
+              {activeFilter === 'all' && (
+                <Ionicons name="checkmark" size={16} color="#007AFF" />
+              )}
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.filterOption, activeFilter === 'active' && styles.activeFilterOption]} 
+              onPress={() => handleFilterSelect('active')}
+            >
+              <Text style={[styles.filterOptionText, activeFilter === 'active' && styles.activeFilterOptionText]}>
+                Active
+              </Text>
+              {activeFilter === 'active' && (
+                <Ionicons name="checkmark" size={16} color="#007AFF" />
+              )}
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.filterOption, activeFilter === 'completed' && styles.activeFilterOption]} 
+              onPress={() => handleFilterSelect('completed')}
+            >
+              <Text style={[styles.filterOptionText, activeFilter === 'completed' && styles.activeFilterOptionText]}>
+                Completed
+              </Text>
+              {activeFilter === 'completed' && (
+                <Ionicons name="checkmark" size={16} color="#007AFF" />
+              )}
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.filterOption, activeFilter === 'cancelled' && styles.activeFilterOption]} 
+              onPress={() => handleFilterSelect('cancelled')}
+            >
+              <Text style={[styles.filterOptionText, activeFilter === 'cancelled' && styles.activeFilterOptionText]}>
+                Cancelled
+              </Text>
+              {activeFilter === 'cancelled' && (
+                <Ionicons name="checkmark" size={16} color="#007AFF" />
+              )}
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
       {/* Transactions List */}
@@ -276,33 +331,77 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   filterContainer: {
-    flexDirection: 'row',
+    alignItems: 'flex-end',
     paddingHorizontal: Spacing.lg,
     marginBottom: 16,
+    position: 'relative',
   },
-  filterButton: {
-    flex: 1,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    marginHorizontal: 3,
-    borderRadius: 20,
-    backgroundColor: '#F5F5F5',
+  filterDropdownButton: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    backgroundColor: '#F5F5F5',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    minWidth: 120,
   },
-  activeFilterButton: {
-    backgroundColor: '#0066CC',
-  },
-  filterText: {
+  filterDropdownText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#666666',
+    color: '#333333',
+    marginRight: 8,
   },
-  activeFilterText: {
-    color: '#ffffff',
+  filtersDropdown: {
+    position: 'absolute',
+    top: 45,
+    right: 0,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    zIndex: 1000,
+    minWidth: 150,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  filterOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+  },
+  filterOptionText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#333333',
+  },
+  activeFilterOption: {
+    backgroundColor: '#F0F8FF',
+  },
+  activeFilterOptionText: {
+    color: '#007AFF',
+    fontWeight: '600',
   },
   listContainer: {
     paddingHorizontal: Spacing.lg,
     paddingBottom: 80,
+  },
+  listHeader: {
+    paddingBottom: Spacing.sm,
+  },
+  listTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333333',
   },
   transactionCard: {
     backgroundColor: Colors.background.secondary,
