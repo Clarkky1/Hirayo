@@ -108,6 +108,7 @@ export default function HelpSupportScreen() {
               key={option.id}
               style={styles.supportOption}
               onPress={() => handleSupportAction(option.id)}
+              activeOpacity={0.7}
             >
               <View style={styles.optionLeft}>
                 <View style={styles.optionIcon}>
@@ -121,6 +122,7 @@ export default function HelpSupportScreen() {
               <TouchableOpacity
                 style={styles.actionButton}
                 onPress={() => handleSupportAction(option.id)}
+                activeOpacity={0.7}
               >
                 <Text style={styles.actionButtonText}>{option.action}</Text>
               </TouchableOpacity>
@@ -136,6 +138,7 @@ export default function HelpSupportScreen() {
               key={resource.id}
               style={styles.resourceItem}
               onPress={() => handleResourceTap(resource.id)}
+              activeOpacity={0.7}
             >
               <View style={styles.resourceLeft}>
                 <View style={styles.resourceIcon}>
@@ -154,11 +157,12 @@ export default function HelpSupportScreen() {
         {/* FAQ Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Frequently Asked Questions</Text>
-          {faqItems.map((faq) => (
+          {faqItems.map((faq, index) => (
             <TouchableOpacity
               key={faq.id}
               style={styles.faqItem}
               onPress={() => handleFaqToggle(faq.id)}
+              activeOpacity={0.7}
             >
               <View style={styles.faqHeader}>
                 <Text style={styles.faqQuestion}>{faq.question}</Text>

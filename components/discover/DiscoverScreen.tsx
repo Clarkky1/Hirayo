@@ -3,14 +3,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-    FlatList,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  FlatList,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { ProductCard } from '../ui/ProductCard';
 
@@ -282,7 +282,7 @@ export default function DiscoverScreen() {
 
         {/* Sort and Filter Controls */}
         <View style={styles.controlsContainer}>
-          <TouchableOpacity style={styles.controlButton} onPress={handleSortBy}>
+          <TouchableOpacity style={styles.controlButton} onPress={handleSortBy} activeOpacity={0.7}>
             <Ionicons name="funnel-outline" size={16} color={Colors.text.primary} />
             <Text style={styles.controlButtonText}>
               {selectedSort || 'Price Range'}
@@ -290,7 +290,7 @@ export default function DiscoverScreen() {
             <Ionicons name="chevron-down" size={14} color={Colors.text.primary} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.controlButton} onPress={handleFilters}>
+          <TouchableOpacity style={styles.controlButton} onPress={handleFilters} activeOpacity={0.7}>
             <Ionicons name="options-outline" size={16} color={Colors.text.primary} />
             <Text style={styles.controlButtonText}>
               Filters
@@ -310,6 +310,7 @@ export default function DiscoverScreen() {
                   selectedSort === option && styles.selectedDropdownItem
                 ]}
                 onPress={() => handleSortOptionSelect(option)}
+                activeOpacity={0.7}
               >
                 <Text style={[
                   styles.dropdownItemText,
@@ -340,6 +341,7 @@ export default function DiscoverScreen() {
                       selectedCategory === category.id && styles.selectedCategoryChip
                     ]}
                     onPress={() => handleCategoryPress(category.id)}
+                    activeOpacity={0.7}
                   >
                     <Ionicons name={category.icon as any} size={16} color={Colors.text.primary} />
                     <Text style={[
@@ -365,6 +367,7 @@ export default function DiscoverScreen() {
                       selectedLocation === location.id && styles.selectedLocationChip
                     ]}
                     onPress={() => handleLocationPress(location.id)}
+                    activeOpacity={0.7}
                   >
                     <Ionicons name={location.icon as any} size={16} color={Colors.text.primary} />
                     <Text style={[
@@ -390,6 +393,7 @@ export default function DiscoverScreen() {
                       selectedSort === option && styles.selectedPriceRangeChip
                     ]}
                     onPress={() => handleSortOptionSelect(option)}
+                    activeOpacity={0.7}
                   >
                     <Text style={[
                       styles.priceRangeChipText,
@@ -408,10 +412,10 @@ export default function DiscoverScreen() {
 
             {/* Action Buttons */}
             <View style={styles.filterActions}>
-              <TouchableOpacity style={styles.clearButton} onPress={handleClearFilters}>
+              <TouchableOpacity style={styles.clearButton} onPress={handleClearFilters} activeOpacity={0.7}>
                 <Text style={styles.clearButtonText}>Clear All</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.applyButton} onPress={handleApplyFilters}>
+              <TouchableOpacity style={styles.applyButton} onPress={handleApplyFilters} activeOpacity={0.7}>
                 <Text style={styles.applyButtonText}>Apply Filters</Text>
               </TouchableOpacity>
             </View>
@@ -426,7 +430,7 @@ export default function DiscoverScreen() {
               {selectedCategories.map((category) => (
                 <View key={category} style={styles.activeFilterChip}>
                   <Text style={styles.activeFilterChipText}>{category}</Text>
-                  <TouchableOpacity onPress={() => handleCategoryToggle(category)}>
+                  <TouchableOpacity onPress={() => handleCategoryToggle(category)} activeOpacity={0.7}>
                     <Ionicons name="close" size={16} color={Colors.text.inverse} />
                   </TouchableOpacity>
                 </View>

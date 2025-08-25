@@ -226,6 +226,7 @@ export default function PaymentScreen() {
         selectedPaymentMethod === method.id && styles.selectedPaymentMethod,
       ]}
       onPress={() => handlePaymentMethodSelect(method.id)}
+      activeOpacity={0.7}
     >
       <View style={styles.paymentMethodContent}>
         <View style={styles.paymentMethodIcon}>
@@ -245,7 +246,7 @@ export default function PaymentScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header with Back Button */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
+        <TouchableOpacity style={styles.backButton} onPress={handleGoBack} activeOpacity={0.7}>
           <Ionicons name="arrow-back" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Payment</Text>
@@ -383,7 +384,7 @@ export default function PaymentScreen() {
 
       {/* Payment Button */}
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.payButton} onPress={handlePayment}>
+        <TouchableOpacity style={styles.payButton} onPress={handlePayment} activeOpacity={0.7}>
           <Text style={styles.payButtonText}>Pay ₱{rentalDetails.totalAmount.toLocaleString()}</Text>
         </TouchableOpacity>
       </View>

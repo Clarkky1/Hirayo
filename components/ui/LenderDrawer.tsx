@@ -3,12 +3,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useRef } from 'react';
 import {
-  Animated,
-  Dimensions,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    Animated,
+    Dimensions,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 
 interface LenderDrawerProps {
@@ -77,7 +77,7 @@ export const LenderDrawer: React.FC<LenderDrawerProps> = ({ isVisible, onClose }
           onPress={() => {}}
         >
           {/* Close Button */}
-          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+          <TouchableOpacity style={styles.closeButton} onPress={onClose} activeOpacity={0.7}>
             <Ionicons name="close" size={24} color={Colors.text.primary} />
           </TouchableOpacity>
 
@@ -103,6 +103,7 @@ export const LenderDrawer: React.FC<LenderDrawerProps> = ({ isVisible, onClose }
             <TouchableOpacity 
               style={styles.actionButton} 
               onPress={handleLenderProfilePress}
+              activeOpacity={0.7}
             >
               <Ionicons name="person-outline" size={24} color={Colors.primary[500]} />
               <Text style={styles.actionText}>Lender Profile</Text>
@@ -112,6 +113,7 @@ export const LenderDrawer: React.FC<LenderDrawerProps> = ({ isVisible, onClose }
             <TouchableOpacity 
               style={styles.actionButton} 
               onPress={() => handleQuickActionPress('/post-item')}
+              activeOpacity={0.7}
             >
               <Ionicons name="add-circle-outline" size={24} color={Colors.primary[500]} />
               <Text style={styles.actionText}>Post New Item</Text>
@@ -121,6 +123,7 @@ export const LenderDrawer: React.FC<LenderDrawerProps> = ({ isVisible, onClose }
             <TouchableOpacity 
               style={styles.actionButton} 
               onPress={() => handleQuickActionPress('/my-items')}
+              activeOpacity={0.7}
             >
               <Ionicons name="cube-outline" size={24} color={Colors.primary[500]} />
               <Text style={styles.actionText}>My Items</Text>
@@ -130,6 +133,7 @@ export const LenderDrawer: React.FC<LenderDrawerProps> = ({ isVisible, onClose }
             <TouchableOpacity 
               style={styles.actionButton} 
               onPress={() => handleQuickActionPress('/earnings')}
+              activeOpacity={0.7}
             >
               <Ionicons name="trending-up-outline" size={24} color={Colors.primary[500]} />
               <Text style={styles.actionText}>Earnings</Text>
@@ -139,6 +143,7 @@ export const LenderDrawer: React.FC<LenderDrawerProps> = ({ isVisible, onClose }
             <TouchableOpacity 
               style={styles.actionButton} 
               onPress={() => handleQuickActionPress('/lender-messages')}
+              activeOpacity={0.7}
             >
               <Ionicons name="chatbubble-outline" size={24} color={Colors.primary[500]} />
               <Text style={styles.actionText}>Messages</Text>
@@ -148,6 +153,7 @@ export const LenderDrawer: React.FC<LenderDrawerProps> = ({ isVisible, onClose }
             <TouchableOpacity 
               style={styles.actionButton} 
               onPress={() => handleQuickActionPress('/lender-settings')}
+              activeOpacity={0.7}
             >
               <Ionicons name="settings-outline" size={24} color={Colors.primary[500]} />
               <Text style={styles.actionText}>Lender Settings</Text>

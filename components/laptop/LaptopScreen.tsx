@@ -219,7 +219,8 @@ export default function LaptopScreen() {
   const renderProductItem = ({ item }: { item: ProductItem }) => (
     <TouchableOpacity 
       style={styles.productItem}
-      onPress={() => router.push(`/item/${item.id}`)}
+      onPress={() => router.push('/item')}
+      activeOpacity={0.7}
     >
       <Image source={{ uri: item.image }} style={styles.productImage} />
       <View style={styles.productInfo}>
@@ -254,7 +255,7 @@ export default function LaptopScreen() {
 
       <View style={styles.filterSortContainer}>
         <View style={styles.dropdownContainer}>
-          <TouchableOpacity style={styles.filterSortButton} onPress={handleSortBy}>
+          <TouchableOpacity style={styles.filterSortButton} onPress={handleSortBy} activeOpacity={0.7}>
             <Text style={styles.filterSortButtonText}>Sort by</Text>
             <Ionicons name="chevron-down" size={16} color="#333" />
           </TouchableOpacity>
@@ -266,6 +267,7 @@ export default function LaptopScreen() {
                   key={option.id}
                   style={styles.sortOption}
                   onPress={() => handleSortOptionSelect(option.id)}
+                  activeOpacity={0.7}
                 >
                   <Text style={styles.sortOptionText}>{option.label}</Text>
                   {selectedSort === option.id && (
@@ -278,7 +280,7 @@ export default function LaptopScreen() {
         </View>
 
         <View style={styles.dropdownContainer}>
-          <TouchableOpacity style={styles.filterSortButton} onPress={handleFilters}>
+          <TouchableOpacity style={styles.filterSortButton} onPress={handleFilters} activeOpacity={0.7}>
             <Text style={styles.filterSortButtonText}>Filters</Text>
             <Ionicons name="chevron-down" size={16} color="#333" />
           </TouchableOpacity>
@@ -297,6 +299,7 @@ export default function LaptopScreen() {
                           selectedCategories.includes(category.id) && styles.categoryChipSelected
                         ]}
                         onPress={() => handleCategoryToggle(category.id)}
+                        activeOpacity={0.7}
                       >
                         <Ionicons 
                           name={category.icon as any} 
@@ -324,6 +327,7 @@ export default function LaptopScreen() {
                         selectedPriceRange === range.id && styles.priceRangeItemSelected
                       ]}
                       onPress={() => handlePriceRangeSelect(range.id)}
+                      activeOpacity={0.7}
                     >
                       <Text style={[
                         styles.priceRangeText,
@@ -340,10 +344,10 @@ export default function LaptopScreen() {
               </ScrollView>
 
               <View style={styles.filterActions}>
-                <TouchableOpacity style={styles.clearButton} onPress={handleClearFilters}>
+                <TouchableOpacity style={styles.clearButton} onPress={handleClearFilters} activeOpacity={0.7}>
                   <Text style={styles.clearButtonText}>Clear</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.applyButton} onPress={handleApplyFilters}>
+                <TouchableOpacity style={styles.applyButton} onPress={handleApplyFilters} activeOpacity={0.7}>
                   <Text style={styles.applyButtonText}>Apply</Text>
                 </TouchableOpacity>
               </View>
@@ -365,13 +369,14 @@ export default function LaptopScreen() {
                   <TouchableOpacity
                     onPress={() => handleCategoryToggle(categoryId)}
                     style={styles.removeFilterButton}
+                    activeOpacity={0.7}
                   >
                     <Ionicons name="close" size={14} color="#007AFF" />
                   </TouchableOpacity>
                 </View>
               );
             })}
-            <TouchableOpacity style={styles.clearAllButton} onPress={handleClearFilters}>
+            <TouchableOpacity style={styles.clearAllButton} onPress={handleClearFilters} activeOpacity={0.7}>
               <Text style={styles.clearAllButtonText}>Clear All</Text>
             </TouchableOpacity>
           </View>

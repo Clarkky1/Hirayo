@@ -102,7 +102,7 @@ const MessageCard: React.FC<{ item: Message }> = ({ item }) => {
   };
 
   return (
-    <TouchableOpacity style={styles.messageCard} onPress={handleMessagePress}>
+    <TouchableOpacity style={styles.messageCard} onPress={handleMessagePress} activeOpacity={0.7}>
       <View style={styles.avatarContainer}>
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>

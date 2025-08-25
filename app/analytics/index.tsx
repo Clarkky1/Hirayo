@@ -2,12 +2,12 @@ import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSys
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { Card } from '../../components/ui/Card';
 
@@ -52,7 +52,7 @@ export default function AnalyticsScreen() {
     <Card variant="filled" padding="large" style={styles.chartCard}>
       <View style={styles.chartHeader}>
         <Text style={styles.chartTitle}>{title}</Text>
-        <TouchableOpacity style={styles.viewDetailsButton}>
+        <TouchableOpacity style={styles.viewDetailsButton} activeOpacity={0.7}>
           <Text style={styles.viewDetailsText}>View Details</Text>
         </TouchableOpacity>
       </View>
@@ -71,6 +71,7 @@ export default function AnalyticsScreen() {
           <TouchableOpacity 
             style={[styles.periodButton, selectedPeriod === 'week' && styles.periodButtonActive]}
             onPress={() => setSelectedPeriod('week')}
+            activeOpacity={0.7}
           >
             <Text style={[styles.periodButtonText, selectedPeriod === 'week' && styles.periodButtonTextActive]}>
               Week
@@ -79,6 +80,7 @@ export default function AnalyticsScreen() {
           <TouchableOpacity 
             style={[styles.periodButton, selectedPeriod === 'month' && styles.periodButtonActive]}
             onPress={() => setSelectedPeriod('month')}
+            activeOpacity={0.7}
           >
             <Text style={[styles.periodButtonText, selectedPeriod === 'month' && styles.periodButtonTextActive]}>
               Month
@@ -87,6 +89,7 @@ export default function AnalyticsScreen() {
           <TouchableOpacity 
             style={[styles.periodButton, selectedPeriod === 'year' && styles.periodButtonActive]}
             onPress={() => setSelectedPeriod('year')}
+            activeOpacity={0.7}
           >
             <Text style={[styles.periodButtonText, selectedPeriod === 'year' && styles.periodButtonTextActive]}>
               Year
@@ -100,15 +103,15 @@ export default function AnalyticsScreen() {
           <View style={styles.metricsGrid}>
             {renderMetricCard(
               'eye-outline',
-              'Total Views',
-              '1,247',
+              'Views',
+              '1.2K',
               '+8%',
               'positive',
               Colors.primary[500]
             )}
             {renderMetricCard(
               'star',
-              'Avg. Rating',
+              'Rating',
               '4.8',
               '+0.2',
               'positive',
@@ -116,7 +119,7 @@ export default function AnalyticsScreen() {
             )}
             {renderMetricCard(
               'repeat',
-              'Repeat Customers',
+              'Repeat',
               '23',
               '+5',
               'positive',

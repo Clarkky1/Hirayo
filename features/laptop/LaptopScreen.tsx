@@ -114,7 +114,7 @@ export default function LaptopScreen() {
   }, [initialCategory]);
 
   const handleProductPress = (product: ProductItem) => {
-    router.push(`/item/${product.id}`);
+    router.push('/item');
   };
 
   const handleSort = (sortId: string) => {
@@ -135,18 +135,19 @@ export default function LaptopScreen() {
   };
 
   const renderProductItem = ({ item }: { item: ProductItem }) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={styles.productCard}
       onPress={() => handleProductPress(item)}
+      activeOpacity={0.7}
     >
       <Image source={{ uri: item.image }} style={styles.productImage} />
       <View style={styles.productInfo}>
         <Text style={styles.productName}>{item.name}</Text>
+        <Text style={styles.productPrice}>₱{item.price} for a day</Text>
         <View style={styles.ratingContainer}>
           <Ionicons name="star" size={16} color="#FFD700" />
           <Text style={styles.rating}>{item.rating}</Text>
         </View>
-        <Text style={styles.productPrice}>${item.price}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -154,7 +155,7 @@ export default function LaptopScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7}>
           <Ionicons name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Laptops</Text>
@@ -179,6 +180,7 @@ export default function LaptopScreen() {
         <TouchableOpacity 
           style={styles.controlButton}
           onPress={() => setShowSortDropdown(!showSortDropdown)}
+          activeOpacity={0.7}
         >
           <Ionicons name="funnel-outline" size={20} color="#666" />
           <Text style={styles.controlButtonText}>Sort</Text>
@@ -188,6 +190,7 @@ export default function LaptopScreen() {
         <TouchableOpacity 
           style={styles.controlButton}
           onPress={() => setShowFiltersDropdown(!showFiltersDropdown)}
+          activeOpacity={0.7}
         >
           <Ionicons name="options-outline" size={20} color="#666" />
           <Text style={styles.controlButtonText}>Filters</Text>
@@ -205,6 +208,7 @@ export default function LaptopScreen() {
                 selectedSort === option.id && styles.selectedDropdownItem
               ]}
               onPress={() => handleSort(option.id)}
+              activeOpacity={0.7}
             >
               <Text style={[
                 styles.dropdownItemText,
@@ -231,6 +235,7 @@ export default function LaptopScreen() {
                 selectedFilters.includes(category.id) && styles.selectedFilterItem
               ]}
               onPress={() => handleFilterToggle(category.id)}
+              activeOpacity={0.7}
             >
               <Ionicons 
                 name={category.icon as any} 
@@ -255,6 +260,7 @@ export default function LaptopScreen() {
                 selectedPriceRange === range.id && styles.selectedFilterItem
               ]}
               onPress={() => handlePriceRangeSelect(range.id)}
+              activeOpacity={0.7}
             >
               <Text style={[
                 styles.filterItemText,

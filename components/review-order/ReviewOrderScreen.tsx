@@ -99,7 +99,7 @@ export default function ReviewOrderScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header with Back Button */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
+        <TouchableOpacity style={styles.backButton} onPress={handleGoBack} activeOpacity={0.7}>
           <Ionicons name="arrow-back" size={24} color={Colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Review Order</Text>
@@ -130,6 +130,7 @@ export default function ReviewOrderScreen() {
               <TouchableOpacity 
                 style={[styles.navArrow, styles.leftArrow]} 
                 onPress={previousImage}
+                activeOpacity={0.7}
               >
                 <Ionicons name="chevron-back" size={20} color={Colors.text.inverse} />
               </TouchableOpacity>
@@ -137,6 +138,7 @@ export default function ReviewOrderScreen() {
               <TouchableOpacity 
                 style={[styles.navArrow, styles.rightArrow]} 
                 onPress={nextImage}
+                activeOpacity={0.7}
               >
                 <Ionicons name="chevron-forward" size={20} color={Colors.text.inverse} />
               </TouchableOpacity>
@@ -159,6 +161,7 @@ export default function ReviewOrderScreen() {
                     index === currentImageIndex && styles.activeIndicator
                   ]}
                   onPress={() => goToImage(index)}
+                  activeOpacity={0.7}
                 />
               ))}
             </View>
@@ -233,7 +236,7 @@ export default function ReviewOrderScreen() {
           <Text style={styles.totalPrice}>₱10,000</Text>
           <Text style={styles.totalPeriod}>for 4 days</Text>
         </View>
-        <TouchableOpacity style={styles.payButton} onPress={handlePay}>
+        <TouchableOpacity style={styles.payButton} onPress={handlePay} activeOpacity={0.7}>
           <Text style={styles.payButtonText}>Pay</Text>
         </TouchableOpacity>
       </View>

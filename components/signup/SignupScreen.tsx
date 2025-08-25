@@ -48,7 +48,7 @@ export default function SignupScreen() {
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           <View style={styles.content}>
             <View style={styles.header}>
-              <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+              <TouchableOpacity style={styles.backButton} onPress={handleBack} activeOpacity={0.7}>
                 <Ionicons name="arrow-back" size={24} color="#000000" />
               </TouchableOpacity>
               <Text style={styles.headerTitle}>Finish signing up</Text>
@@ -131,13 +131,14 @@ export default function SignupScreen() {
               style={[styles.continueButton, isFormValid && styles.continueButtonActive]}
               onPress={handleAgreeAndContinue}
               disabled={!isFormValid}
+              activeOpacity={0.7}
             >
               <Text style={styles.continueButtonText}>Agree and continue</Text>
             </TouchableOpacity>
 
             <View style={styles.loginContainer}>
               <Text style={styles.loginText}>Already have an account? </Text>
-              <TouchableOpacity onPress={handleBack}>
+              <TouchableOpacity onPress={handleBack} activeOpacity={0.7}>
                 <Text style={styles.loginLink}>Log in</Text>
               </TouchableOpacity>
             </View>

@@ -140,7 +140,7 @@ export default function HomeScreen() {
               value={searchQuery}
               onChangeText={setSearchQuery}
             />
-            <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+            <TouchableOpacity style={styles.searchButton} onPress={handleSearch} activeOpacity={0.7}>
               <Ionicons name="arrow-forward" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
@@ -167,7 +167,7 @@ export default function HomeScreen() {
           <View style={styles.exploreSection}>
           <View style={styles.exploreHeader}>
             <Text style={styles.exploreTitle}>Explore</Text>
-            <TouchableOpacity onPress={() => router.push('/discover')}>
+            <TouchableOpacity onPress={() => router.push('/discover')} activeOpacity={0.7}>
               <Text style={styles.moreText}>More</Text>
             </TouchableOpacity>
           </View>
@@ -188,7 +188,7 @@ export default function HomeScreen() {
           <View style={styles.popularSection}>
           <View style={styles.popularHeader}>
             <Text style={styles.popularTitle}>Popular</Text>
-            <TouchableOpacity onPress={() => router.push('/discover')}>
+            <TouchableOpacity onPress={() => router.push('/discover')} activeOpacity={0.7}>
               <Text style={styles.moreText}>More</Text>
             </TouchableOpacity>
           </View>

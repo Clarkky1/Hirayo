@@ -125,6 +125,7 @@ export default function PostItemScreen() {
         selectedCategory === item.id && styles.categoryItemSelected,
       ]}
       onPress={() => setSelectedCategory(item.id)}
+      activeOpacity={0.7}
     >
       <View style={styles.categoryIconContainer}>
         <Ionicons 
@@ -149,6 +150,7 @@ export default function PostItemScreen() {
         selectedPriceRange === item.id && styles.priceRangeItemSelected,
       ]}
       onPress={() => setSelectedPriceRange(item.id)}
+      activeOpacity={0.7}
     >
       <Text style={[
         styles.priceRangeText,
@@ -255,6 +257,7 @@ export default function PostItemScreen() {
                   condition === cond && styles.conditionButtonSelected,
                 ]}
                 onPress={() => setCondition(cond)}
+                activeOpacity={0.7}
               >
                 <Text style={[
                   styles.conditionButtonText,
@@ -283,6 +286,7 @@ export default function PostItemScreen() {
                 <TouchableOpacity 
                   style={styles.removeImageButton} 
                   onPress={() => removeImage(index)}
+                  activeOpacity={0.7}
                 >
                   <Ionicons name="close-circle" size={12} color={Colors.error} />
                 </TouchableOpacity>
@@ -295,6 +299,7 @@ export default function PostItemScreen() {
                 key={`empty-${index}`} 
                 style={styles.emptyImageBox} 
                 onPress={handleAddImage}
+                activeOpacity={0.7}
               >
                 <Ionicons name="add" size={14} color={Colors.neutral[400]} />
               </TouchableOpacity>
@@ -312,7 +317,7 @@ export default function PostItemScreen() {
 
         {/* Post Button */}
         <View style={styles.postButtonContainer}>
-          <TouchableOpacity style={styles.postButton} onPress={handlePostItem}>
+          <TouchableOpacity style={styles.postButton} onPress={handlePostItem} activeOpacity={0.7}>
             <Text style={styles.postButtonText}>Post Item</Text>
           </TouchableOpacity>
         </View>

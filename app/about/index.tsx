@@ -86,6 +86,7 @@ export default function AboutScreen() {
               key={link.id}
               style={styles.legalItem}
               onPress={() => handleLegalLink(link.id)}
+              activeOpacity={0.7}
             >
               <View style={styles.legalLeft}>
                 <View style={styles.legalIcon}>
@@ -107,6 +108,7 @@ export default function AboutScreen() {
                 key={social.id}
                 style={styles.socialItem}
                 onPress={() => handleSocialLink(social.id)}
+                activeOpacity={0.7}
               >
                 <View style={[styles.socialIcon, { backgroundColor: social.color }]}>
                   <Ionicons name={social.icon as any} size={24} color="#ffffff" />
@@ -119,12 +121,12 @@ export default function AboutScreen() {
 
         {/* Action Buttons */}
         <View style={styles.actionSection}>
-          <TouchableOpacity style={styles.actionButton} onPress={handleContactUs}>
+          <TouchableOpacity style={styles.actionButton} onPress={handleContactUs} activeOpacity={0.7}>
             <Ionicons name="mail" size={20} color="#0066CC" />
             <Text style={styles.actionButtonText}>Contact Us</Text>
           </TouchableOpacity>
           
-          <TouchableOpacity style={styles.actionButton} onPress={handleRateApp}>
+          <TouchableOpacity style={styles.actionButton} onPress={handleRateApp} activeOpacity={0.7}>
             <Ionicons name="star" size={20} color="#FFD700" />
             <Text style={styles.actionButtonText}>Rate Our App</Text>
           </TouchableOpacity>

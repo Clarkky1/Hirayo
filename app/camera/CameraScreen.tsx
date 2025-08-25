@@ -228,9 +228,9 @@ export default function CameraScreen() {
   };
 
   const ProductCard: React.FC<{ item: ProductItem }> = ({ item }) => (
-    <TouchableOpacity style={styles.card} onPress={() => handleProductPress(item)}>
+    <TouchableOpacity style={styles.card} onPress={() => handleProductPress(item)} activeOpacity={0.7}>
       <View style={styles.imagePlaceholder}>
-        <TouchableOpacity style={styles.favoriteIcon}>
+        <TouchableOpacity style={styles.favoriteIcon} activeOpacity={0.7}>
           <Ionicons name="heart-outline" size={20} color="#666" />
         </TouchableOpacity>
         <TouchableOpacity 
@@ -239,6 +239,7 @@ export default function CameraScreen() {
             e.stopPropagation();
             handleMessageLender(item);
           }}
+          activeOpacity={0.7}
         >
           <Ionicons name="chatbubble-outline" size={20} color={Colors.primary[500]} />
         </TouchableOpacity>
@@ -269,6 +270,7 @@ export default function CameraScreen() {
               key={`cat-${category}`}
               style={styles.activeFilterChip}
               onPress={() => handleCategoryToggle(category)}
+              activeOpacity={0.7}
             >
               <Text style={styles.activeFilterText}>{categoryInfo.label}</Text>
               <Ionicons name="close" size={16} color="#fff" />
@@ -284,6 +286,7 @@ export default function CameraScreen() {
           key="price"
           style={styles.activeFilterChip}
           onPress={() => setSelectedPriceRange('')}
+          activeOpacity={0.7}
         >
           <Text style={styles.activeFilterText}>₱{selectedPriceRange}</Text>
           <Ionicons name="close" size={16} color="#fff" />
@@ -298,7 +301,7 @@ export default function CameraScreen() {
           <View style={styles.activeFiltersList}>
             {activeFilters}
           </View>
-          <TouchableOpacity style={styles.clearAllButton} onPress={handleClearFilters}>
+          <TouchableOpacity style={styles.clearAllButton} onPress={handleClearFilters} activeOpacity={0.7}>
             <Text style={styles.clearAllText}>Clear All</Text>
           </TouchableOpacity>
         </View>
@@ -324,6 +327,7 @@ export default function CameraScreen() {
                 selectedCategories.includes(category.id) && styles.filterChipActive
               ]}
               onPress={() => handleCategoryToggle(category.id)}
+              activeOpacity={0.7}
             >
               <Ionicons 
                 name={category.icon as any} 
@@ -358,7 +362,7 @@ export default function CameraScreen() {
               value={searchQuery}
               onChangeText={setSearchQuery}
             />
-            <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+            <TouchableOpacity style={styles.searchButton} onPress={handleSearch} activeOpacity={0.7}>
               <Ionicons name="arrow-forward" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
@@ -366,7 +370,7 @@ export default function CameraScreen() {
 
         {/* Sort and Filter Controls */}
         <View style={styles.controlsContainer}>
-          <TouchableOpacity style={styles.controlButton} onPress={handleSortBy}>
+          <TouchableOpacity style={styles.controlButton} onPress={handleSortBy} activeOpacity={0.7}>
             <Ionicons name="swap-vertical" size={16} color="#333" />
             <Text style={styles.controlButtonText}>
               {selectedSort ? sortOptions.find(s => s.id === selectedSort)?.label : 'Sort by'}
@@ -374,7 +378,7 @@ export default function CameraScreen() {
             <Ionicons name="chevron-down" size={16} color="#333" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.controlButton} onPress={handleFilters}>
+          <TouchableOpacity style={styles.controlButton} onPress={handleFilters} activeOpacity={0.7}>
             <Ionicons name="filter" size={16} color="#333" />
             <Text style={styles.controlButtonText}>Filters</Text>
             <Ionicons name="chevron-down" size={16} color="#333" />
@@ -394,6 +398,7 @@ export default function CameraScreen() {
                   selectedSort === option.id && styles.selectedDropdownItem
                 ]}
                 onPress={() => handleSortOptionSelect(option.id)}
+                activeOpacity={0.7}
               >
                 <Text style={[
                   styles.dropdownItemText,
@@ -423,6 +428,7 @@ export default function CameraScreen() {
                       selectedCategories.includes(category.id) && styles.selectedCategoryChip
                     ]}
                     onPress={() => handleCategoryNavigation(category.id)}
+                    activeOpacity={0.7}
                   >
                     <Ionicons 
                       name={category.icon as any} 
@@ -450,6 +456,7 @@ export default function CameraScreen() {
                     selectedPriceRange === range && styles.selectedPriceRangeItem
                   ]}
                   onPress={() => handlePriceRangeSelect(range)}
+                  activeOpacity={0.7}
                 >
                   <Text style={[
                     styles.priceRangeText,
@@ -465,10 +472,10 @@ export default function CameraScreen() {
             </View>
 
             <View style={styles.filterActions}>
-              <TouchableOpacity style={styles.applyButton} onPress={handleApplyFilters}>
+              <TouchableOpacity style={styles.applyButton} onPress={handleApplyFilters} activeOpacity={0.7}>
                 <Text style={styles.applyButtonText}>Apply Filters</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.clearButton} onPress={handleClearFilters}>
+              <TouchableOpacity style={styles.clearButton} onPress={handleClearFilters} activeOpacity={0.7}>
                 <Text style={styles.clearButtonText}>Clear All</Text>
               </TouchableOpacity>
             </View>

@@ -133,6 +133,7 @@ export default function ItemDetailScreen() {
               <TouchableOpacity 
                 style={[styles.navArrow, styles.leftArrow]} 
                 onPress={previousImage}
+                activeOpacity={0.7}
               >
                 <Ionicons name="chevron-back" size={24} color={Colors.text.inverse} />
               </TouchableOpacity>
@@ -140,6 +141,7 @@ export default function ItemDetailScreen() {
               <TouchableOpacity 
                 style={[styles.navArrow, styles.rightArrow]} 
                 onPress={nextImage}
+                activeOpacity={0.7}
               >
                 <Ionicons name="chevron-forward" size={24} color={Colors.text.inverse} />
               </TouchableOpacity>
@@ -163,6 +165,7 @@ export default function ItemDetailScreen() {
                   index === currentImageIndex && styles.activeIndicator
                 ]}
                 onPress={() => goToImage(index)}
+                activeOpacity={0.7}
               />
             ))}
           </View>
@@ -182,6 +185,7 @@ export default function ItemDetailScreen() {
                     index === currentImageIndex && styles.activeThumbnail
                   ]}
                   onPress={() => goToImage(index)}
+                  activeOpacity={0.7}
                 >
                   <Image 
                     source={{ uri: image }} 
@@ -199,6 +203,7 @@ export default function ItemDetailScreen() {
           <TouchableOpacity 
             style={[styles.tab, activeTab === 'description' && styles.activeTab]} 
             onPress={() => setActiveTab('description')}
+            activeOpacity={0.7}
           >
             <Text style={[styles.tabText, activeTab === 'description' && styles.activeTabText]}>
               Description
@@ -207,6 +212,7 @@ export default function ItemDetailScreen() {
           <TouchableOpacity 
             style={[styles.tab, activeTab === 'review' && styles.activeTab]} 
             onPress={() => setActiveTab('review')}
+            activeOpacity={0.7}
           >
             <Text style={[styles.tabText, activeTab === 'review' && styles.activeTabText]}>
               Review
@@ -221,7 +227,7 @@ export default function ItemDetailScreen() {
               Capture high-resolution photos and 4K video with this versatile DSLR. Perfect for events, travel, or content creation. Rent it for a day or a week — no strings attached.
             </Text>
             {isDescriptionLong && (
-              <TouchableOpacity style={styles.showMoreButton} onPress={handleShowMore}>
+              <TouchableOpacity style={styles.showMoreButton} onPress={handleShowMore} activeOpacity={0.7}>
                 <Text style={styles.showMoreText}>Show more</Text>
               </TouchableOpacity>
             )}
@@ -253,7 +259,7 @@ export default function ItemDetailScreen() {
                 <Text style={styles.reviewText}>
                   The camera was in excellent condition and worked flawlessly throughout a 4-day shoot. Batteries were fully charged, lenses were clean, and everything came in a padded case — very professional setup. Setup w...
                 </Text>
-                <TouchableOpacity style={styles.showMoreLink}>
+                <TouchableOpacity style={styles.showMoreLink} activeOpacity={0.7}>
                   <Text style={styles.showMoreLinkText}>Show more</Text>
                 </TouchableOpacity>
                 <View style={styles.reviewerInfo}>
@@ -283,7 +289,7 @@ export default function ItemDetailScreen() {
             </View>
 
             {/* Show All Reviews Button */}
-            <TouchableOpacity style={styles.showAllReviewsButton}>
+            <TouchableOpacity style={styles.showAllReviewsButton} activeOpacity={0.7}>
               <Text style={styles.showAllReviewsText}>Show all 12 reviews</Text>
             </TouchableOpacity>
           </View>
@@ -329,7 +335,7 @@ export default function ItemDetailScreen() {
                   ownerName: 'Lorenz Aguirre',
                   ownerLocation: 'Cebu City'
                 }
-              })}>
+              })} activeOpacity={0.7}>
                 <Ionicons name="chatbubble-outline" size={20} color={Colors.primary[500]} />
               </TouchableOpacity>
             </View>
@@ -346,7 +352,7 @@ export default function ItemDetailScreen() {
           <Text style={styles.actionBarPrice}>P1,253</Text>
           <Text style={styles.actionBarPeriod}>for a day</Text>
         </View>
-        <TouchableOpacity style={styles.rentButton} onPress={handleRent}>
+        <TouchableOpacity style={styles.rentButton} onPress={handleRent} activeOpacity={0.7}>
           <Text style={styles.rentButtonText}>Rent</Text>
         </TouchableOpacity>
       </View>

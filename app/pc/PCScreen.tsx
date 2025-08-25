@@ -174,7 +174,7 @@ const PCScreen = () => {
   const filteredProducts = getFilteredProducts();
 
   const renderProductItem = ({ item }: { item: ProductItem }) => (
-    <TouchableOpacity style={styles.productItem}>
+    <TouchableOpacity style={styles.productItem} activeOpacity={0.7}>
       <View style={styles.imageContainer}>
         <Image source={{ uri: item.image }} style={styles.productImage} />
         <TouchableOpacity 
@@ -183,6 +183,7 @@ const PCScreen = () => {
             e.stopPropagation();
             handleMessageLender(item);
           }}
+          activeOpacity={0.7}
         >
           <Ionicons name="chatbubble-outline" size={16} color={Colors.primary[500]} />
         </TouchableOpacity>
@@ -232,16 +233,14 @@ const PCScreen = () => {
         </View>
 
         <View style={styles.controlsContainer}>
-          <TouchableOpacity style={styles.controlButton} onPress={handleSortBy}>
-            <Ionicons name="funnel" size={20} color="#333" />
-            <Text style={styles.controlButtonText}>Sort by</Text>
-            <Ionicons name="chevron-down" size={16} color="#333" />
+          <TouchableOpacity style={styles.controlButton} onPress={handleSortBy} activeOpacity={0.7}>
+            <Ionicons name="funnel-outline" size={20} color="#666666" />
+            <Text style={styles.controlButtonText}>Sort</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.controlButton} onPress={handleFilters}>
-            <Ionicons name="options" size={20} color="#333" />
+          <TouchableOpacity style={styles.controlButton} onPress={handleFilters} activeOpacity={0.7}>
+            <Ionicons name="options-outline" size={20} color="#666666" />
             <Text style={styles.controlButtonText}>Filters</Text>
-            <Ionicons name="chevron-down" size={16} color="#333" />
           </TouchableOpacity>
         </View>
 
@@ -255,6 +254,7 @@ const PCScreen = () => {
                   selectedSort === option.id && styles.selectedDropdownItem
                 ]}
                 onPress={() => handleSortOptionSelect(option.id)}
+                activeOpacity={0.7}
               >
                 <Text style={[
                   styles.dropdownItemText,
@@ -283,6 +283,7 @@ const PCScreen = () => {
                       selectedCategory === category.id && styles.selectedCategoryChip
                     ]}
                     onPress={() => handleCategoryPress(category.id)}
+                    activeOpacity={0.7}
                   >
                     <Ionicons 
                       name={category.icon as any} 
@@ -311,6 +312,7 @@ const PCScreen = () => {
                       selectedLocation === location.id && styles.selectedLocationChip
                     ]}
                     onPress={() => handleLocationPress(location.id)}
+                    activeOpacity={0.7}
                   >
                     <Ionicons 
                       name={location.icon as any} 
@@ -338,6 +340,7 @@ const PCScreen = () => {
                     selectedPriceRange === range.id && styles.selectedPriceRangeItem
                   ]}
                   onPress={() => handlePriceRangeSelect(range.id)}
+                  activeOpacity={0.7}
                 >
                   <Text style={[
                     styles.priceRangeText,
@@ -356,12 +359,12 @@ const PCScreen = () => {
               <TouchableOpacity style={styles.clearButton} onPress={() => {
                 setSelectedCategory(null);
                 setSelectedPriceRange('');
-              }}>
+              }} activeOpacity={0.7}>
                 <Text style={styles.clearButtonText}>Clear All</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.applyButton} onPress={() => {
                 setShowFiltersDropdown(false);
-              }}>
+              }} activeOpacity={0.7}>
                 <Text style={styles.applyButtonText}>Apply Filters</Text>
               </TouchableOpacity>
             </View>
@@ -376,6 +379,7 @@ const PCScreen = () => {
                 <TouchableOpacity
                   style={styles.activeFilterChip}
                   onPress={() => setSelectedCategory(null)}
+                  activeOpacity={0.7}
                 >
                   <Text style={styles.activeFilterChipText}>
                     {categories.find(c => c.id === selectedCategory)?.name}
@@ -387,6 +391,7 @@ const PCScreen = () => {
                 <TouchableOpacity
                   style={styles.activeFilterChip}
                   onPress={() => setSelectedLocation(null)}
+                  activeOpacity={0.7}
                 >
                   <Text style={styles.activeFilterChipText}>
                     {locations.find(l => l.id === selectedLocation)?.name}
@@ -398,6 +403,7 @@ const PCScreen = () => {
                 <TouchableOpacity
                   style={styles.activeFilterChip}
                   onPress={() => setSelectedPriceRange('')}
+                  activeOpacity={0.7}
                 >
                   <Text style={styles.activeFilterChipText}>
                     {priceRanges.find(r => r.id === selectedPriceRange)?.label}

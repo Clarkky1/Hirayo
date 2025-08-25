@@ -89,7 +89,7 @@ const TransactionCard: React.FC<{ item: Transaction; onPress: (item: Transaction
   };
 
   return (
-    <TouchableOpacity style={styles.transactionCard} onPress={() => onPress(item)}>
+    <TouchableOpacity style={styles.transactionCard} onPress={() => onPress(item)} activeOpacity={0.7}>
       {/* Item Image Placeholder */}
       <View style={styles.itemImage} />
       
@@ -222,7 +222,7 @@ export default function TransactionsScreen() {
 
       {/* Filter Dropdown */}
       <View style={styles.filterContainer}>
-        <TouchableOpacity style={styles.filterDropdownButton} onPress={toggleFiltersDropdown}>
+        <TouchableOpacity style={styles.filterDropdownButton} onPress={toggleFiltersDropdown} activeOpacity={0.7}>
           <Text style={styles.filterDropdownText}>
             {activeFilter === 'all' ? 'All' : 
              activeFilter === 'active' ? 'Active' : 
@@ -236,6 +236,7 @@ export default function TransactionsScreen() {
             <TouchableOpacity 
               style={[styles.filterOption, activeFilter === 'all' && styles.activeFilterOption]} 
               onPress={() => handleFilterSelect('all')}
+              activeOpacity={0.7}
             >
               <Text style={[styles.filterOptionText, activeFilter === 'all' && styles.activeFilterOptionText]}>
                 All
@@ -248,6 +249,7 @@ export default function TransactionsScreen() {
             <TouchableOpacity 
               style={[styles.filterOption, activeFilter === 'active' && styles.activeFilterOption]} 
               onPress={() => handleFilterSelect('active')}
+              activeOpacity={0.7}
             >
               <Text style={[styles.filterOptionText, activeFilter === 'active' && styles.activeFilterOptionText]}>
                 Active
@@ -260,6 +262,7 @@ export default function TransactionsScreen() {
             <TouchableOpacity 
               style={[styles.filterOption, activeFilter === 'completed' && styles.activeFilterOption]} 
               onPress={() => handleFilterSelect('completed')}
+              activeOpacity={0.7}
             >
               <Text style={[styles.filterOptionText, activeFilter === 'completed' && styles.activeFilterOptionText]}>
                 Completed
@@ -272,6 +275,7 @@ export default function TransactionsScreen() {
             <TouchableOpacity 
               style={[styles.filterOption, activeFilter === 'cancelled' && styles.activeFilterOption]} 
               onPress={() => handleFilterSelect('cancelled')}
+              activeOpacity={0.7}
             >
               <Text style={[styles.filterOptionText, activeFilter === 'cancelled' && styles.activeFilterOptionText]}>
                 Cancelled

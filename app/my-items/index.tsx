@@ -1,4 +1,4 @@
-import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
+  import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
@@ -23,7 +23,7 @@ interface MyItem {
   image?: string;
 }
 
-export default function MyItemsScreen() {
+export default function MyItemsScreen() {                                                          
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'active' | 'rented' | 'inactive'>('all');
 
   const myItems: MyItem[] = [
@@ -103,6 +103,7 @@ export default function MyItemsScreen() {
         selectedFilter === filter && styles.filterButtonActive
       ]}
       onPress={() => setSelectedFilter(filter)}
+      activeOpacity={0.7}
     >
       <Text style={[
         styles.filterButtonText,
@@ -172,6 +173,7 @@ export default function MyItemsScreen() {
               pathname: '/my-items/view',
               params: { itemId: item.id }
             })}
+            activeOpacity={0.7}
           >
             <Ionicons name="eye" size={16} color={Colors.text.inverse} />
             <Text style={styles.viewButtonText}>View</Text>
@@ -182,6 +184,7 @@ export default function MyItemsScreen() {
               pathname: '/my-items/edit',
               params: { itemId: item.id }
             })}
+            activeOpacity={0.7}
           >
             <Ionicons name="create" size={16} color={Colors.text.inverse} />
             <Text style={styles.editButtonText}>Edit</Text>
@@ -214,6 +217,7 @@ export default function MyItemsScreen() {
           <TouchableOpacity 
             style={styles.addItemButton}
             onPress={() => router.push('/post-item' as any)}
+            activeOpacity={0.7}
           >
             <Ionicons name="add" size={20} color={Colors.text.inverse} />
             <Text style={styles.addItemText}>Add Item</Text>
@@ -278,6 +282,7 @@ export default function MyItemsScreen() {
                 <TouchableOpacity 
                   style={styles.emptyStateButton}
                   onPress={() => router.push('/post-item' as any)}
+                  activeOpacity={0.7}
                 >
                   <Text style={styles.emptyStateButtonText}>Add Your First Item</Text>
                 </TouchableOpacity>

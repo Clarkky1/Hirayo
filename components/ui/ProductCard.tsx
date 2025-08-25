@@ -114,6 +114,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               e.stopPropagation();
               handleFavoritePress();
             }}
+            activeOpacity={0.7}
           >
             <Ionicons 
               name={isItemSaved(item.id) ? "heart" : "heart-outline"} 

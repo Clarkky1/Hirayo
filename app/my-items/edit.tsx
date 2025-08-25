@@ -4,6 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
     Alert,
+    Image,
     SafeAreaView,
     ScrollView,
     StyleSheet,
@@ -11,7 +12,6 @@ import {
     TextInput,
     TouchableOpacity,
     View,
-    Image,
 } from 'react-native';
 import { Card } from '../../components/ui/Card';
 
@@ -229,6 +229,7 @@ export default function EditItemScreen() {
                       item.status === status && styles.statusOptionActive
                     ]}
                     onPress={() => setItem({ ...item, status })}
+                    activeOpacity={0.7}
                   >
                     <Text style={[
                       styles.statusOptionText,
@@ -261,6 +262,7 @@ export default function EditItemScreen() {
                     <TouchableOpacity 
                       style={styles.removeImageButton} 
                       onPress={() => handleRemoveImage(index)}
+                      activeOpacity={0.7}
                     >
                       <Ionicons name="close-circle" size={16} color={Colors.error} />
                     </TouchableOpacity>
@@ -273,6 +275,7 @@ export default function EditItemScreen() {
                     key={`empty-${index}`} 
                     style={styles.emptyImageBox} 
                     onPress={handleAddImage}
+                    activeOpacity={0.7}
                   >
                     <Ionicons name="add" size={24} color={Colors.neutral[400]} />
                     <Text style={styles.addImageText}>Add</Text>
@@ -297,6 +300,7 @@ export default function EditItemScreen() {
             <TouchableOpacity 
               style={[styles.actionButton, styles.saveButton]} 
               onPress={handleSave}
+              activeOpacity={0.7}
             >
               <Ionicons name="checkmark" size={20} color={Colors.text.inverse} />
               <Text style={styles.actionButtonText}>Save Changes</Text>
@@ -305,6 +309,7 @@ export default function EditItemScreen() {
             <TouchableOpacity 
               style={[styles.actionButton, styles.cancelButton]} 
               onPress={handleCancel}
+              activeOpacity={0.7}
             >
               <Ionicons name="close" size={20} color={Colors.text.inverse} />
               <Text style={styles.actionButtonText}>Cancel</Text>
@@ -317,6 +322,7 @@ export default function EditItemScreen() {
           <TouchableOpacity 
             style={styles.deleteButton} 
             onPress={handleDelete}
+            activeOpacity={0.7}
           >
             <Ionicons name="trash" size={20} color={Colors.error} />
             <Text style={styles.deleteButtonText}>Delete Item</Text>
@@ -494,9 +500,12 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.success,
   },
   cancelButton: {
-    backgroundColor: Colors.background.secondary,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
+    backgroundColor: '#FF9500', // Changed to orange
+    borderRadius: BorderRadius.md,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.xl,
+    alignItems: 'center',
+    marginRight: Spacing.md,
   },
   actionButtonText: {
     ...TextStyles.button.medium,

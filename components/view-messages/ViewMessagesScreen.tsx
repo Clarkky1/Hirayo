@@ -1,13 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
-    FlatList,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 interface ChatMessage {
@@ -136,7 +136,7 @@ export default function ViewMessagesScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+        <TouchableOpacity style={styles.backButton} onPress={handleBack} activeOpacity={0.7}>
           <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
         
@@ -153,7 +153,7 @@ export default function ViewMessagesScreen() {
           </View>
         </View>
         
-        <TouchableOpacity style={styles.moreButton} onPress={handleMore}>
+        <TouchableOpacity style={styles.moreButton} onPress={handleMore} activeOpacity={0.7}>
           <Ionicons name="ellipsis-vertical" size={24} color="black" />
         </TouchableOpacity>
       </View>
@@ -195,6 +195,7 @@ export default function ViewMessagesScreen() {
             ]}
             onPress={handleSend}
             disabled={!messageText.trim()}
+            activeOpacity={0.7}
           >
             <Ionicons 
               name="send" 

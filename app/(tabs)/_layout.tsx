@@ -47,6 +47,7 @@ export default function TabLayout() {
             <TouchableOpacity 
               style={{ marginRight: 16 }}
               onPress={() => setIsDrawerOpen(true)}
+              activeOpacity={0.7}
             >
               <Ionicons name="menu" size={24} color="#FFFFFF" />
             </TouchableOpacity>

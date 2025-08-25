@@ -1,4 +1,4 @@
-import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
+ import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
@@ -42,80 +42,70 @@ export const LenderMenu: React.FC<LenderMenuProps> = ({ visible, onClose }) => {
     >
       <TouchableOpacity style={styles.overlay} onPress={onClose} activeOpacity={1}>
         <View style={styles.menuContainer}>
-          <View style={styles.menuHeader}>
-            <Text style={styles.menuTitle}>Lender Menu</Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Ionicons name="close" size={24} color={Colors.text.primary} />
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity onPress={onClose} style={styles.closeButton} activeOpacity={0.7}>
+            <Ionicons name="close" size={24} color="#333" />
+          </TouchableOpacity>
           
-          {/* Lender Profile */}
-          <TouchableOpacity 
-            style={styles.menuItem} 
-            onPress={() => handleMenuAction('profile')}
-          >
-            <View style={styles.menuItemContent}>
-              <View style={styles.menuItemIcon}>
-                <Ionicons name="person-circle" size={24} color={Colors.primary[500]} />
-              </View>
-              <Text style={styles.menuItemText}>Lender Profile</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={Colors.text.secondary} />
-          </TouchableOpacity>
-
-          {/* Quick Actions */}
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
+          <Text style={styles.menuTitle}>Lender Menu</Text>
           
-          <TouchableOpacity 
-            style={styles.menuItem} 
-            onPress={() => handleMenuAction('myItems')}
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => {
+              onClose();
+              router.push('/my-items');
+            }}
+            activeOpacity={0.7}
           >
-            <View style={styles.menuItemContent}>
-              <View style={styles.menuItemIcon}>
-                <Ionicons name="list-outline" size={24} color={Colors.primary[500]} />
-              </View>
-              <Text style={styles.menuItemText}>My Items</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={Colors.text.secondary} />
+            <Ionicons name="cube-outline" size={20} color="#333" />
+            <Text style={styles.menuItemText}>My Items</Text>
           </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={styles.menuItem} 
-            onPress={() => handleMenuAction('earnings')}
+          
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => {
+              onClose();
+              router.push('/earnings');
+            }}
+            activeOpacity={0.7}
           >
-            <View style={styles.menuItemContent}>
-              <View style={styles.menuItemIcon}>
-                <Ionicons name="trending-up-outline" size={24} color={Colors.success} />
-              </View>
-              <Text style={styles.menuItemText}>Earnings</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={Colors.text.secondary} />
+            <Ionicons name="trending-up-outline" size={20} color="#333" />
+            <Text style={styles.menuItemText}>Earnings</Text>
           </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={styles.menuItem} 
-            onPress={() => handleMenuAction('analytics')}
+          
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => {
+              onClose();
+              router.push('/analytics');
+            }}
+            activeOpacity={0.7}
           >
-            <View style={styles.menuItemContent}>
-              <View style={styles.menuItemIcon}>
-                <Ionicons name="analytics-outline" size={24} color={Colors.primary[500]} />
-              </View>
-              <Text style={styles.menuItemText}>Analytics</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={Colors.text.secondary} />
+            <Ionicons name="analytics-outline" size={20} color="#333" />
+            <Text style={styles.menuItemText}>Analytics</Text>
           </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={styles.menuItem} 
-            onPress={() => handleMenuAction('messages')}
+          
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => {
+              onClose();
+              router.push('/lender-messages');
+            }}
+            activeOpacity={0.7}
           >
-            <View style={styles.menuItemContent}>
-              <View style={styles.menuItemIcon}>
-                <Ionicons name="chatbubbles-outline" size={24} color={Colors.primary[500]} />
-              </View>
-              <Text style={styles.menuItemText}>Messages</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={Colors.text.secondary} />
+            <Ionicons name="chatbubbles-outline" size={20} color="#333" />
+            <Text style={styles.menuItemText}>Messages</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => {
+              onClose();
+              router.push('/lender-settings');
+            }}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="settings-outline" size={20} color="#333" />
+            <Text style={styles.menuItemText}>Settings</Text>
           </TouchableOpacity>
         </View>
       </TouchableOpacity>

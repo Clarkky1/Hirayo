@@ -88,6 +88,7 @@ export default function ProfileScreen() {
     <TouchableOpacity 
       onPress={onPress}
       disabled={!onPress}
+      activeOpacity={0.7}
     >
       <Card variant="filled" padding="large" style={styles.settingItem}>
         <View style={styles.settingItemLeft}>
@@ -187,7 +188,7 @@ export default function ProfileScreen() {
 
         {/* Logout Section */}
         <View style={styles.section}>
-          <TouchableOpacity onPress={handleLogout}>
+          <TouchableOpacity onPress={handleLogout} activeOpacity={0.7}>
             <Card variant="filled" padding="large" style={styles.logoutButton}>
               <Ionicons name="log-out-outline" size={20} color={Colors.error} />
               <Text style={styles.logoutText}>Logout</Text>

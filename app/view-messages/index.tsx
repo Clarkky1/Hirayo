@@ -3,14 +3,14 @@ import { useNavigation } from '@react-navigation/native';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
-  FlatList,
-  Keyboard,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
+    FlatList,
+    Keyboard,
+    SafeAreaView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import { Spacing } from '../../constants/DesignSystem';
 
@@ -153,7 +153,7 @@ export default function ViewMessagesScreen() {
       <View style={[styles.contentContainer, { paddingBottom: keyboardHeight }]}>
         {/* Item Navigation Button */}
         {itemName && (
-          <TouchableOpacity style={styles.itemButton} onPress={() => router.push('/item')}>
+          <TouchableOpacity style={styles.itemButton} onPress={() => router.push('/item')} activeOpacity={0.7}>
             <View style={styles.itemButtonContent}>
               <Ionicons name="cube-outline" size={20} color="#0066CC" />
               <Text style={styles.itemButtonText}>View Item: {itemName}</Text>
@@ -190,6 +190,7 @@ export default function ViewMessagesScreen() {
             style={[styles.sendButton, !newMessage.trim() && styles.sendButtonDisabled]} 
             onPress={handleSendMessage}
             disabled={!newMessage.trim()}
+            activeOpacity={0.7}
           >
             <Ionicons 
               name="send" 

@@ -165,7 +165,7 @@ const AudioScreen = () => {
   const filteredProducts = getFilteredProducts();
 
   const renderProductItem = ({ item }: { item: ProductItem }) => (
-    <TouchableOpacity style={styles.productItem}>
+    <TouchableOpacity style={styles.productItem} activeOpacity={0.7}>
       <Image source={{ uri: item.image }} style={styles.productImage} />
       <View style={styles.productInfo}>
         <Text style={styles.productName}>{item.name}</Text>
@@ -190,6 +190,7 @@ const AudioScreen = () => {
               key={`cat-${category}`}
               style={styles.activeFilterChip}
               onPress={() => handleCategoryToggle(category)}
+              activeOpacity={0.7}
             >
               <Text style={styles.activeFilterText}>{categoryInfo.label}</Text>
               <Ionicons name="close" size={16} color="#fff" />
@@ -205,6 +206,7 @@ const AudioScreen = () => {
           key="price"
           style={styles.activeFilterChip}
           onPress={() => setSelectedPriceRange('')}
+          activeOpacity={0.7}
         >
           <Text style={styles.activeFilterText}>₱{selectedPriceRange}</Text>
           <Ionicons name="close" size={16} color="#fff" />
@@ -219,7 +221,7 @@ const AudioScreen = () => {
           <View style={styles.activeFiltersList}>
             {activeFilters}
           </View>
-          <TouchableOpacity style={styles.clearAllButton} onPress={handleClearFilters}>
+          <TouchableOpacity style={styles.clearAllButton} onPress={handleClearFilters} activeOpacity={0.7}>
             <Text style={styles.clearAllText}>Clear All</Text>
           </TouchableOpacity>
         </View>
@@ -245,6 +247,7 @@ const AudioScreen = () => {
                 selectedCategories.includes(category.id) && styles.filterChipActive
               ]}
               onPress={() => handleCategoryToggle(category.id)}
+              activeOpacity={0.7}
             >
               <Ionicons 
                 name={category.icon as any} 
@@ -285,16 +288,14 @@ const AudioScreen = () => {
         </View>
 
         <View style={styles.controlsContainer}>
-          <TouchableOpacity style={styles.controlButton} onPress={handleSortBy}>
-            <Ionicons name="funnel" size={20} color="#333" />
-            <Text style={styles.controlButtonText}>Sort by</Text>
-            <Ionicons name="chevron-down" size={16} color="#333" />
+          <TouchableOpacity style={styles.controlButton} onPress={handleSortBy} activeOpacity={0.7}>
+            <Ionicons name="funnel-outline" size={20} color="#666666" />
+            <Text style={styles.controlButtonText}>Sort</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.controlButton} onPress={handleFilters}>
-            <Ionicons name="options" size={20} color="#333" />
+          <TouchableOpacity style={styles.controlButton} onPress={handleFilters} activeOpacity={0.7}>
+            <Ionicons name="options-outline" size={20} color="#666666" />
             <Text style={styles.controlButtonText}>Filters</Text>
-            <Ionicons name="chevron-down" size={16} color="#333" />
           </TouchableOpacity>
         </View>
 
@@ -308,6 +309,7 @@ const AudioScreen = () => {
                   selectedSort === option.id && styles.selectedDropdownItem
                 ]}
                 onPress={() => handleSortOptionSelect(option.id)}
+                activeOpacity={0.7}
               >
                 <Text style={[
                   styles.dropdownItemText,
@@ -336,6 +338,7 @@ const AudioScreen = () => {
                       selectedCategories.includes(category.id) && styles.selectedCategoryChip
                     ]}
                     onPress={() => handleCategoryNavigation(category.id)}
+                    activeOpacity={0.7}
                   >
                     <Ionicons 
                       name={category.icon as any} 
@@ -363,6 +366,7 @@ const AudioScreen = () => {
                     selectedPriceRange === range.id && styles.selectedPriceRangeItem
                   ]}
                   onPress={() => handlePriceRangeSelect(range.id)}
+                  activeOpacity={0.7}
                 >
                   <Text style={[
                     styles.priceRangeText,
@@ -378,11 +382,11 @@ const AudioScreen = () => {
             </View>
 
             <View style={styles.filterActions}>
-              <TouchableOpacity style={styles.clearButton} onPress={handleClearFilters}>
-                <Text style={styles.clearButtonText}>Clear All</Text>
+              <TouchableOpacity style={styles.clearButton} onPress={handleClearFilters} activeOpacity={0.7}>
+                <Text style={styles.clearButtonText}>Clear</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.applyButton} onPress={handleApplyFilters}>
-                <Text style={styles.applyButtonText}>Apply Filters</Text>
+              <TouchableOpacity style={styles.applyButton} onPress={handleApplyFilters} activeOpacity={0.7}>
+                <Text style={styles.applyButtonText}>Apply</Text>
               </TouchableOpacity>
             </View>
           </View>

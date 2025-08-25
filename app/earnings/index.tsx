@@ -98,6 +98,7 @@ export default function EarningsScreen() {
           <TouchableOpacity 
             style={[styles.periodButton, selectedPeriod === 'week' && styles.periodButtonActive]}
             onPress={() => setSelectedPeriod('week')}
+            activeOpacity={0.7}
           >
             <Text style={[
               styles.periodButtonText,
@@ -109,6 +110,7 @@ export default function EarningsScreen() {
           <TouchableOpacity 
             style={[styles.periodButton, selectedPeriod === 'month' && styles.periodButtonActive]}
             onPress={() => setSelectedPeriod('month')}
+            activeOpacity={0.7}
           >
             <Text style={[
               styles.periodButtonText,
@@ -120,6 +122,7 @@ export default function EarningsScreen() {
           <TouchableOpacity 
             style={[styles.periodButton, selectedPeriod === 'year' && styles.periodButtonActive]}
             onPress={() => setSelectedPeriod('year')}
+            activeOpacity={0.7}
           >
             <Text style={[
               styles.periodButtonText,

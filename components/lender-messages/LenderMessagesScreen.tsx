@@ -120,6 +120,7 @@ export default function LenderMessagesScreen() {
                   isLenderView: 'true'
                 }
               })}
+              activeOpacity={0.7}
             >
               <Card variant="filled" padding="large">
                 <View style={styles.messageContent}>

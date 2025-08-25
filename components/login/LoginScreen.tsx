@@ -75,6 +75,7 @@ export default function LoginScreen() {
             style={[styles.continueButton, phoneNumber.length > 0 && styles.continueButtonActive]}
             onPress={handleContinue}
             disabled={phoneNumber.length === 0}
+            activeOpacity={0.7}
           >
             <Text style={styles.continueButtonText}>Continue</Text>
           </TouchableOpacity>
@@ -85,14 +86,14 @@ export default function LoginScreen() {
             <View style={styles.dividerLine} />
           </View>
 
-          <TouchableOpacity style={styles.socialButton} onPress={handleFacebookLogin}>
+          <TouchableOpacity style={styles.socialButton} onPress={handleFacebookLogin} activeOpacity={0.7}>
             <View style={styles.socialButtonContent}>
               <Ionicons name="logo-facebook" size={20} color="#1877F2" />
               <Text style={styles.socialButtonText}>Continue with Facebook</Text>
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.socialButton} onPress={handleGoogleLogin}>
+          <TouchableOpacity style={styles.socialButton} onPress={handleGoogleLogin} activeOpacity={0.7}>
             <View style={styles.socialButtonContent}>
               <Ionicons name="logo-google" size={20} color="#DB4437" />
               <Text style={styles.socialButtonText}>Continue with Google</Text>
@@ -101,7 +102,7 @@ export default function LoginScreen() {
 
           <View style={styles.signupContainer}>
             <Text style={styles.signupText}>Don&apos;t have an account? </Text>
-            <TouchableOpacity onPress={handleSignup}>
+            <TouchableOpacity onPress={handleSignup} activeOpacity={0.7}>
               <Text style={styles.signupLink}>Sign up</Text>
             </TouchableOpacity>
           </View>

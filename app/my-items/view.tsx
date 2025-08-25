@@ -179,6 +179,7 @@ export default function ViewItemScreen() {
                 <TouchableOpacity 
                   style={[styles.trackingButton, styles.startButton]} 
                   onPress={handleStartTracking}
+                  activeOpacity={0.7}
                 >
                   <Ionicons name="play" size={20} color={Colors.text.inverse} />
                   <Text style={styles.buttonText}>Start Tracking</Text>
@@ -187,6 +188,7 @@ export default function ViewItemScreen() {
                 <TouchableOpacity 
                   style={[styles.trackingButton, styles.stopButton]} 
                   onPress={handleStopTracking}
+                  activeOpacity={0.7}
                 >
                   <Ionicons name="stop" size={20} color={Colors.text.inverse} />
                   <Text style={styles.buttonText}>Stop Tracking</Text>
@@ -203,6 +205,7 @@ export default function ViewItemScreen() {
             <TouchableOpacity 
               style={[styles.actionButton, styles.contactButton]} 
               onPress={handleContactRenter}
+              activeOpacity={0.7}
             >
               <Ionicons name="call" size={20} color={Colors.text.inverse} />
               <Text style={styles.actionButtonText}>Contact Renter</Text>
@@ -211,6 +214,7 @@ export default function ViewItemScreen() {
             <TouchableOpacity 
               style={[styles.actionButton, styles.reportButton]} 
               onPress={handleReportIssue}
+              activeOpacity={0.7}
             >
               <Ionicons name="warning" size={20} color={Colors.text.inverse} />
               <Text style={styles.actionButtonText}>Report Issue</Text>

@@ -105,7 +105,7 @@ export const RentalRequestForm: React.FC<RentalRequestFormProps> = ({
         <View style={styles.container}>
           <View style={styles.header}>
             <Text style={styles.title}>Create Rental Request</Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <TouchableOpacity onPress={onClose} style={styles.closeButton} activeOpacity={0.7}>
               <Ionicons name="close" size={24} color={Colors.text.primary} />
             </TouchableOpacity>
           </View>
@@ -160,7 +160,7 @@ export const RentalRequestForm: React.FC<RentalRequestFormProps> = ({
           </View>
 
           <View style={styles.actions}>
-            <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
+            <TouchableOpacity style={styles.cancelButton} onPress={onClose} activeOpacity={0.7}>
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
             
