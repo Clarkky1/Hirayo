@@ -62,17 +62,17 @@ export default function HomeScreen() {
           <TouchableOpacity style={styles.featuredCard}>
             <View style={styles.featuredImage} />
             <Text style={styles.featuredTitle}>MacBook Pro 16"</Text>
-            <Text style={styles.featuredPrice}>$50/day</Text>
+            <Text style={styles.featuredPrice}>₱3,500 for a day</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.featuredCard}>
             <View style={styles.featuredImage} />
             <Text style={styles.featuredTitle}>iPhone 15 Pro</Text>
-            <Text style={styles.featuredPrice}>$25/day</Text>
+            <Text style={styles.featuredPrice}>₱1,800 for a day</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.featuredCard}>
             <View style={styles.featuredImage} />
             <Text style={styles.featuredTitle}>Sony A7R V</Text>
-            <Text style={styles.featuredPrice}>$75/day</Text>
+            <Text style={styles.featuredPrice}>₱2,500 for a day</Text>
           </TouchableOpacity>
         </ScrollView>
       </View>

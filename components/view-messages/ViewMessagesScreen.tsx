@@ -163,7 +163,7 @@ export default function ViewMessagesScreen() {
         <View style={styles.itemImage} />
         <View style={styles.itemDetails}>
           <Text style={styles.itemName}>Canon EOS 90D DSLR Camera</Text>
-          <Text style={styles.itemPrice}>₱1,253/day</Text>
+          <Text style={styles.itemPrice}>₱2,500 for a day</Text>
         </View>
       </View>
 

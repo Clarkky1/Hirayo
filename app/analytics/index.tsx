@@ -122,14 +122,6 @@ export default function AnalyticsScreen() {
               'positive',
               Colors.success
             )}
-            {renderMetricCard(
-              'time-outline',
-              'Response Time',
-              '2.3h',
-              '-0.5h',
-              'positive',
-              Colors.warning
-            )}
           </View>
         </View>
 
@@ -274,9 +266,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
+    gap: Spacing.sm,
   },
   metricCard: {
-    width: '48%',
+    width: '31%',
     marginBottom: Spacing.sm,
   },
   metricHeader: {

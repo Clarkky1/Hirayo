@@ -170,7 +170,7 @@ const DroneScreen = () => {
       <Image source={{ uri: item.image }} style={styles.productImage} />
       <View style={styles.productInfo}>
         <Text style={styles.productName}>{item.name}</Text>
-        <Text style={styles.productPrice}>₱{item.price.toLocaleString()} per day</Text>
+        <Text style={styles.productPrice}>₱{item.price.toLocaleString()} for a day</Text>
         <View style={styles.ratingContainer}>
           <Ionicons name="star" size={16} color="#FFD700" />
           <Text style={styles.rating}>{item.rating}</Text>

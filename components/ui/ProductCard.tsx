@@ -138,7 +138,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         
         <Text style={variantStyles.price}>
           ₱{item.price.toLocaleString()} 
-          <Text style={styles.perDayText}> per day</Text>
+          <Text style={styles.perDayText}> for a day</Text>
         </Text>
       </View>
     </TouchableOpacity>

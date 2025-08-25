@@ -49,7 +49,7 @@ export default function ViewMessagesScreen() {
     },
     {
       id: '4',
-      text: 'The daily rate is ₱45. How many days do you need it?',
+      text: 'The daily rate is ₱2,500 for a day. How many days do you need it?',
       timestamp: '2:37 PM',
       isFromUser: true,
     },

@@ -24,14 +24,14 @@ interface ProductItem {
 }
 
 const products: ProductItem[] = [
-  { id: '1', name: 'Canon EOS R5 Mirrorless Camera', rating: 4.8, location: 'Talisay, Cebu', price: 45, category: 'camera' },
-  { id: '2', name: 'MacBook Pro M2 14-inch', rating: 4.9, location: 'Cebu City', price: 35, category: 'laptop' },
-  { id: '3', name: 'iPhone 15 Pro Max', rating: 4.7, location: 'Mandaue City', price: 25, category: 'phone' },
-  { id: '4', name: 'iPad Pro 12.9" M2', rating: 4.6, location: 'Lapu-Lapu City', price: 30, category: 'tablet' },
-  { id: '5', name: 'DJI Mavic 3 Pro Drone', rating: 4.9, location: 'Cebu City', price: 55, category: 'drone' },
-  { id: '6', name: 'Gaming PC RTX 4080', rating: 4.7, location: 'Mandaue City', price: 40, category: 'pc' },
-  { id: '7', name: 'PlayStation 5', rating: 4.8, location: 'Lapu-Lapu City', price: 20, category: 'gaming' },
-  { id: '8', name: 'Sony WH-1000XM5 Headphones', rating: 4.6, location: 'Talisay, Cebu', price: 15, category: 'audio' },
+  { id: '1', name: 'Canon EOS R5 Mirrorless Camera', rating: 4.8, location: 'Talisay, Cebu', price: 2500, category: 'camera' },
+  { id: '2', name: 'MacBook Pro M2 14-inch', rating: 4.9, location: 'Cebu City', price: 3500, category: 'laptop' },
+  { id: '3', name: 'iPhone 15 Pro Max', rating: 4.7, location: 'Mandaue City', price: 1800, category: 'phone' },
+  { id: '4', name: 'iPad Pro 12.9" M2', rating: 4.6, location: 'Lapu-Lapu City', price: 2200, category: 'tablet' },
+  { id: '5', name: 'DJI Mavic 3 Pro Drone', rating: 4.9, location: 'Cebu City', price: 4200, category: 'drone' },
+  { id: '6', name: 'Gaming PC RTX 4080', rating: 4.7, location: 'Mandaue City', price: 3800, category: 'pc' },
+  { id: '7', name: 'PlayStation 5', rating: 4.8, location: 'Lapu-Lapu City', price: 1200, category: 'gaming' },
+  { id: '8', name: 'Sony WH-1000XM5 Headphones', rating: 4.6, location: 'Talisay, Cebu', price: 800, category: 'audio' },
 ];
 
   const sortOptions = ['₱500 - ₱1,500', '₱1,500 - ₱2,500', '₱2,500 - ₱3,500', '₱3,500 - ₱4,500', '₱4,500 - ₱5,500', '₱5,500 - ₱6,500', '₱6,500 - ₱7,500', '₱7,500 - ₱8,500', '₱8,500 - ₱9,500', '₱9,500 - ₱10,000'];
@@ -378,6 +378,32 @@ export default function DiscoverScreen() {
               </View>
             </View>
 
+            {/* Price Range */}
+            <View style={styles.filterSection}>
+              <Text style={styles.filterSectionTitle}>Price Range</Text>
+              <View style={styles.priceRangeGrid}>
+                {sortOptions.map((option, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={[
+                      styles.priceRangeChip,
+                      selectedSort === option && styles.selectedPriceRangeChip
+                    ]}
+                    onPress={() => handleSortOptionSelect(option)}
+                  >
+                    <Text style={[
+                      styles.priceRangeChipText,
+                      selectedSort === option && styles.selectedPriceRangeChipText
+                    ]}>
+                      {option}
+                    </Text>
+                    {selectedSort === option && (
+                      <Ionicons name="checkmark" size={14} color={Colors.primary[500]} />
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
 
 
             {/* Action Buttons */}
@@ -606,23 +632,31 @@ const styles = StyleSheet.create({
   selectedLocationChipText: {
     color: Colors.text.inverse,
   },
-  priceRangeItem: {
+  priceRangeGrid: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: Spacing.sm,
+  },
+  priceRangeChip: {
+    backgroundColor: Colors.background.secondary,
+    borderRadius: BorderRadius.full,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
-    borderRadius: BorderRadius.base,
-    marginBottom: Spacing.xs,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
   },
-  selectedPriceRangeItem: {
-    backgroundColor: Colors.primary[50],
-  },
-  priceRangeText: {
-    ...TextStyles.body.medium,
+  priceRangeChipText: {
+    ...TextStyles.body.small,
     color: Colors.text.primary,
   },
-  selectedPriceRangeText: {
+  selectedPriceRangeChip: {
+    backgroundColor: Colors.primary[50],
+    borderColor: Colors.primary[300],
+  },
+  selectedPriceRangeChipText: {
     color: Colors.primary[500],
     fontWeight: '600',
   },

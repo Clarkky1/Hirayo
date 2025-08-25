@@ -41,8 +41,8 @@ export default function ReviewOrderScreen() {
           
           {/* Price per Day */}
           <View style={styles.priceContainer}>
-            <Text style={styles.price}>₱1,253</Text>
-            <Text style={styles.pricePeriod}>per day</Text>
+            <Text style={styles.price}>₱2,500</Text>
+            <Text style={styles.pricePeriod}>for a day</Text>
           </View>
         </View>
 
@@ -102,7 +102,7 @@ export default function ReviewOrderScreen() {
       {/* Sticky Footer */}
       <View style={styles.footer}>
         <View style={styles.totalSection}>
-          <Text style={styles.totalPrice}>₱5,012</Text>
+          <Text style={styles.totalPrice}>₱10,000</Text>
           <Text style={styles.totalPeriod}>for 4 days</Text>
         </View>
         <TouchableOpacity style={styles.payButton} onPress={handlePay}>

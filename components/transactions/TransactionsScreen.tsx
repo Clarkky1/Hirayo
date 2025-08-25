@@ -110,7 +110,9 @@ const TransactionCard: React.FC<{ item: Transaction; onPress: (item: Transaction
 
       {/* Amount and Status */}
       <View style={styles.amountStatusContainer}>
-        <Text style={styles.amount}>₱{item.amount.toLocaleString()}</Text>
+        <Text style={styles.amount}>
+          ₱{item.amount.toLocaleString()} <Text style={styles.perDayText}>for a day</Text>
+        </Text>
         <View style={styles.statusContainer}>
           <Ionicons 
             name={getStatusIcon(item.status) as any} 
@@ -456,6 +458,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333333',
     marginBottom: 6,
+  },
+  perDayText: {
+    fontSize: 12,
+    color: '#999999',
+    marginLeft: 4,
   },
   statusContainer: {
     flexDirection: 'row',

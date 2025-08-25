@@ -183,7 +183,7 @@ export default function EarningsScreen() {
                 <Text style={styles.activityTitle}>Canon EOS R5 Rental</Text>
                 <Text style={styles.activityTime}>Today, 2:30 PM</Text>
               </View>
-              <Text style={styles.activityTransactionAmount}>+₱45</Text>
+              <Text style={styles.activityTransactionAmount}>+₱2,500</Text>
             </View>
             
             <View style={styles.activityItem}>
@@ -194,7 +194,7 @@ export default function EarningsScreen() {
                 <Text style={styles.activityTitle}>MacBook Pro Rental</Text>
                 <Text style={styles.activityTime}>Yesterday, 10:15 AM</Text>
               </View>
-              <Text style={styles.activityTransactionAmount}>+₱35</Text>
+              <Text style={styles.activityTransactionAmount}>+₱3,500</Text>
             </View>
             
             <View style={styles.activityItem}>
@@ -205,7 +205,7 @@ export default function EarningsScreen() {
                 <Text style={styles.activityTitle}>iPhone 15 Pro Max</Text>
                 <Text style={styles.activityTime}>2 days ago</Text>
               </View>
-              <Text style={styles.activityTransactionAmount}>+₱25</Text>
+              <Text style={styles.activityTransactionAmount}>+₱1,800</Text>
             </View>
             
             <View style={styles.activityItem}>
@@ -216,7 +216,7 @@ export default function EarningsScreen() {
                 <Text style={styles.activityTitle}>DJI Mavic 3 Drone</Text>
                 <Text style={styles.activityTime}>3 days ago</Text>
               </View>
-              <Text style={styles.activityTransactionAmount}>+₱55</Text>
+              <Text style={styles.activityTransactionAmount}>+₱4,200</Text>
             </View>
             
             <View style={styles.activityItem}>
@@ -227,7 +227,7 @@ export default function EarningsScreen() {
                 <Text style={styles.activityTitle}>Gaming PC RTX 4080</Text>
                 <Text style={styles.activityTime}>1 week ago</Text>
               </View>
-              <Text style={styles.activityTransactionAmount}>+₱40</Text>
+              <Text style={styles.activityTransactionAmount}>+₱3,800</Text>
             </View>
           </Card>
         </View>

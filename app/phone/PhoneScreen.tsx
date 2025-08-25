@@ -187,7 +187,7 @@ export default function PhoneScreen() {
         </View>
         <Text style={styles.locationText}>{item.location}</Text>
         <Text style={styles.priceText}>
-          ₱{item.price.toLocaleString()} <Text style={styles.perDayText}>per day</Text>
+          ₱{item.price.toLocaleString()} <Text style={styles.perDayText}>for a day</Text>
         </Text>
       </View>
     </TouchableOpacity>

@@ -41,18 +41,18 @@ const categories: CategoryItem[] = [
 ];
 
 const exploreItems: ExploreItem[] = [
-  { id: '1', name: 'Canon EOS R5 Mirrorless Camera', rating: 4.8, location: 'Talisay, Cebu', price: 45 },
-  { id: '2', name: 'MacBook Pro M2 14-inch', rating: 4.9, location: 'Cebu City', price: 35 },
-  { id: '3', name: 'iPhone 15 Pro Max', rating: 4.7, location: 'Mandaue City', price: 25 },
-  { id: '4', name: 'iPad Pro 12.9" M2', rating: 4.6, location: 'Lapu-Lapu City', price: 30 },
+  { id: '1', name: 'Canon EOS R5 Mirrorless Camera', rating: 4.8, location: 'Talisay, Cebu', price: 2500 },
+  { id: '2', name: 'MacBook Pro M2 14-inch', rating: 4.9, location: 'Cebu City', price: 3500 },
+  { id: '3', name: 'iPhone 15 Pro Max', rating: 4.7, location: 'Mandaue City', price: 1800 },
+  { id: '4', name: 'iPad Pro 12.9" M2', rating: 4.6, location: 'Lapu-Lapu City', price: 2200 },
 ];
 
 const popularItems: ExploreItem[] = [
-  { id: 'p1', name: 'DJI Mavic 3 Pro Drone', rating: 4.9, location: 'Cebu City', price: 55 },
-  { id: 'p2', name: 'Gaming PC RTX 4080', rating: 4.7, location: 'Mandaue City', price: 40 },
-  { id: 'p3', name: 'PlayStation 5', rating: 4.8, location: 'Lapu-Lapu City', price: 20 },
-  { id: 'p4', name: 'Sony WH-1000XM5 Headphones', rating: 4.6, location: 'Talisay, Cebu', price: 15 },
-  { id: 'p5', name: 'GoPro Hero 11 Black', rating: 4.8, location: 'Cebu City', price: 25 },
+  { id: 'p1', name: 'DJI Mavic 3 Pro Drone', rating: 4.9, location: 'Cebu City', price: 4200 },
+  { id: 'p2', name: 'Gaming PC RTX 4080', rating: 4.7, location: 'Mandaue City', price: 3800 },
+  { id: 'p3', name: 'PlayStation 5', rating: 4.8, location: 'Lapu-Lapu City', price: 1200 },
+  { id: 'p4', name: 'Sony WH-1000XM5 Headphones', rating: 4.6, location: 'Talisay, Cebu', price: 800 },
+  { id: 'p5', name: 'GoPro Hero 11 Black', rating: 4.8, location: 'Cebu City', price: 1500 },
 ];
 
 export default function HomeScreen() {

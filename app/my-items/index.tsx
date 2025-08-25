@@ -31,7 +31,7 @@ export default function MyItemsScreen() {
       id: '1',
       name: 'Canon EOS R5 Camera',
       category: 'Cameras',
-      price: '₱45/day',
+      price: '₱2,500 for a day',  
       status: 'active',
       rating: 4.9,
       totalRentals: 12
@@ -40,7 +40,7 @@ export default function MyItemsScreen() {
       id: '2',
       name: 'MacBook Pro M2',
       category: 'Laptops',
-      price: '₱35/day',
+      price: '₱3,500 for a day',
       status: 'rented',
       rating: 4.8,
       totalRentals: 8
@@ -49,7 +49,7 @@ export default function MyItemsScreen() {
       id: '3',
       name: 'iPhone 15 Pro Max',
       category: 'Phones',
-      price: '₱25/day',
+      price: '₱1,800 for a day',
       status: 'active',
       rating: 4.7,
       totalRentals: 15
@@ -58,7 +58,7 @@ export default function MyItemsScreen() {
       id: '4',
       name: 'DJI Mavic 3 Drone',
       category: 'Drones',
-      price: '₱55/day',
+      price: '₱4,200 for a day',
       status: 'inactive',
       rating: 4.6,
       totalRentals: 6
@@ -166,11 +166,23 @@ export default function MyItemsScreen() {
         </View>
         
         <View style={styles.actionButtons}>
-          <TouchableOpacity style={styles.viewButton}>
+          <TouchableOpacity 
+            style={styles.viewButton}
+            onPress={() => router.push({
+              pathname: '/my-items/view',
+              params: { itemId: item.id }
+            })}
+          >
             <Ionicons name="eye" size={16} color={Colors.text.inverse} />
             <Text style={styles.viewButtonText}>View</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.editButton}>
+          <TouchableOpacity 
+            style={styles.editButton}
+            onPress={() => router.push({
+              pathname: '/my-items/edit',
+              params: { itemId: item.id }
+            })}
+          >
             <Ionicons name="create" size={16} color={Colors.text.inverse} />
             <Text style={styles.editButtonText}>Edit</Text>
           </TouchableOpacity>

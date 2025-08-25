@@ -22,7 +22,7 @@ export default function ItemDetailScreen() {
   const item = selectedItem || {
     id: '1',
     name: 'Canon EOS 90D DSLR Camera',
-    price: 1253,
+    price: 2500,
     rating: 4.76,
     location: 'Cebu City',
     category: 'camera'
@@ -52,7 +52,7 @@ export default function ItemDetailScreen() {
           <Text style={styles.productName}>{item.name}</Text>
           <View style={styles.priceContainer}>
             <Text style={styles.price}>₱{item.price}</Text>
-            <Text style={styles.rentalPeriod}>per day</Text>
+            <Text style={styles.rentalPeriod}>for a day</Text>
           </View>
         </View>
 
@@ -219,7 +219,7 @@ export default function ItemDetailScreen() {
       <View style={styles.actionBar}>
         <View style={styles.priceDisplay}>
           <Text style={styles.actionBarPrice}>P1,253</Text>
-          <Text style={styles.actionBarPeriod}>Per day</Text>
+          <Text style={styles.actionBarPeriod}>for a day</Text>
         </View>
         <TouchableOpacity style={styles.rentButton} onPress={handleRent}>
           <Text style={styles.rentButtonText}>Rent</Text>
