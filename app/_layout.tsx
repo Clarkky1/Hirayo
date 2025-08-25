@@ -63,6 +63,9 @@ export default function RootLayout() {
                   <Stack.Screen name="terms-conditions" options={{ headerShown: false }} />
                   <Stack.Screen name="view-messages" options={{ headerShown: false }} />
                   <Stack.Screen name="pay" options={{ headerShown: false }} />
+                  <Stack.Screen name="camera" options={{ headerShown: false }} />
+                  <Stack.Screen name="video-call" options={{ headerShown: false }} />
+                  <Stack.Screen name="laptop" options={{ headerShown: false }} />
                   <Stack.Screen name="+not-found" />
                 </Stack>
                 <StatusBar style="auto" />

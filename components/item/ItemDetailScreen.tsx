@@ -23,6 +23,7 @@ export default function ItemDetailScreen() {
   const [activeTab, setActiveTab] = useState<'description' | 'review'>('description');
   const [showMore, setShowMore] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showCommunicationModal, setShowCommunicationModal] = useState(false);
   
   // Animation value for swipe gestures
   const pan = useRef(new Animated.ValueXY()).current;
@@ -51,12 +52,20 @@ export default function ItemDetailScreen() {
   const isDescriptionLong = descriptionText.length > 100; // Show button if description is longer than 100 characters
 
   const handleRent = () => {
-    // Validate that user has selected an item before proceeding
-    const validationFn = () => {
-      return selectedItem !== null;
-    };
-    
-    validateAndNavigate('rental-period', validationFn);
+    // Show communication options modal instead of direct navigation
+    setShowCommunicationModal(true);
+  };
+
+  const handleVideoCall = () => {
+    setShowCommunicationModal(false);
+    // Navigate to video call screen
+    router.push('/video-call');
+  };
+
+  const handleMessageLender = () => {
+    setShowCommunicationModal(false);
+    // Navigate to conversation with lender
+    router.push('/lender-messages');
   };
 
   const handleShowMore = () => {
@@ -356,6 +365,27 @@ export default function ItemDetailScreen() {
           <Text style={styles.rentButtonText}>Rent</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Communication Modal */}
+      {showCommunicationModal && (
+        <View style={styles.communicationModalOverlay}>
+          <View style={styles.communicationModalContent}>
+            <Text style={styles.communicationModalTitle}>Communication Options</Text>
+            <TouchableOpacity style={styles.communicationOption} onPress={handleVideoCall} activeOpacity={0.7}>
+              <Ionicons name="videocam-outline" size={24} color={Colors.primary[500]} />
+              <Text style={styles.communicationOptionText}>Video Call</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.communicationOption} onPress={handleMessageLender} activeOpacity={0.7}>
+              <Ionicons name="chatbubble-outline" size={24} color={Colors.primary[500]} />
+              <Text style={styles.communicationOptionText}>Message Lender</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.communicationOption} onPress={() => setShowCommunicationModal(false)} activeOpacity={0.7}>
+              <Ionicons name="close-outline" size={24} color={Colors.primary[500]} />
+              <Text style={styles.communicationOptionText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -734,5 +764,47 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderRadius: 8,
+  },
+  // Communication Modal Styles
+  communicationModalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 100,
+  },
+  communicationModalContent: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 20,
+    width: '80%',
+    alignItems: 'center',
+  },
+  communicationModalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#000000',
+    marginBottom: 20,
+  },
+  communicationOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    marginBottom: 10,
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  communicationOptionText: {
+    fontSize: 16,
+    color: '#000000',
+    marginLeft: 10,
+    fontWeight: '500',
   },
 });
