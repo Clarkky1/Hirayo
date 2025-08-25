@@ -411,7 +411,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   securityTitle: {
-    ...TextStyles.heading.h4,
+    ...TextStyles.heading.h3,
     color: Colors.text.primary,
     marginLeft: Spacing.sm,
   },

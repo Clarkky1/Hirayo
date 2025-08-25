@@ -1,8 +1,11 @@
 import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
+import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import {
+    Animated,
+    Image,
+    PanResponder,
     SafeAreaView,
     ScrollView,
     StyleSheet,
@@ -12,29 +15,154 @@ import {
 } from 'react-native';
 
 export default function ReviewOrderScreen() {
+  const { validateAndNavigate, goBack } = useNavigationGuard();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  // Animation value for swipe gestures
+  const pan = useRef(new Animated.ValueXY()).current;
+  
+  // Mock images for demonstration
+  const itemImages = [
+    'https://picsum.photos/400/300?random=1',
+    'https://picsum.photos/400/300?random=2',
+    'https://picsum.photos/400/300?random=3',
+    'https://picsum.photos/400/300?random=4',
+    'https://picsum.photos/400/300?random=5',
+  ];
+
   const handleShowReviews = () => {
     console.log('Show reviews pressed');
   };
 
   const handlePay = () => {
-    console.log('Pay button pressed!');
-    console.log('Attempting to navigate to /pay');
-    try {
-      router.replace('/pay' as any);
-      console.log('Navigation successful');
-    } catch (error) {
-      console.error('Navigation error:', error);
-    }
+    // Validate that user has confirmed rental details before proceeding
+    const validationFn = () => {
+      // Add any validation logic here (e.g., check if dates are selected)
+      return true; // For now, always allow proceeding
+    };
+    
+    validateAndNavigate('payment', validationFn);
   };
+
+  const handleGoBack = () => {
+    goBack('rental-period');
+  };
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => 
+      prev === itemImages.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const previousImage = () => {
+    setCurrentImageIndex((prev) => 
+      prev === 0 ? itemImages.length - 1 : prev - 1
+    );
+  };
+
+  const goToImage = (index: number) => {
+    setCurrentImageIndex(index);
+  };
+
+  // PanResponder for swipe gestures
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderMove: (_, gestureState) => {
+        // Limit horizontal movement and add some resistance
+        const limitedDx = Math.max(-100, Math.min(100, gestureState.dx * 0.3));
+        pan.setValue({ x: limitedDx, y: 0 });
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        const swipeThreshold = 50;
+        
+        if (gestureState.dx > swipeThreshold) {
+          // Swipe right - go to previous image
+          previousImage();
+        } else if (gestureState.dx < -swipeThreshold) {
+          // Swipe left - go to next image
+          nextImage();
+        }
+        
+        // Reset pan value with smooth animation
+        Animated.spring(pan, {
+          toValue: { x: 0, y: 0 },
+          useNativeDriver: false,
+          tension: 100,
+          friction: 8,
+        }).start();
+      },
+    })
+  ).current;
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header with Back Button */}
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
+          <Ionicons name="arrow-back" size={24} color={Colors.text.primary} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Review Order</Text>
+        <View style={styles.headerSpacer} />
+      </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Product Information Section */}
         <View style={styles.productSection}>
-          {/* Product Image Placeholder */}
-          <View style={styles.imagePlaceholder} />
+          {/* Product Image Carousel */}
+          <View style={styles.imageContainer}>
+            <Animated.View 
+              style={[
+                styles.imageCarousel,
+                {
+                  transform: pan.getTranslateTransform(),
+                }
+              ]}
+              {...panResponder.panHandlers}
+            >
+              <Image 
+                source={{ uri: itemImages[currentImageIndex] }} 
+                style={styles.mainImage}
+                resizeMode="cover"
+              />
+              
+              {/* Navigation Arrows */}
+              <TouchableOpacity 
+                style={[styles.navArrow, styles.leftArrow]} 
+                onPress={previousImage}
+              >
+                <Ionicons name="chevron-back" size={20} color={Colors.text.inverse} />
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[styles.navArrow, styles.rightArrow]} 
+                onPress={nextImage}
+              >
+                <Ionicons name="chevron-forward" size={20} color={Colors.text.inverse} />
+              </TouchableOpacity>
+              
+              {/* Image Counter */}
+              <View style={styles.imageCounter}>
+                <Text style={styles.imageCounterText}>
+                  {currentImageIndex + 1} of {itemImages.length}
+                </Text>
+              </View>
+            </Animated.View>
+            
+            {/* Image Indicators */}
+            <View style={styles.imageIndicators}>
+              {itemImages.map((_, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.indicator,
+                    index === currentImageIndex && styles.activeIndicator
+                  ]}
+                  onPress={() => goToImage(index)}
+                />
+              ))}
+            </View>
+          </View>
           
           {/* Product Name */}
           <Text style={styles.productName}>Canon EOS 90D DSLR Camera</Text>
@@ -118,6 +246,28 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background.primary,
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.sm,
+    backgroundColor: Colors.background.primary,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border.light,
+  },
+  backButton: {
+    padding: Spacing.sm,
+  },
+  headerTitle: {
+    ...TextStyles.heading.h2,
+    color: Colors.text.primary,
+    textAlign: 'center',
+    flex: 1,
+  },
+  headerSpacer: {
+    width: Spacing.md,
+  },
   scrollView: {
     flex: 1,
     paddingHorizontal: Spacing.lg,
@@ -127,12 +277,70 @@ const styles = StyleSheet.create({
     marginTop: Spacing.md,
     marginBottom: Spacing.lg,
   },
-  imagePlaceholder: {
+  imageContainer: {
     width: '100%',
     height: 200,
     backgroundColor: Colors.neutral[300],
     borderRadius: BorderRadius.lg,
     marginBottom: Spacing.md,
+    position: 'relative',
+  },
+  imageCarousel: {
+    width: '100%',
+    height: '100%',
+    borderRadius: BorderRadius.lg,
+    position: 'relative',
+  },
+  mainImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: BorderRadius.lg,
+  },
+  navArrow: {
+    position: 'absolute',
+    top: '50%',
+    transform: [{ translateY: -10 }],
+    backgroundColor: Colors.primary[500],
+    borderRadius: BorderRadius.base,
+    padding: Spacing.sm,
+    zIndex: 10,
+  },
+  leftArrow: {
+    left: Spacing.sm,
+  },
+  rightArrow: {
+    right: Spacing.sm,
+  },
+  imageCounter: {
+    position: 'absolute',
+    top: Spacing.sm,
+    right: Spacing.sm,
+    backgroundColor: Colors.primary[500],
+    borderRadius: BorderRadius.base,
+    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.sm,
+    borderWidth: 1,
+    borderColor: Colors.text.inverse,
+  },
+  imageCounterText: {
+    ...TextStyles.body.small,
+    color: Colors.text.inverse,
+    fontWeight: '600',
+  },
+  imageIndicators: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: Spacing.sm,
+    gap: Spacing.xs,
+  },
+  indicator: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: Colors.neutral[400],
+  },
+  activeIndicator: {
+    backgroundColor: Colors.primary[500],
   },
   productName: {
     ...TextStyles.heading.h2,

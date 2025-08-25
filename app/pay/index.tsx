@@ -1,4 +1,5 @@
 import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
+import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -28,13 +29,15 @@ const paymentMethods: PaymentMethod[] = [
 ];
 
 export default function PaymentScreen() {
+  const { validateAndNavigate, goBack } = useNavigationGuard();
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('');
   const [cardNumber, setCardNumber] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
   const [cvv, setCvv] = useState('');
   const [cardholderName, setCardholderName] = useState('');
   const [showCountdown, setShowCountdown] = useState(false);
-  const [countdown, setCountdown] = useState(5);
+  const [countdown, setCountdown] = useState(10);
+  const [isProcessing, setIsProcessing] = useState(false);
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isMountedRef = useRef(true);
   const countdownStartedRef = useRef(false);
@@ -177,39 +180,43 @@ export default function PaymentScreen() {
     }, 1000);
   }, [countdown, navigateToReceipt]);
 
-  const handlePay = () => {
-    if (!isMountedRef.current) {
-      return; // Component unmounted, don't proceed
-    }
-
-    if (showCountdown) {
-      return; // Already showing countdown, don't start again
-    }
-
+  const handlePayment = useCallback(() => {
     if (!selectedPaymentMethod) {
-      Alert.alert('Payment Method Required', 'Please select a payment method');
+      Alert.alert('Payment Method Required', 'Please select a payment method to continue.');
       return;
     }
 
-    if (selectedPaymentMethod === '1') {
-      // Credit/Debit Card validation
-      if (!cardNumber || !expiryDate || !cvv || !cardholderName) {
-        Alert.alert('Missing Information', 'Please fill in all card details');
-        return;
-      }
+    if (selectedPaymentMethod === 'card' && (!cardNumber || !expiryDate || !cvv || !cardholderName)) {
+      Alert.alert('Card Details Required', 'Please fill in all card details to continue.');
+      return;
     }
 
-    console.log('Payment successful, starting countdown');
-    
-    // Show payment success and start countdown
+    setIsProcessing(true);
     setShowCountdown(true);
-    setCountdown(5);
-    
-    // Use setTimeout to defer countdown start to next tick
-    setTimeout(() => {
-      startCountdown();
-    }, 0);
-  };
+    setCountdown(10);
+
+    // Simulate payment processing
+    const countdownInterval = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(countdownInterval);
+          setIsProcessing(false);
+          setShowCountdown(false);
+          
+          // Use navigation guard to proceed to receipt
+          validateAndNavigate('receipt');
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    countdownRef.current = countdownInterval;
+  }, [selectedPaymentMethod, cardNumber, expiryDate, cvv, cardholderName, validateAndNavigate]);
+
+  const handleGoBack = useCallback(() => {
+    goBack('review-order');
+  }, [goBack]);
 
   const renderPaymentMethod = (method: PaymentMethod) => (
     <TouchableOpacity
@@ -236,6 +243,15 @@ export default function PaymentScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header with Back Button */}
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
+          <Ionicons name="arrow-back" size={24} color={Colors.text.primary} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Payment</Text>
+        <View style={styles.headerSpacer} />
+      </View>
+
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Order Summary */}
         <View style={styles.orderSummarySection}>
@@ -367,7 +383,7 @@ export default function PaymentScreen() {
 
       {/* Payment Button */}
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.payButton} onPress={handlePay}>
+        <TouchableOpacity style={styles.payButton} onPress={handlePayment}>
           <Text style={styles.payButtonText}>Pay ₱{rentalDetails.totalAmount.toLocaleString()}</Text>
         </TouchableOpacity>
       </View>
@@ -634,5 +650,27 @@ const styles = StyleSheet.create({
   countdownText: {
     ...TextStyles.heading.h1,
     color: Colors.primary[500],
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.md,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.sm,
+    backgroundColor: Colors.background.primary,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border.light,
+  },
+  backButton: {
+    padding: Spacing.sm,
+  },
+  headerTitle: {
+    ...TextStyles.heading.h2,
+    color: Colors.text.primary,
+    flex: 1,
+    textAlign: 'center',
+  },
+  headerSpacer: {
+    width: 40, // Adjust as needed for spacing
   },
 });

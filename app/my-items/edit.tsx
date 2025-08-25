@@ -11,6 +11,7 @@ import {
     TextInput,
     TouchableOpacity,
     View,
+    Image,
 } from 'react-native';
 import { Card } from '../../components/ui/Card';
 
@@ -22,6 +23,7 @@ interface EditableItem {
   description: string;
   location: string;
   status: 'active' | 'rented' | 'inactive';
+  images?: string[]; // Added for image handling
 }
 
 export default function EditItemScreen() {
@@ -40,28 +42,43 @@ export default function EditItemScreen() {
       description: 'Professional mirrorless camera with 45MP sensor and 4K video capabilities. Perfect for photography and videography.',
       location: 'Cebu City, Cebu',
       status: 'active',
+      images: [
+        'https://via.placeholder.com/150',
+        'https://via.placeholder.com/150',
+        'https://via.placeholder.com/150',
+      ],
     };
     setItem(mockItem);
   }, [itemId]);
 
   const handleSave = () => {
-    if (item) {
-      Alert.alert(
-        'Save Changes',
-        'Are you sure you want to save the changes?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { 
-            text: 'Save', 
-            onPress: () => {
-              console.log('Saving item:', item);
-              Alert.alert('Success', 'Item updated successfully!');
-              router.back();
-            }
-          }
-        ]
-      );
+    if (!item) return;
+    
+    if (!item.name || !item.category || !item.price || !item.description || !item.location) {
+      Alert.alert('Missing Information', 'Please fill in all required fields.');
+      return;
     }
+    
+    if (!item.images || item.images.length < 3) {
+      Alert.alert('Insufficient Images', 'Please upload at least 3 images of your item.');
+      return;
+    }
+    
+    Alert.alert(
+      'Save Changes',
+      'Are you sure you want to save the changes?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Save', 
+          onPress: () => {
+            console.log('Saving item:', item);
+            Alert.alert('Success', 'Item updated successfully!');
+            router.back();
+          }
+        }
+      ]
+    );
   };
 
   const handleCancel = () => {
@@ -98,6 +115,21 @@ export default function EditItemScreen() {
     );
   };
 
+  const handleAddImage = () => {
+    if (item && item.images && item.images.length < 5) {
+      setItem({ ...item, images: [...item.images, 'https://via.placeholder.com/150'] });
+    }
+  };
+
+  const handleRemoveImage = (index: number) => {
+    if (item && item.images) {
+      setItem({
+        ...item,
+        images: item.images.filter((_, i) => i !== index),
+      });
+    }
+  };
+
   if (!item) {
     return (
       <SafeAreaView style={styles.container}>
@@ -111,12 +143,6 @@ export default function EditItemScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View style={styles.headerSection}>
-          <Text style={styles.headerTitle}>Edit Item</Text>
-          <Text style={styles.headerSubtitle}>Update your item information</Text>
-        </View>
-
         {/* Basic Information */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Basic Information</Text>
@@ -219,17 +245,48 @@ export default function EditItemScreen() {
 
         {/* Photos Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Photos</Text>
+          <Text style={styles.sectionTitle}>Photos *</Text>
+          <Text style={styles.photoSubtitle}>
+            Upload at least 3 images, maximum 5 images ({item.images?.length || 0}/5)
+          </Text>
+          
           <Card variant="filled" padding="large" style={styles.sectionCard}>
             <View style={styles.photoSection}>
-              <View style={styles.photoPlaceholder}>
-                <Ionicons name="camera" size={32} color={Colors.neutral[400]} />
-                <Text style={styles.photoPlaceholderText}>Add Photos</Text>
+              {/* Image Grid */}
+              <View style={styles.imageGrid}>
+                {/* Existing Images */}
+                {(item.images || []).map((image, index) => (
+                  <View key={index} style={styles.imageBox}>
+                    <Image source={{ uri: image }} style={styles.selectedImage} />
+                    <TouchableOpacity 
+                      style={styles.removeImageButton} 
+                      onPress={() => handleRemoveImage(index)}
+                    >
+                      <Ionicons name="close-circle" size={16} color={Colors.error} />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+                
+                {/* Empty Image Boxes */}
+                {Array.from({ length: 5 - (item.images?.length || 0) }).map((_, index) => (
+                  <TouchableOpacity 
+                    key={`empty-${index}`} 
+                    style={styles.emptyImageBox} 
+                    onPress={handleAddImage}
+                  >
+                    <Ionicons name="add" size={24} color={Colors.neutral[400]} />
+                    <Text style={styles.addImageText}>Add</Text>
+                  </TouchableOpacity>
+                ))}
               </View>
-              <TouchableOpacity style={styles.addPhotoButton}>
-                <Ionicons name="add" size={20} color={Colors.primary[500]} />
-                <Text style={styles.addPhotoText}>Add Photo</Text>
-              </TouchableOpacity>
+              
+              {/* Image Requirements Notice */}
+              <View style={styles.imageRequirements}>
+                <Ionicons name="information-circle" size={16} color={Colors.warning} />
+                <Text style={styles.imageRequirementsText}>
+                  Minimum 3 images required. High-quality images help attract more renters.
+                </Text>
+              </View>
             </View>
           </Card>
         </View>
@@ -249,8 +306,8 @@ export default function EditItemScreen() {
               style={[styles.actionButton, styles.cancelButton]} 
               onPress={handleCancel}
             >
-              <Ionicons name="close" size={20} color={Colors.text.primary} />
-              <Text style={[styles.actionButtonText, styles.cancelButtonText]}>Cancel</Text>
+              <Ionicons name="close" size={20} color={Colors.text.inverse} />
+              <Text style={styles.actionButtonText}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -286,18 +343,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    ...TextStyles.body.medium,
-    color: Colors.text.secondary,
-  },
-  headerSection: {
-    marginBottom: Spacing.lg,
-  },
-  headerTitle: {
-    ...TextStyles.heading.h2,
-    color: Colors.text.primary,
-    marginBottom: Spacing.xs,
-  },
-  headerSubtitle: {
     ...TextStyles.body.medium,
     color: Colors.text.secondary,
   },
@@ -364,36 +409,70 @@ const styles = StyleSheet.create({
   photoSection: {
     alignItems: 'center',
   },
-  photoPlaceholder: {
-    width: 120,
-    height: 120,
+  photoSubtitle: {
+    ...TextStyles.body.small,
+    color: Colors.text.secondary,
+    marginBottom: Spacing.md,
+    textAlign: 'center',
+  },
+  imageGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+    gap: Spacing.md,
+  },
+  imageBox: {
+    position: 'relative',
+    width: 100,
+    height: 100,
+    borderRadius: BorderRadius.base,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
+    overflow: 'hidden',
+  },
+  selectedImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  removeImageButton: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    backgroundColor: Colors.background.secondary,
+    borderRadius: BorderRadius.full,
+    padding: Spacing.xs,
+    zIndex: 1,
+  },
+  emptyImageBox: {
+    width: 100,
+    height: 100,
     backgroundColor: Colors.neutral[100],
-    borderRadius: BorderRadius.lg,
+    borderRadius: BorderRadius.base,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: Spacing.md,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: Colors.border.light,
     borderStyle: 'dashed',
   },
-  photoPlaceholderText: {
+  addImageText: {
     ...TextStyles.body.small,
-    color: Colors.text.secondary,
+    color: Colors.neutral[400],
     marginTop: Spacing.xs,
   },
-  addPhotoButton: {
+  imageRequirements: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: Spacing.md,
+    backgroundColor: Colors.background.secondary,
+    borderRadius: BorderRadius.base,
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
-    borderRadius: BorderRadius.base,
-    borderWidth: 1,
-    borderColor: Colors.primary[500],
   },
-  addPhotoText: {
+  imageRequirementsText: {
     ...TextStyles.body.small,
-    color: Colors.primary[500],
-    marginLeft: Spacing.xs,
+    color: Colors.warning,
+    marginLeft: Spacing.sm,
   },
   actionsSection: {
     marginBottom: Spacing.lg,

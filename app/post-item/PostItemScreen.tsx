@@ -62,6 +62,11 @@ export default function PostItemScreen() {
       return;
     }
     
+    if (images.length < 3) {
+      Alert.alert('Insufficient Images', 'Please upload at least 3 images of your item.');
+      return;
+    }
+    
     console.log('Posting item:', {
       itemName,
       description,
@@ -79,8 +84,8 @@ export default function PostItemScreen() {
   };
 
   const handleAddImage = () => {
-    if (images.length >= 3) {
-      Alert.alert('Maximum Images Reached', 'You can only upload up to 3 images.');
+    if (images.length >= 5) {
+      Alert.alert('Maximum Images Reached', 'You can only upload up to 5 images.');
       return;
     }
     
@@ -97,6 +102,7 @@ export default function PostItemScreen() {
 
   const pickImage = async (source: 'camera' | 'library') => {
     try {
+      // Simulate image picker
       const newImage = `https://picsum.photos/300/300?random=${Date.now()}`;
       setImages(prev => [...prev, newImage]);
     } catch (error) {
@@ -105,6 +111,10 @@ export default function PostItemScreen() {
   };
 
   const removeImage = (index: number) => {
+    if (images.length <= 3) {
+      Alert.alert('Minimum Images Required', 'You must have at least 3 images. Cannot remove more images.');
+      return;
+    }
     setImages(prev => prev.filter((_, i) => i !== index));
   };
 
@@ -259,8 +269,10 @@ export default function PostItemScreen() {
 
         {/* Images */}
         <Card variant="filled" padding="large" style={styles.formSection}>
-          <Text style={styles.sectionTitle}>Images</Text>
-          <Text style={styles.imageSubtitle}>Upload up to 3 images ({images.length}/3)</Text>
+          <Text style={styles.sectionTitle}>Images *</Text>
+          <Text style={styles.imageSubtitle}>
+            Upload at least 3 images, maximum 5 images ({images.length}/5)
+          </Text>
           
           {/* Image Grid */}
           <View style={styles.imageGrid}>
@@ -278,7 +290,7 @@ export default function PostItemScreen() {
             ))}
             
             {/* Empty Image Boxes */}
-            {Array.from({ length: 3 - images.length }).map((_, index) => (
+            {Array.from({ length: 5 - images.length }).map((_, index) => (
               <TouchableOpacity 
                 key={`empty-${index}`} 
                 style={styles.emptyImageBox} 
@@ -287,6 +299,14 @@ export default function PostItemScreen() {
                 <Ionicons name="add" size={14} color={Colors.neutral[400]} />
               </TouchableOpacity>
             ))}
+          </View>
+          
+          {/* Image Requirements Notice */}
+          <View style={styles.imageRequirements}>
+            <Ionicons name="information-circle" size={16} color={Colors.warning} />
+            <Text style={styles.imageRequirementsText}>
+              Minimum 3 images required. High-quality images help attract more renters.
+            </Text>
           </View>
         </Card>
 
@@ -440,41 +460,62 @@ const styles = StyleSheet.create({
   },
   imageGrid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: Spacing.md,
     marginBottom: Spacing.md,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   imageBox: {
     position: 'relative',
-    width: 100,
-    height: 100,
+    width: '48%',
+    aspectRatio: 1,
+    borderRadius: BorderRadius.base,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
+    overflow: 'hidden',
+    marginBottom: Spacing.sm,
   },
   selectedImage: {
-    width: 100,
-    height: 100,
-    borderRadius: BorderRadius.md,
-    borderWidth: 2,
-    borderColor: Colors.border.light,
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
   emptyImageBox: {
-    width: 100,
-    height: 100,
-    borderRadius: BorderRadius.md,
-    borderWidth: 2,
-    borderColor: Colors.border.medium,
-    borderStyle: 'dashed',
-    backgroundColor: Colors.background.secondary,
-    alignItems: 'center',
+    width: '48%',
+    aspectRatio: 1,
+    backgroundColor: Colors.neutral[100],
+    borderRadius: BorderRadius.base,
     justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: Colors.border.light,
+    borderStyle: 'dashed',
+    marginBottom: Spacing.sm,
   },
   removeImageButton: {
     position: 'absolute',
-    top: -8,
-    right: -8,
-    backgroundColor: Colors.background.primary,
-    borderRadius: 10,
+    top: Spacing.xs,
+    right: Spacing.xs,
+    backgroundColor: Colors.background.secondary,
+    borderRadius: BorderRadius.full,
     padding: 2,
+  },
+  imageRequirements: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: Spacing.md,
+    backgroundColor: Colors.background.secondary,
+    borderRadius: BorderRadius.md,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
+  },
+  imageRequirementsText: {
+    ...TextStyles.body.small,
+    color: Colors.text.secondary,
+    marginLeft: Spacing.xs,
+    flexShrink: 1,
   },
   postButtonContainer: {
     paddingTop: 0,

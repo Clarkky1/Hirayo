@@ -7,6 +7,7 @@ import 'react-native-reanimated';
 
 import SplashScreen from '@/components/SplashScreen';
 import { LenderProvider } from '@/contexts/LenderContext';
+import { RentalFlowProvider } from '@/contexts/RentalFlowContext';
 import { SavedItemsProvider } from '@/contexts/SavedItemsContext';
 import { SelectedItemProvider } from '@/contexts/SelectedItemContext';
 import { AuthProvider } from '@/hooks/useAuth';
@@ -40,32 +41,34 @@ export default function RootLayout() {
       <SavedItemsProvider>
         <SelectedItemProvider>
           <LenderProvider>
-            <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-            <Stack initialRouteName="login">
-            <Stack.Screen name="login" options={{ headerShown: false }} />
-            <Stack.Screen name="signup" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="lenders" options={{ headerShown: false }} />
-            <Stack.Screen name="lender-messages" options={{ headerShown: false }} />
-            <Stack.Screen name="my-items" options={{ headerShown: false }} />
-            <Stack.Screen name="lender-settings" options={{ headerShown: false }} />
-            <Stack.Screen name="analytics" options={{ headerShown: false }} />
-            <Stack.Screen name="earnings" options={{ headerShown: false }} />
-            <Stack.Screen name="personal-information" options={{ headerShown: false }} />
-            <Stack.Screen name="post-item" options={{ headerShown: false }} />
-            <Stack.Screen name="payment-methods" options={{ headerShown: false }} />
-            <Stack.Screen name="notifications" options={{ headerShown: false }} />
-            <Stack.Screen name="privacy-security" options={{ headerShown: false }} />
-            <Stack.Screen name="help-support" options={{ headerShown: false }} />
-            <Stack.Screen name="about" options={{ headerShown: false }} />
-            <Stack.Screen name="terms-conditions" options={{ headerShown: false }} />
-            <Stack.Screen name="view-messages" options={{ headerShown: false }} />
-            <Stack.Screen name="pay" options={{ headerShown: false }} />
-            <Stack.Screen name="+not-found" />
-          </Stack>
-          <StatusBar style="auto" />
-        </ThemeProvider>
-            </LenderProvider>
+            <RentalFlowProvider>
+              <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+                <Stack initialRouteName="login">
+                  <Stack.Screen name="login" options={{ headerShown: false }} />
+                  <Stack.Screen name="signup" options={{ headerShown: false }} />
+                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                  <Stack.Screen name="lenders" options={{ headerShown: false }} />
+                  <Stack.Screen name="lender-messages" options={{ headerShown: false }} />
+                  <Stack.Screen name="my-items" options={{ headerShown: false }} />
+                  <Stack.Screen name="lender-settings" options={{ headerShown: false }} />
+                  <Stack.Screen name="analytics" options={{ headerShown: false }} />
+                  <Stack.Screen name="earnings" options={{ headerShown: false }} />
+                  <Stack.Screen name="personal-information" options={{ headerShown: false }} />
+                  <Stack.Screen name="post-item" options={{ headerShown: false }} />
+                  <Stack.Screen name="payment-methods" options={{ headerShown: false }} />
+                  <Stack.Screen name="notifications" options={{ headerShown: false }} />
+                  <Stack.Screen name="privacy-security" options={{ headerShown: false }} />
+                  <Stack.Screen name="help-support" options={{ headerShown: false }} />
+                  <Stack.Screen name="about" options={{ headerShown: false }} />
+                  <Stack.Screen name="terms-conditions" options={{ headerShown: false }} />
+                  <Stack.Screen name="view-messages" options={{ headerShown: false }} />
+                  <Stack.Screen name="pay" options={{ headerShown: false }} />
+                  <Stack.Screen name="+not-found" />
+                </Stack>
+                <StatusBar style="auto" />
+              </ThemeProvider>
+            </RentalFlowProvider>
+          </LenderProvider>
         </SelectedItemProvider>
       </SavedItemsProvider>
     </AuthProvider>

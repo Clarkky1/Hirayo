@@ -1,4 +1,5 @@
 import { Stack } from 'expo-router';
+import React from 'react';
 
 export default function MyItemsLayout() {
   return (
@@ -7,7 +8,11 @@ export default function MyItemsLayout() {
         name="index"
         options={{
           title: 'My Items',
-          headerShown: false,
+          headerShown: true,
+          headerStyle: {
+            backgroundColor: '#0066CC',
+          },
+          headerTintColor: '#ffffff',
         }}
       />
       <Stack.Screen
@@ -15,6 +20,10 @@ export default function MyItemsLayout() {
         options={{
           title: 'View Item',
           headerShown: true,
+          headerStyle: {
+            backgroundColor: '#0066CC',
+          },
+          headerTintColor: '#ffffff',
           presentation: 'modal',
         }}
       />
@@ -23,6 +32,10 @@ export default function MyItemsLayout() {
         options={{
           title: 'Edit Item',
           headerShown: true,
+          headerStyle: {
+            backgroundColor: '#0066CC',
+          },
+          headerTintColor: '#ffffff',
           presentation: 'modal',
         }}
       />

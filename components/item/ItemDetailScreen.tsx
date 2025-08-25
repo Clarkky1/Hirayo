@@ -1,22 +1,31 @@
 import { BorderRadius, Colors, Spacing } from '@/constants/DesignSystem';
 import { useSelectedItem } from '@/contexts/SelectedItemContext';
+import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Animated,
+  Image,
+  PanResponder,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
 export default function ItemDetailScreen() {
   const { selectedItem } = useSelectedItem();
+  const { validateAndNavigate } = useNavigationGuard();
   const [activeTab, setActiveTab] = useState<'description' | 'review'>('description');
   const [showMore, setShowMore] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  // Animation value for swipe gestures
+  const pan = useRef(new Animated.ValueXY()).current;
   
   // Use selected item data if available, otherwise use default data
   const item = selectedItem || {
@@ -28,21 +37,74 @@ export default function ItemDetailScreen() {
     category: 'camera'
   };
   
+  // Mock images for demonstration - in real app this would come from the item data
+  const itemImages = [
+    'https://picsum.photos/400/300?random=1',
+    'https://picsum.photos/400/300?random=2',
+    'https://picsum.photos/400/300?random=3',
+    'https://picsum.photos/400/300?random=4',
+    'https://picsum.photos/400/300?random=5',
+  ];
+  
   // Check if description is long enough to show "Show more" button
   const descriptionText = "Capture high-resolution photos and 4K video with this versatile DSLR. Perfect for events, travel, or content creation. Rent it for a day or a week — no strings attached.";
   const isDescriptionLong = descriptionText.length > 100; // Show button if description is longer than 100 characters
 
-
-
-
-
   const handleRent = () => {
-    router.replace('/period');
+    // Validate that user has selected an item before proceeding
+    const validationFn = () => {
+      return selectedItem !== null;
+    };
+    
+    validateAndNavigate('rental-period', validationFn);
   };
 
   const handleShowMore = () => {
     setShowMore(!showMore);
   };
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => 
+      prev === itemImages.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const previousImage = () => {
+    setCurrentImageIndex((prev) => 
+      prev === 0 ? itemImages.length - 1 : prev - 1
+    );
+  };
+
+  const goToImage = (index: number) => {
+    setCurrentImageIndex(index);
+  };
+
+  // PanResponder for swipe gestures
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderMove: (_, gestureState) => {
+        pan.setValue({ x: gestureState.dx, y: 0 });
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        const swipeThreshold = 50;
+        
+        if (gestureState.dx > swipeThreshold) {
+          // Swipe right - go to previous image
+          previousImage();
+        } else if (gestureState.dx < -swipeThreshold) {
+          // Swipe left - go to next image
+          nextImage();
+        }
+        
+        // Reset pan value
+        Animated.spring(pan, {
+          toValue: { x: 0, y: 0 },
+          useNativeDriver: false,
+        }).start();
+      },
+    })
+  ).current;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -58,14 +120,77 @@ export default function ItemDetailScreen() {
 
         {/* Product Image/Carousel Section */}
         <View style={styles.imageSection}>
-          <View style={styles.imagePlaceholder}>
+          <View style={styles.imageCarousel}>
+            {/* Main Image Display */}
+            <View style={styles.mainImageContainer}>
+              <Image 
+                source={{ uri: itemImages[currentImageIndex] }} 
+                style={styles.mainImage}
+                resizeMode="cover"
+              />
+              
+              {/* Navigation Arrows */}
+              <TouchableOpacity 
+                style={[styles.navArrow, styles.leftArrow]} 
+                onPress={previousImage}
+              >
+                <Ionicons name="chevron-back" size={24} color={Colors.text.inverse} />
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[styles.navArrow, styles.rightArrow]} 
+                onPress={nextImage}
+              >
+                <Ionicons name="chevron-forward" size={24} color={Colors.text.inverse} />
+              </TouchableOpacity>
+              
+              {/* Image Counter */}
+              <View style={styles.imageCounter}>
+                <Text style={styles.imageCounterText}>
+                  {currentImageIndex + 1} of {itemImages.length}
+                </Text>
+              </View>
+            </View>
           </View>
           
           {/* Image Indicators */}
           <View style={styles.imageIndicators}>
-            <View style={[styles.indicator, styles.activeIndicator]} />
-            <View style={styles.indicator} />
-            <View style={styles.indicator} />
+            {itemImages.map((_, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.indicator,
+                  index === currentImageIndex && styles.activeIndicator
+                ]}
+                onPress={() => goToImage(index)}
+              />
+            ))}
+          </View>
+          
+          {/* Thumbnail Preview */}
+          <View style={styles.thumbnailContainer}>
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.thumbnailScroll}
+            >
+              {itemImages.map((image, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.thumbnail,
+                    index === currentImageIndex && styles.activeThumbnail
+                  ]}
+                  onPress={() => goToImage(index)}
+                >
+                  <Image 
+                    source={{ uri: image }} 
+                    style={styles.thumbnailImage}
+                    resizeMode="cover"
+                  />
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
           </View>
         </View>
 
@@ -528,5 +653,80 @@ const styles = StyleSheet.create({
     marginTop: Spacing.lg,
     borderWidth: 1,
     borderColor: Colors.border.light,
+  },
+  imageCarousel: {
+    width: '100%',
+    height: 250, // Fixed height for the carousel
+    backgroundColor: '#E0E0E0',
+    borderRadius: 12,
+    position: 'relative',
+  },
+  mainImageContainer: {
+    width: '100%',
+    height: '100%',
+    position: 'relative',
+  },
+  mainImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 12,
+  },
+  navArrow: {
+    position: 'absolute',
+    top: '50%',
+    transform: [{ translateY: -12 }],
+    zIndex: 10,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 20,
+    padding: 8,
+  },
+  leftArrow: {
+    left: 10,
+  },
+  rightArrow: {
+    right: 10,
+  },
+  imagePlaceholderText: {
+    fontSize: 16,
+    color: '#666666',
+    marginTop: 10,
+  },
+  imageCounter: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 10,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  imageCounterText: {
+    fontSize: 12,
+    color: '#ffffff',
+    fontWeight: '600',
+  },
+  thumbnailContainer: {
+    marginTop: 10,
+    paddingHorizontal: 20,
+  },
+  thumbnailScroll: {
+    alignItems: 'center',
+  },
+  thumbnail: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  activeThumbnail: {
+    borderColor: Colors.primary[500],
+    borderWidth: 2,
+  },
+  thumbnailImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
   },
 });
