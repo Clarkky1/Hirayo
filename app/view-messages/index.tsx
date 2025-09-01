@@ -229,7 +229,7 @@ export default function ViewMessagesScreen() {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: senderName,
-      headerRight: () => (
+      headerRight: isLenderView ? () => (
         <TouchableOpacity 
           style={styles.headerIconButton}
           onPress={() => handleHeaderIconPress()}
@@ -237,12 +237,12 @@ export default function ViewMessagesScreen() {
           <Ionicons 
             name="cube-outline" 
             size={24} 
-            color="#0066CC" 
+            color="#FFFFFF" 
           />
         </TouchableOpacity>
-      ),
+      ) : undefined,
     });
-  }, [navigation, senderName, itemId]);
+  }, [navigation, senderName, itemId, isLenderView]);
 
   // Debug: Log the parameters to see what's being received
   console.log('ViewMessagesScreen params:', {
@@ -302,14 +302,25 @@ export default function ViewMessagesScreen() {
   };
 
   const handleHeaderIconPress = () => {
-    // For renters: Navigate to the item details
-    router.push({
-      pathname: '/item',
-      params: { 
-        itemId: itemId,
-        fromMessages: 'true'
-      }
-    });
+    if (isLenderView) {
+      // For lenders: Navigate to my-items and highlight the specific item
+      router.push({
+        pathname: '/my-items',
+        params: { 
+          highlightItemId: itemId,
+          fromMessages: 'true'
+        }
+      });
+    } else {
+      // For renters: Navigate to the item details
+      router.push({
+        pathname: '/item',
+        params: { 
+          itemId: itemId,
+          fromMessages: 'true'
+        }
+      });
+    }
   };
 
   const handleSend = () => {

@@ -1,7 +1,7 @@
   import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import React, { useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -24,6 +24,9 @@ interface MyItem {
 }
 
 export default function MyItemsScreen() {                                                          
+  const params = useLocalSearchParams();
+  const highlightItemId = params.highlightItemId as string;
+  const scrollViewRef = useRef<ScrollView>(null);
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'active' | 'rented' | 'inactive'>('all');
 
   const myItems: MyItem[] = [
@@ -125,18 +128,36 @@ export default function MyItemsScreen() {
     </TouchableOpacity>
   );
 
-  const renderItemCard = (item: MyItem) => (
-    <Card key={item.id} variant="filled" padding="large" style={styles.itemCard}>
-      {/* Item Header */}
-      <View style={styles.itemHeader}>
-        <View style={styles.itemInfo}>
-          <Text style={styles.itemName}>{item.name}</Text>
-          <Text style={styles.itemCategory}>{item.category}</Text>
+  const renderItemCard = (item: MyItem) => {
+    const cardStyle = item.id === highlightItemId 
+      ? { ...styles.itemCard, ...styles.highlightedItemCard }
+      : styles.itemCard;
+    
+    return (
+      <Card 
+        key={item.id} 
+        variant="filled" 
+        padding="large" 
+        style={cardStyle}
+      >
+              {/* Item Header */}
+        <View style={styles.itemHeader}>
+          <View style={styles.itemInfo}>
+            <View style={styles.itemNameRow}>
+              <Text style={styles.itemName}>{item.name}</Text>
+              {item.id === highlightItemId && (
+                <View style={styles.highlightBadge}>
+                  <Ionicons name="star" size={12} color="#FFFFFF" />
+                  <Text style={styles.highlightBadgeText}>From Messages</Text>
+                </View>
+              )}
+            </View>
+            <Text style={styles.itemCategory}>{item.category}</Text>
+          </View>
+          <View style={styles.itemPrice}>
+            <Text style={styles.priceText}>{item.price}</Text>
+          </View>
         </View>
-        <View style={styles.itemPrice}>
-          <Text style={styles.priceText}>{item.price}</Text>
-        </View>
-      </View>
 
       {/* Item Stats */}
       <View style={styles.itemStats}>
@@ -192,7 +213,8 @@ export default function MyItemsScreen() {
         </View>
       </View>
     </Card>
-  );
+    );
+  };
 
   const getFilterCounts = () => {
     return {
@@ -205,9 +227,34 @@ export default function MyItemsScreen() {
 
   const counts = getFilterCounts();
 
+  // Auto-scroll to highlighted item when navigating from messages
+  useEffect(() => {
+    if (highlightItemId && scrollViewRef.current) {
+      // Find the index of the highlighted item
+      const itemIndex = myItems.findIndex(item => item.id === highlightItemId);
+      if (itemIndex !== -1) {
+        // Calculate approximate scroll position (each item card height + margins)
+        const estimatedItemHeight = 200; // Approximate height of each item card
+        const scrollPosition = itemIndex * estimatedItemHeight;
+        
+        // Scroll to the highlighted item with a slight delay for smooth animation
+        setTimeout(() => {
+          scrollViewRef.current?.scrollTo({
+            y: scrollPosition,
+            animated: true
+          });
+        }, 500);
+      }
+    }
+  }, [highlightItemId]);
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        ref={scrollViewRef}
+        style={styles.scrollView} 
+        showsVerticalScrollIndicator={false}
+      >
         {/* Header Section */}
         <View style={styles.headerSection}>
           <View style={styles.headerContent}>
@@ -456,6 +503,36 @@ const styles = StyleSheet.create({
   },
   itemCard: {
     marginBottom: Spacing.md,
+  },
+  highlightedItemCard: {
+    borderWidth: 3,
+    borderColor: Colors.primary[500],
+    backgroundColor: Colors.background.secondary,
+    shadowColor: Colors.primary[500],
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  itemNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
+  highlightBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.primary[500],
+    paddingHorizontal: Spacing.xs,
+    paddingVertical: 2,
+    borderRadius: BorderRadius.sm,
+    gap: 2,
+  },
+  highlightBadgeText: {
+    ...TextStyles.body.small,
+    color: Colors.text.inverse,
+    fontSize: 10,
+    fontWeight: '600',
   },
   itemHeader: {
     flexDirection: 'row',
