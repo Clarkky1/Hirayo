@@ -7,11 +7,10 @@ import {
   SafeAreaView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View
 } from 'react-native';
-import { BorderRadius, Colors, Spacing } from '../../constants/DesignSystem';
+import { BorderRadius, Spacing } from '../../constants/DesignSystem';
 
 interface RentalRequest {
   id: string;
@@ -21,27 +20,18 @@ interface RentalRequest {
   status: 'pending' | 'approved' | 'declined';
   message: string;
   timestamp: string;
-  isFirstRequest: boolean;
   itemName: string;
   itemPrice: number;
   startDate: string;
   endDate: string;
   totalDays: number;
   totalAmount: number;
-}
-
-interface Message {
-  id: string;
-  text: string;
-  sender: 'lender' | 'renter';
-  timestamp: string;
-  requestId?: string;
+  hasReplied: boolean;
+  lastReplyTime?: string;
 }
 
 export default function LenderMessagesScreen() {
-  const [activeTab, setActiveTab] = useState<'conversation' | 'requests' | 'overview'>('conversation');
-  const [message, setMessage] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<'requests' | 'overview'>('requests');
   const [activeRequests, setActiveRequests] = useState<RentalRequest[]>([
     {
       id: '1',
@@ -51,13 +41,14 @@ export default function LenderMessagesScreen() {
       status: 'pending',
       message: 'Hi! I would like to rent your camera for this weekend.',
       timestamp: '2 min ago',
-      isFirstRequest: true,
       itemName: 'Canon EOS 90D DSLR Camera',
       itemPrice: 1200,
       startDate: 'Aug 24, 2025',
       endDate: 'Aug 26, 2025',
       totalDays: 3,
       totalAmount: 3600,
+      hasReplied: true,
+      lastReplyTime: '1 min ago',
     },
     {
       id: '2',
@@ -67,89 +58,79 @@ export default function LenderMessagesScreen() {
       status: 'pending',
       message: 'Is this camera still available? I need it for a wedding.',
       timestamp: '5 min ago',
-      isFirstRequest: false,
       itemName: 'Canon EOS 90D DSLR Camera',
       itemPrice: 1200,
       startDate: 'Aug 25, 2025',
       endDate: 'Aug 27, 2025',
       totalDays: 3,
       totalAmount: 3600,
+      hasReplied: false,
     },
     {
       id: '3',
       renterName: 'Mike Johnson',
       renterId: 'renter3',
       itemId: 'item1',
-      status: 'pending',
+      status: 'approved',
       message: 'Can I rent this for next week?',
       timestamp: '10 min ago',
-      isFirstRequest: false,
       itemName: 'Canon EOS 90D DSLR Camera',
       itemPrice: 1200,
       startDate: 'Aug 28, 2025',
       endDate: 'Aug 30, 2025',
       totalDays: 3,
       totalAmount: 3600,
+      hasReplied: true,
+      lastReplyTime: '8 min ago',
+    },
+    {
+      id: '4',
+      renterName: 'Sarah Wilson',
+      renterId: 'renter4',
+      itemId: 'item2',
+      status: 'declined',
+      message: 'Interested in renting your laptop for a week.',
+      timestamp: '1 hour ago',
+      itemName: 'MacBook Pro 16"',
+      itemPrice: 2500,
+      startDate: 'Aug 20, 2025',
+      endDate: 'Aug 27, 2025',
+      totalDays: 7,
+      totalAmount: 17500,
+      hasReplied: true,
+      lastReplyTime: '45 min ago',
     },
   ]);
-
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      text: 'Hi! I would like to rent your camera for this weekend.',
-      sender: 'renter',
-      timestamp: '2 min ago',
-      requestId: '1',
-    },
-    {
-      id: '2',
-      text: 'Sure! When exactly do you need it?',
-      sender: 'lender',
-      timestamp: '1 min ago',
-    },
-    {
-      id: '3',
-      text: 'This Saturday and Sunday, from morning to evening.',
-      sender: 'renter',
-      timestamp: 'Just now',
-      requestId: '1',
-    },
-  ]);
-
-  const handleSendMessage = () => {
-    if (message.trim()) {
-      const newMessage: Message = {
-        id: Date.now().toString(),
-        text: message.trim(),
-        sender: 'lender',
-        timestamp: 'Just now',
-      };
-      setMessages(prev => [...prev, newMessage]);
-      setMessage('');
-    }
-  };
 
   const handleApproveRequest = (requestId: string) => {
+    const approvedRequest = activeRequests.find(req => req.id === requestId);
+    
     Alert.alert(
       'Approve Request',
-      'Are you sure you want to approve this rental request? This will automatically decline other pending requests for the same time period.',
+      'Are you sure you want to approve this rental request? This will automatically remove other renters\' requests for the same item. Are you sure you want to proceed?',
       [
         { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Approve',
+          text: 'Yes, Approve',
           style: 'default',
           onPress: () => {
             setActiveRequests(prev =>
-              prev.map(req => {
+              prev.filter(req => {
+                // Keep the approved request
                 if (req.id === requestId) {
-                  return { ...req, status: 'approved' as const };
+                  return true;
                 }
-                // Auto-decline other requests for the same time period
-                if (req.status === 'pending' && req.id !== requestId) {
-                  return { ...req, status: 'declined' as const };
+                // Remove other requests for the same item (they're no longer relevant)
+                if (req.itemId === approvedRequest?.itemId) {
+                  return false;
                 }
-                return req;
-              })
+                // Keep requests for other items
+                return true;
+              }).map(req => 
+                req.id === requestId 
+                  ? { ...req, status: 'approved' as const }
+                  : req
+              )
             );
           },
         },
@@ -187,8 +168,10 @@ export default function LenderMessagesScreen() {
           messageId: requestId,
           senderName: request.renterName || '',
           itemName: request.itemName || '',
-          itemId: request.itemId || 'item1', // Include item ID for navigation
-          isLenderView: 'true'
+          itemId: request.itemId || 'item1',
+          isLenderView: 'true',
+          requestStatus: request.status,
+          hasReplied: request.hasReplied ? 'true' : 'false'
         }
       });
     }
@@ -212,7 +195,7 @@ export default function LenderMessagesScreen() {
     }
   };
 
-  const renderTabButton = (tab: 'conversation' | 'requests' | 'overview', label: string, icon: string) => (
+  const renderTabButton = (tab: 'requests' | 'overview', label: string, icon: string) => (
     <TouchableOpacity
       style={[styles.tabButton, activeTab === tab && styles.activeTabButton]}
       onPress={() => setActiveTab(tab)}
@@ -220,7 +203,7 @@ export default function LenderMessagesScreen() {
       <Ionicons
         name={icon as any}
         size={20}
-        color={activeTab === tab ? Colors.primary[500] : Colors.text.secondary}
+        color={activeTab === tab ? '#0066CC' : '#666666'}
       />
       <Text style={[styles.tabLabel, activeTab === tab && styles.activeTabLabel]}>
         {label}
@@ -242,102 +225,34 @@ export default function LenderMessagesScreen() {
             <Text style={styles.timestamp}>{request.timestamp}</Text>
           </View>
         </View>
-        <View style={[
-          styles.statusBadge,
-          { backgroundColor: getStatusColor(request.status) }
-        ]}>
-          <Text style={styles.statusText}>
-            {getStatusText(request.status)}
-          </Text>
-        </View>
+
       </View>
 
       <Text style={styles.itemName}>{request.itemName}</Text>
       <Text style={styles.requestMessage}>{request.message}</Text>
 
-      <View style={styles.rentalDetails}>
-        <View style={styles.rentalInfo}>
-          <Ionicons name="calendar-outline" size={16} color="#666666" />
-          <Text style={styles.rentalText}>
-            {request.startDate} - {request.endDate} ({request.totalDays} days)
-          </Text>
-        </View>
-        <Text style={styles.rentalAmount}>₱{request.totalAmount.toLocaleString()}</Text>
-      </View>
 
-      {request.status === 'pending' && (
-        <View style={styles.requestActions}>
-          <TouchableOpacity
-            style={[styles.actionButton, styles.approveButton]}
-            onPress={() => handleApproveRequest(request.id)}
-          >
-            <Ionicons name="checkmark" size={18} color="#ffffff" />
-            <Text style={styles.approveButtonText}>Approve</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.actionButton, styles.declineButton]}
-            onPress={() => handleDeclineRequest(request.id)}
-          >
-            <Ionicons name="close" size={18} color="#FF3B30" />
-            <Text style={styles.declineButtonText}>Decline</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      <TouchableOpacity
-        style={styles.viewConversationButton}
-        onPress={() => handleViewConversation(request.id)}
-      >
-        <Ionicons name="chatbubble-outline" size={16} color="#0066CC" />
-        <Text style={styles.viewConversationText}>View Conversation</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
-  const renderConversation = () => (
-    <View style={styles.conversationContainer}>
-      <View style={styles.conversationHeader}>
-        <Text style={styles.conversationTitle}>Recent Conversations</Text>
-        <Text style={styles.conversationSubtitle}>Chat with renters about your items</Text>
-      </View>
-
-      <View style={styles.messagesContainer}>
-        {messages.map((msg) => (
-          <View
-            key={msg.id}
-            style={[
-              styles.messageBubble,
-              msg.sender === 'lender' ? styles.lenderMessage : styles.renterMessage,
-            ]}
-          >
-            <Text style={styles.messageText}>{msg.text}</Text>
-            <Text style={styles.messageTimestamp}>{msg.timestamp}</Text>
+              {request.hasReplied && (
+          <View style={styles.replyIndicator}>
+            <Ionicons name="checkmark-circle" size={16} color="#00A86B" />
+            <Text style={styles.replyText}>Replied {request.lastReplyTime}</Text>
           </View>
-        ))}
-      </View>
+        )}
 
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.textInput}
-          placeholder="Type a message..."
-          value={message}
-          onChangeText={setMessage}
-          multiline
-        />
-        <TouchableOpacity style={styles.sendButton} onPress={handleSendMessage}>
-          <Ionicons name="send" size={20} color="#ffffff" />
-        </TouchableOpacity>
-      </View>
+        <TouchableOpacity
+            style={styles.viewConversationButton}
+            onPress={() => handleViewConversation(request.id)}
+          >
+            <Ionicons name="chatbubble-outline" size={16} color="#0066CC" />
+            <Text style={styles.viewConversationText}>
+              {request.status === 'approved' ? 'Proceed to Rental' : 'View Conversation'}
+            </Text>
+          </TouchableOpacity>
     </View>
   );
 
   const renderRequests = () => (
     <View style={styles.requestsContainer}>
-      <View style={styles.requestsHeader}>
-        <Text style={styles.requestsTitle}>Rental Requests</Text>
-        <Text style={styles.requestsSubtitle}>Manage incoming rental requests</Text>
-      </View>
-
       <FlatList
         data={activeRequests}
         keyExtractor={(item) => item.id}
@@ -360,25 +275,31 @@ export default function LenderMessagesScreen() {
           <Text style={styles.statNumber}>
             {activeRequests.filter(r => r.status === 'pending').length}
           </Text>
-          <Text style={styles.statLabel}>Pending Requests</Text>
+          <Text style={styles.statLabel}>Pending</Text>
         </View>
         <View style={styles.statCard}>
           <Text style={styles.statNumber}>
             {activeRequests.filter(r => r.status === 'approved').length}
           </Text>
-          <Text style={styles.statLabel}>Approved Rentals</Text>
+          <Text style={styles.statLabel}>Approved</Text>
         </View>
         <View style={styles.statCard}>
           <Text style={styles.statNumber}>
             {activeRequests.filter(r => r.status === 'declined').length}
           </Text>
-          <Text style={styles.statLabel}>Declined Requests</Text>
+          <Text style={styles.statLabel}>Declined</Text>
+        </View>
+        <View style={styles.statCard}>
+          <Text style={styles.statNumber}>
+            {activeRequests.filter(r => r.hasReplied).length}
+          </Text>
+          <Text style={styles.statLabel}>Replied</Text>
         </View>
       </View>
 
       <View style={styles.recentActivity}>
         <Text style={styles.recentActivityTitle}>Recent Activity</Text>
-        {activeRequests.slice(0, 3).map((request) => (
+        {activeRequests.slice(0, 5).map((request) => (
           <View key={request.id} style={styles.activityItem}>
             <View style={styles.activityIcon}>
               <Ionicons 
@@ -393,6 +314,9 @@ export default function LenderMessagesScreen() {
                 {request.renterName} requested to rent {request.itemName}
               </Text>
               <Text style={styles.activityTimestamp}>{request.timestamp}</Text>
+              {request.hasReplied && (
+                <Text style={styles.replyIndicatorText}>✓ Replied</Text>
+              )}
             </View>
           </View>
         ))}
@@ -402,15 +326,14 @@ export default function LenderMessagesScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      
 
       <View style={styles.tabContainer}>
-       
         {renderTabButton('requests', 'Requests', 'list-outline')}
         {renderTabButton('overview', 'Overview', 'grid-outline')}
       </View>
 
       <View style={styles.content}>
-        
         {activeTab === 'requests' && renderRequests()}
         {activeTab === 'overview' && renderOverview()}
       </View>
@@ -565,21 +488,16 @@ const styles = StyleSheet.create({
   requestCard: {
     backgroundColor: '#ffffff',
     borderRadius: BorderRadius.lg,
-    padding: Spacing.md,
-    marginBottom: Spacing.md,
+    padding: Spacing.sm,
+    marginBottom: Spacing.sm,
     borderWidth: 1,
     borderColor: '#E0E0E0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   requestHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.xs,
   },
   renterInfo: {
     flexDirection: 'row',
@@ -626,20 +544,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     color: '#0066CC',
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.xs,
   },
   requestMessage: {
     fontSize: 14,
     color: '#666666',
     lineHeight: 20,
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.xs,
   },
   rentalDetails: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: Spacing.sm,
-    paddingVertical: Spacing.sm,
+    marginBottom: Spacing.xs,
+    paddingVertical: Spacing.xs,
     paddingHorizontal: Spacing.sm,
     backgroundColor: '#F8F9FA',
     borderRadius: BorderRadius.md,
@@ -695,10 +613,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
     backgroundColor: '#F0F8FF',
-    borderRadius: 8,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: '#0066CC',
   },
@@ -706,6 +624,40 @@ const styles = StyleSheet.create({
     color: '#0066CC',
     fontWeight: '500',
     marginLeft: 6,
+  },
+  replyIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: Spacing.xs,
+    marginBottom: Spacing.xs,
+  },
+  replyText: {
+    fontSize: 12,
+    color: '#00A86B',
+    marginLeft: Spacing.xs,
+  },
+  replyIndicatorText: {
+    fontSize: 12,
+    color: '#00A86B',
+    marginTop: Spacing.xs,
+  },
+  approvalStatus: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E8F5E8',
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.sm,
+    borderRadius: BorderRadius.md,
+    marginTop: Spacing.sm,
+    marginBottom: Spacing.sm,
+    borderWidth: 1,
+    borderColor: '#00A86B',
+  },
+  approvalText: {
+    fontSize: 14,
+    color: '#00A86B',
+    marginLeft: Spacing.xs,
+    fontWeight: '600',
   },
   overviewContainer: {
     flex: 1,

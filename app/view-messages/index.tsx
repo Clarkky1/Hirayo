@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
+  Alert,
   Keyboard,
   Platform,
   SafeAreaView,
@@ -74,57 +75,138 @@ const ChatBubble: React.FC<{ message: ChatMessage }> = ({ message }) => {
   );
 };
 
-const RentalRequestActions: React.FC<{ isLenderView: boolean }> = ({ isLenderView }) => {
-  const [requestStatus, setRequestStatus] = useState<'pending' | 'accepted' | 'declined'>('pending');
+const RentalRequestActions: React.FC<{ 
+  isLenderView: boolean;
+  requestStatus?: string;
+  hasReplied?: string;
+  messageId?: string;
+}> = ({ isLenderView, requestStatus: propRequestStatus, hasReplied, messageId }) => {
+  console.log('RentalRequestActions props:', { isLenderView, propRequestStatus, hasReplied, messageId });
+  
+  const [requestStatus, setRequestStatus] = useState<'pending' | 'accepted' | 'declined'>(
+    propRequestStatus === 'approved' ? 'accepted' : 
+    propRequestStatus === 'declined' ? 'declined' : 'pending'
+  );
 
-  if (!isLenderView) return null;
+  // For lender view - show approve/decline actions
+  if (isLenderView) {
+    const handleAccept = () => {
+      Alert.alert(
+        'Approve Request',
+        'Are you sure you want to approve this rental request? This will automatically remove other renters\' requests for the same item. Are you sure you want to proceed?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Yes, Approve',
+            style: 'default',
+            onPress: () => {
+              setRequestStatus('accepted');
+              console.log('Rental request accepted for messageId:', messageId);
+              // Here you would typically update the backend/database
+              // For now, we're just updating the local state
+            },
+          },
+        ]
+      );
+    };
 
-  const handleAccept = () => {
-    setRequestStatus('accepted');
-    console.log('Rental request accepted');
-  };
+    const handleDecline = () => {
+      setRequestStatus('declined');
+      console.log('Rental request declined');
+    };
 
-  const handleDecline = () => {
-    setRequestStatus('declined');
-    console.log('Rental request declined');
-  };
+    // If request is already approved or declined, show status instead of buttons
+    if (requestStatus === 'accepted') {
+      return (
+        <View style={styles.rentalActions}>
+          <View style={styles.statusDisplay}>
+            <Ionicons name="checkmark-circle" size={20} color="#00A86B" />
+            <Text style={styles.statusText}>Request Approved</Text>
+          </View>
+        </View>
+      );
+    }
 
-  if (requestStatus !== 'pending') {
+    if (requestStatus === 'declined') {
+      return (
+        <View style={styles.rentalActions}>
+          <View style={styles.statusDisplay}>
+            <Ionicons name="close-circle" size={20} color="#FF3B30" />
+            <Text style={styles.statusText}>Request Declined</Text>
+          </View>
+        </View>
+      );
+    }
+
+    // Show buttons only for pending requests
     return (
-      <View style={[
-        styles.statusBanner,
-        { backgroundColor: requestStatus === 'accepted' ? '#E8F5E8' : '#FFE8E8' }
-      ]}>
-        <Text style={[
-          styles.statusBannerText,
-          { color: requestStatus === 'accepted' ? '#00A86B' : '#FF3B30' }
-        ]}>
-          Request {requestStatus === 'accepted' ? 'Approved' : 'Declined'}
+      <View style={styles.rentalActions}>
+        <View style={styles.actionButtons}>
+          <TouchableOpacity 
+            style={[styles.actionButton, styles.acceptButton]} 
+            onPress={handleAccept}
+          >
+            <Text style={styles.acceptButtonText}>Accept</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.actionButton, styles.declineButton]} 
+            onPress={handleDecline}
+          >
+            <Text style={styles.declineButtonText}>Decline</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  // For renter view - show status and next steps
+  if (requestStatus === 'accepted') {
+    return (
+      <View style={styles.renterApprovalStatus}>
+        <View style={styles.approvalHeader}>
+          <Ionicons name="checkmark-circle" size={24} color="#00A86B" />
+          <Text style={styles.approvalTitle}>Request Approved!</Text>
+        </View>
+        <Text style={styles.approvalMessage}>
+          Your rental request has been approved. You can now proceed with the rental process.
+        </Text>
+        <TouchableOpacity 
+          style={styles.proceedToRentalButton}
+          onPress={() => {
+            console.log('Proceeding to rental process');
+            // Navigate to rental period selection or payment
+          }}
+        >
+          <Text style={styles.proceedToRentalText}>Proceed to Rental</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  if (requestStatus === 'declined') {
+    return (
+      <View style={styles.renterDeclinedStatus}>
+        <View style={styles.declinedHeader}>
+          <Ionicons name="close-circle" size={24} color="#FF3B30" />
+          <Text style={styles.declinedTitle}>Request Declined</Text>
+        </View>
+        <Text style={styles.declinedMessage}>
+          Unfortunately, your rental request has been declined.
         </Text>
       </View>
     );
   }
 
+  // Default pending status for renter
   return (
-    <View style={styles.rentalActions}>
-      <Text style={styles.rentalRequestTitle}>Rental Request</Text>
-      <Text style={styles.rentalRequestDetails}>
-        Aug 24 - Aug 26, 2025 • 3 days • ₱3,600
-      </Text>
-      <View style={styles.actionButtons}>
-        <TouchableOpacity 
-          style={[styles.actionButton, styles.acceptButton]} 
-          onPress={handleAccept}
-        >
-          <Text style={styles.acceptButtonText}>Accept</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.actionButton, styles.declineButton]} 
-          onPress={handleDecline}
-        >
-          <Text style={styles.declineButtonText}>Decline</Text>
-        </TouchableOpacity>
+    <View style={styles.renterPendingStatus}>
+      <View style={styles.pendingHeader}>
+        <Ionicons name="time" size={24} color="#FF9500" />
+        <Text style={styles.pendingTitle}>Request Pending</Text>
       </View>
+      <Text style={styles.pendingMessage}>
+        Your rental request is currently being reviewed by the lender.
+      </Text>
     </View>
   );
 };
@@ -140,20 +222,36 @@ export default function ViewMessagesScreen() {
   const senderName = params.senderName as string || 'Conversation';
   const itemName = params.itemName as string || 'Canon EOS 90D DSLR Camera';
   const itemId = params.itemId as string || 'item1';
+  const requestStatus = params.requestStatus as string;
+  const hasReplied = params.hasReplied as string;
 
-  // Update the header title dynamically
+  // Update the header title dynamically with icon
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: senderName,
+      headerRight: () => (
+        <TouchableOpacity 
+          style={styles.headerIconButton}
+          onPress={() => handleHeaderIconPress()}
+        >
+          <Ionicons 
+            name="cube-outline" 
+            size={24} 
+            color="#0066CC" 
+          />
+        </TouchableOpacity>
+      ),
     });
-  }, [navigation, senderName]);
+  }, [navigation, senderName, itemId]);
 
   // Debug: Log the parameters to see what's being received
   console.log('ViewMessagesScreen params:', {
     senderName,
     itemName,
     itemId,
-    isLenderView
+    isLenderView,
+    requestStatus,
+    hasReplied
   });
 
   useEffect(() => {
@@ -203,6 +301,17 @@ export default function ViewMessagesScreen() {
     handleBack();
   };
 
+  const handleHeaderIconPress = () => {
+    // For renters: Navigate to the item details
+    router.push({
+      pathname: '/item',
+      params: { 
+        itemId: itemId,
+        fromMessages: 'true'
+      }
+    });
+  };
+
   const handleSend = () => {
     if (messageText.trim()) {
       // Create new message
@@ -241,8 +350,13 @@ export default function ViewMessagesScreen() {
         <Ionicons name="chevron-forward" size={20} color="#999" />
       </TouchableOpacity>
 
-      {/* Rental Request Actions (Lender View) */}
-      <RentalRequestActions isLenderView={isLenderView} />
+      {/* Rental Request Actions (Renter View) */}
+      <RentalRequestActions 
+        isLenderView={isLenderView}
+        requestStatus={requestStatus}
+        hasReplied={hasReplied}
+        messageId={params.messageId as string}
+      />
 
       {/* Messages List */}
       <ScrollView
@@ -302,6 +416,55 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  headerIconButton: {
+    padding: 8,
+    marginRight: 8,
+  },
+  // Lender action styles
+  rentalActions: {
+    padding: 16,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  actionButton: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  acceptButton: {
+    backgroundColor: '#00A86B',
+  },
+  declineButton: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#FF3B30',
+  },
+  acceptButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  declineButtonText: {
+    color: '#FF3B30',
+    fontWeight: '600',
+  },
+  statusDisplay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+  },
+  statusText: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
   itemInfo: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -332,58 +495,7 @@ const styles = StyleSheet.create({
     color: '#999',
     marginTop: 4,
   },
-  rentalActions: {
-    padding: 16,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  rentalRequestTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
-  },
-  rentalRequestDetails: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 12,
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  actionButton: {
-    flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 6,
-    alignItems: 'center',
-  },
-  acceptButton: {
-    backgroundColor: '#00A86B',
-  },
-  declineButton: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#FF3B30',
-  },
-  acceptButtonText: {
-    color: '#fff',
-    fontWeight: '600',
-  },
-  declineButtonText: {
-    color: '#FF3B30',
-    fontWeight: '600',
-  },
-  statusBanner: {
-    padding: 12,
-    alignItems: 'center',
-  },
-  statusBannerText: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
+
   messagesContainer: {
     flex: 1,
   },
@@ -481,5 +593,91 @@ const styles = StyleSheet.create({
   },
   sendButtonInactive: {
     backgroundColor: '#ddd',
+  },
+  // Renter status styles
+  renterApprovalStatus: {
+    backgroundColor: '#E8F5E8',
+    padding: 16,
+    margin: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#00A86B',
+  },
+  approvalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  approvalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#00A86B',
+    marginLeft: 8,
+  },
+  approvalMessage: {
+    fontSize: 14,
+    color: '#00A86B',
+    marginBottom: 16,
+    lineHeight: 20,
+  },
+  proceedToRentalButton: {
+    backgroundColor: '#00A86B',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  proceedToRentalText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  renterDeclinedStatus: {
+    backgroundColor: '#FFE8E8',
+    padding: 16,
+    margin: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#FF3B30',
+  },
+  declinedHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  declinedTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FF3B30',
+    marginLeft: 8,
+  },
+  declinedMessage: {
+    fontSize: 14,
+    color: '#FF3B30',
+    lineHeight: 20,
+  },
+  renterPendingStatus: {
+    backgroundColor: '#FFF8E8',
+    padding: 16,
+    margin: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#FF9500',
+  },
+  pendingHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  pendingTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FF9500',
+    marginLeft: 8,
+  },
+  pendingMessage: {
+    fontSize: 14,
+    color: '#FF9500',
+    lineHeight: 20,
   },
 });
