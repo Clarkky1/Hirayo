@@ -1,6 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import {
+  Animated,
   FlatList,
   SafeAreaView,
   StyleSheet,
@@ -114,11 +116,119 @@ const ChatBubble: React.FC<{ message: ChatMessage }> = ({ message }) => {
   );
 };
 
+const RentalRequestActions: React.FC<{ isLenderView: boolean }> = ({ isLenderView }) => {
+  const [requestStatus, setRequestStatus] = useState<'pending' | 'accepted' | 'declined'>('pending');
+
+  if (!isLenderView) return null;
+
+  const handleAccept = () => {
+    setRequestStatus('accepted');
+    // Here you would typically update the backend
+    console.log('Rental request accepted');
+  };
+
+  const handleDecline = () => {
+    setRequestStatus('declined');
+    // Here you would typically update the backend
+    console.log('Rental request declined');
+  };
+
+  if (requestStatus !== 'pending') {
+    return (
+      <View style={[
+        styles.statusBanner,
+        { backgroundColor: requestStatus === 'accepted' ? '#E8F5E8' : '#FFE8E8' }
+      ]}>
+        <Ionicons 
+          name={requestStatus === 'accepted' ? 'checkmark-circle' : 'close-circle'} 
+          size={20} 
+          color={requestStatus === 'accepted' ? '#00A86B' : '#FF3B30'} 
+        />
+        <Text style={[
+          styles.statusBannerText,
+          { color: requestStatus === 'accepted' ? '#00A86B' : '#FF3B30' }
+        ]}>
+          Request {requestStatus === 'accepted' ? 'Approved' : 'Declined'}
+        </Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.rentalActions}>
+      <View style={styles.rentalRequestInfo}>
+        <Text style={styles.rentalRequestTitle}>Rental Request</Text>
+        <Text style={styles.rentalRequestDetails}>
+          Aug 24 - Aug 26, 2025 • 3 days • ₱3,600
+        </Text>
+      </View>
+      <View style={styles.actionButtons}>
+        <TouchableOpacity 
+          style={[styles.actionButton, styles.acceptButton]} 
+          onPress={handleAccept}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="checkmark" size={18} color="#ffffff" />
+          <Text style={styles.acceptButtonText}>Accept</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.actionButton, styles.declineButton]} 
+          onPress={handleDecline}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="close" size={18} color="#FF3B30" />
+          <Text style={styles.declineButtonText}>Decline</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
 export default function ViewMessagesScreen() {
   const [messageText, setMessageText] = useState('');
+  const params = useLocalSearchParams();
+  const isLenderView = params.isLenderView === 'true';
+  const senderName = params.senderName as string || 'John Smith';
+  const itemName = params.itemName as string || 'Canon EOS 90D DSLR Camera';
+  const messageId = params.messageId as string;
+  const itemId = params.itemId as string || 'item1'; // Default item ID
+
+  // Animation value for button press feedback
+  const buttonScale = new Animated.Value(1);
 
   const handleBack = () => {
-    console.log('Back pressed');
+    // Navigate to the specific item instead of just going back
+    if (itemId) {
+      router.push({
+        pathname: '/item',
+        params: { 
+          itemId: itemId,
+          fromMessages: 'true'
+        }
+      });
+    } else {
+      // Fallback to going back if no item ID is available
+      router.back();
+    }
+  };
+
+  const handleItemButtonPress = () => {
+    // Animate button press
+    Animated.sequence([
+      Animated.timing(buttonScale, {
+        toValue: 0.95,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(buttonScale, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+    
+    // Navigate to item
+    handleBack();
   };
 
   const handleSend = () => {
@@ -143,12 +253,14 @@ export default function ViewMessagesScreen() {
         <View style={styles.headerInfo}>
           <View style={styles.avatarContainer}>
             <View style={styles.avatar}>
-              <Text style={styles.avatarText}>JS</Text>
+              <Text style={styles.avatarText}>
+                {senderName.split(' ').map(n => n[0]).join('')}
+              </Text>
             </View>
             <View style={styles.onlineIndicator} />
           </View>
           <View style={styles.userInfo}>
-            <Text style={styles.userName}>John Smith</Text>
+            <Text style={styles.userName}>{senderName}</Text>
             <Text style={styles.userStatus}>Online</Text>
           </View>
         </View>
@@ -160,12 +272,30 @@ export default function ViewMessagesScreen() {
 
       {/* Item Info */}
       <View style={styles.itemInfo}>
-        <View style={styles.itemImage} />
-        <View style={styles.itemDetails}>
-          <Text style={styles.itemName}>Canon EOS 90D DSLR Camera</Text>
-          <Text style={styles.itemPrice}>₱2,500 for a day</Text>
-        </View>
+        <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
+          <TouchableOpacity 
+            style={styles.itemImageContainer}
+            onPress={handleItemButtonPress}
+            activeOpacity={0.7}
+          >
+            <View style={styles.itemImageWrapper}>
+              <View style={styles.itemImage} />
+              <View style={styles.itemDetails}>
+                <Text style={styles.itemName}>{itemName}</Text>
+                <Text style={styles.itemPrice}>₱2,500 for a day</Text>
+              </View>
+            </View>
+            <View style={styles.navigationIndicator}>
+              <Ionicons name="home-outline" size={16} color="#0066CC" />
+              <Text style={styles.viewItemText}>View Item</Text>
+              <Ionicons name="chevron-forward" size={16} color="#0066CC" />
+            </View>
+          </TouchableOpacity>
+        </Animated.View>
       </View>
+
+      {/* Rental Request Actions (Lender View) */}
+      <RentalRequestActions isLenderView={isLenderView} />
 
       {/* Messages List */}
       <FlatList
@@ -219,7 +349,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 15,
-          paddingTop: 40,
+    paddingTop: 40,
     backgroundColor: '#ffffff',
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
@@ -277,17 +407,35 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   itemInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 12,
     backgroundColor: '#ffffff',
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
   },
+  itemImageContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  itemImageWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
   itemImage: {
-    width: 40,
-    height: 40,
+    width: 50,
+    height: 50,
     backgroundColor: '#E0E0E0',
     borderRadius: 8,
     marginRight: 12,
@@ -296,15 +444,96 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   itemName: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: 16,
+    fontWeight: '600',
     color: '#333333',
-    marginBottom: 2,
+    marginBottom: 4,
   },
   itemPrice: {
+    fontSize: 14,
+    color: '#0066CC',
+    fontWeight: '600',
+  },
+  navigationIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E3F2FD',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#0066CC',
+  },
+  viewItemText: {
     fontSize: 12,
     color: '#0066CC',
     fontWeight: '600',
+    marginLeft: 4,
+  },
+  rentalActions: {
+    backgroundColor: '#ffffff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+  },
+  rentalRequestInfo: {
+    marginBottom: 12,
+  },
+  rentalRequestTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333333',
+    marginBottom: 4,
+  },
+  rentalRequestDetails: {
+    fontSize: 14,
+    color: '#666666',
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  actionButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  acceptButton: {
+    backgroundColor: '#00A86B',
+    borderColor: '#00A86B',
+  },
+  declineButton: {
+    backgroundColor: '#ffffff',
+    borderColor: '#FF3B30',
+  },
+  acceptButtonText: {
+    color: '#ffffff',
+    fontWeight: '600',
+    marginLeft: 6,
+  },
+  declineButtonText: {
+    color: '#FF3B30',
+    fontWeight: '600',
+    marginLeft: 6,
+  },
+  statusBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    backgroundColor: '#E8F5E8',
+  },
+  statusBannerText: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 8,
   },
   messagesContainer: {
     paddingHorizontal: 20,

@@ -1,21 +1,22 @@
 import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import {
-    Animated,
-    Image,
-    PanResponder,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Animated,
+  Image,
+  PanResponder,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 export default function ReviewOrderScreen() {
-  const { validateAndNavigate, goBack } = useNavigationGuard();
+  const { goBack } = useNavigationGuard();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
   // Animation value for swipe gestures
@@ -35,13 +36,8 @@ export default function ReviewOrderScreen() {
   };
 
   const handlePay = () => {
-    // Validate that user has confirmed rental details before proceeding
-    const validationFn = () => {
-      // Add any validation logic here (e.g., check if dates are selected)
-      return true; // For now, always allow proceeding
-    };
-    
-    validateAndNavigate('payment', validationFn);
+    // Navigate directly to payment page without validation restrictions
+    router.push('/pay');
   };
 
   const handleGoBack = () => {

@@ -1,5 +1,4 @@
 import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
-import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -29,7 +28,6 @@ const paymentMethods: PaymentMethod[] = [
 ];
 
 export default function PaymentScreen() {
-  const { validateAndNavigate, goBack } = useNavigationGuard();
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('');
   const [cardNumber, setCardNumber] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
@@ -203,8 +201,8 @@ export default function PaymentScreen() {
           setIsProcessing(false);
           setShowCountdown(false);
           
-          // Use navigation guard to proceed to receipt
-          validateAndNavigate('receipt');
+          // Navigate directly to receipt without validation restrictions
+          navigateToReceipt();
           return 0;
         }
         return prev - 1;
@@ -212,11 +210,12 @@ export default function PaymentScreen() {
     }, 1000);
 
     countdownRef.current = countdownInterval;
-  }, [selectedPaymentMethod, cardNumber, expiryDate, cvv, cardholderName, validateAndNavigate]);
+  }, [selectedPaymentMethod, cardNumber, expiryDate, cvv, cardholderName, navigateToReceipt]);
 
   const handleGoBack = useCallback(() => {
-    goBack('review-order');
-  }, [goBack]);
+    // Navigate back to review order page
+    router.back();
+  }, []);
 
   const renderPaymentMethod = (method: PaymentMethod) => (
     <TouchableOpacity

@@ -3,13 +3,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  FlatList,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    FlatList,
+    SafeAreaView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 
 interface Message {
@@ -96,7 +96,8 @@ const MessageCard: React.FC<{ item: Message }> = ({ item }) => {
       params: { 
         messageId: item.id,
         senderName: item.senderName,
-        itemName: item.itemName || ''
+        itemName: item.itemName || '',
+        itemId: item.id || 'item1' // Include item ID for navigation
       }
     });
   };
@@ -163,7 +164,8 @@ export default function MessagesScreen() {
           params: { 
             messageId: existingConversation.id,
             senderName: existingConversation.senderName,
-            itemName: existingConversation.itemName || ''
+            itemName: existingConversation.itemName || '',
+            itemId: existingConversation.id || 'item1'
           }
         });
       } else {
@@ -175,6 +177,7 @@ export default function MessagesScreen() {
             messageId: newConversationId,
             senderName: params.ownerName as string,
             itemName: params.itemName as string,
+            itemId: params.itemId as string || 'item1',
             isNewConversation: 'true'
           }
         });

@@ -1,11 +1,8 @@
-import { BorderRadius, Colors, Spacing } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { router, useLocalSearchParams, useNavigation } from 'expo-router';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
+  Keyboard,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -15,253 +12,255 @@ import {
   View
 } from 'react-native';
 
-export default function ViewMessagesScreen() {
-  const [message, setMessage] = useState('');
-  const [showTimeoutBanner, setShowTimeoutBanner] = useState(false);
-  const [timeoutCountdown, setTimeoutCountdown] = useState(300); // 5 minutes in seconds
-  const [messages, setMessages] = useState([
-    {
-      id: '1',
-      text: 'Hi! I\'m interested in renting your Canon EOS 90D DSLR Camera. Is it available for this weekend?',
-      sender: 'renter',
-      timestamp: '2:30 PM',
-      isRentalRequest: true
-    },
-    {
-      id: '2',
-      text: 'Yes, it\'s available! What dates do you need it for?',
-      sender: 'lender',
-      timestamp: '2:32 PM',
-      isRentalRequest: false
-    },
-    {
-      id: '3',
-      text: 'I need it from Friday to Sunday. What\'s the total price?',
-      sender: 'renter',
-      timestamp: '2:35 PM',
-      isRentalRequest: false
-    },
-    {
-      id: '4',
-      text: 'That would be ₱7,500 for 3 days. Does that work for you?',
-      sender: 'lender',
-      timestamp: '2:38 PM',
-      isRentalRequest: false
-    },
-    {
-      id: '5',
-      text: 'Perfect! That works for me.',
-      sender: 'renter',
-      timestamp: '2:40 PM',
-      isRentalRequest: false
-    },
-    {
-      id: '6',
-      text: '✅ Rental permission granted! You can now proceed with the rental form.',
-      sender: 'lender',
-      timestamp: '2:42 PM',
-      isRentalRequest: false,
-      isPermissionGranted: true
-    }
-  ]);
+interface ChatMessage {
+  id: string;
+  text: string;
+  timestamp: string;
+  isFromMe: boolean;
+}
 
-  // Timeout handling - show banner after 5 minutes of no response
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeoutCountdown(prev => {
-        if (prev <= 0) {
-          setShowTimeoutBanner(true);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+const chatMessages: ChatMessage[] = [
+  {
+    id: '1',
+    text: 'Hi! Is the camera still available for rent?',
+    timestamp: '10:30 AM',
+    isFromMe: false,
+  },
+  {
+    id: '2',
+    text: 'Yes, it\'s still available! When do you need it?',
+    timestamp: '10:32 AM',
+    isFromMe: true,
+  },
+  {
+    id: '3',
+    text: 'I need it for this weekend. Can I rent it for 3 days?',
+    timestamp: '10:35 AM',
+    isFromMe: false,
+  },
+  {
+    id: '4',
+    text: 'Perfect! That works for me. What time works best for pickup?',
+    timestamp: '10:37 AM',
+    isFromMe: true,
+  },
+];
 
-    return () => clearInterval(timer);
-  }, []);
-
-  const sendMessage = () => {
-    if (message.trim()) {
-      const newMessage = {
-        id: Date.now().toString(),
-        text: message.trim(),
-        sender: 'renter',
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        isRentalRequest: false
-      };
-      setMessages([...messages, newMessage]);
-      setMessage('');
-      // Reset timeout when renter sends a message
-      setTimeoutCountdown(300);
-      setShowTimeoutBanner(false);
-    }
-  };
-
-  const proceedToRentalForm = () => {
-    Alert.alert(
-      'Proceed to Rental Form',
-      'Great! You can now proceed with the rental process. Would you like to continue?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Continue', 
-          style: 'default',
-          onPress: () => {
-            // Navigate to rental period
-            router.push('/period');
-          }
-        }
-      ]
-    );
-  };
-
-  const switchToVideoCall = () => {
-    Alert.alert(
-      'Switch to Video Call',
-      'Would you like to try video calling the lender instead? This might be faster for getting a response.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Video Call', 
-          style: 'default',
-          onPress: () => {
-            router.push('/video-call');
-          }
-        }
-      ]
-    );
-  };
-
-  const findAlternativeItem = () => {
-    Alert.alert(
-      'Find Alternative',
-      'Would you like to browse other similar items while waiting for a response?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Browse Items', 
-          style: 'default',
-          onPress: () => {
-            router.push('/discover');
-          }
-        }
-      ]
-    );
-  };
-
-  const renderMessage = (msg: any) => (
-    <View key={msg.id} style={[
+const ChatBubble: React.FC<{ message: ChatMessage }> = ({ message }) => {
+  return (
+    <View style={[
       styles.messageContainer,
-      msg.sender === 'renter' ? styles.renterMessage : styles.lenderMessage
+      message.isFromMe ? styles.myMessageContainer : styles.theirMessageContainer
     ]}>
       <View style={[
         styles.messageBubble,
-        msg.sender === 'renter' ? styles.renterBubble : styles.lenderBubble,
-        msg.isPermissionGranted && styles.permissionBubble
+        message.isFromMe ? styles.myMessageBubble : styles.theirMessageBubble
       ]}>
         <Text style={[
           styles.messageText,
-          msg.sender === 'renter' ? styles.renterText : styles.lenderText,
-          msg.isPermissionGranted && styles.permissionText
+          message.isFromMe ? styles.myMessageText : styles.theirMessageText
         ]}>
-          {msg.text}
+          {message.text}
         </Text>
         <Text style={[
           styles.timestamp,
-          msg.sender === 'renter' ? styles.renterTimestamp : styles.lenderTimestamp
+          message.isFromMe ? styles.myTimestamp : styles.theirTimestamp
         ]}>
-          {msg.timestamp}
+          {message.timestamp}
         </Text>
       </View>
     </View>
   );
+};
 
-  const hasPermissionGranted = messages.some(msg => msg.isPermissionGranted);
+const RentalRequestActions: React.FC<{ isLenderView: boolean }> = ({ isLenderView }) => {
+  const [requestStatus, setRequestStatus] = useState<'pending' | 'accepted' | 'declined'>('pending');
+
+  if (!isLenderView) return null;
+
+  const handleAccept = () => {
+    setRequestStatus('accepted');
+    console.log('Rental request accepted');
+  };
+
+  const handleDecline = () => {
+    setRequestStatus('declined');
+    console.log('Rental request declined');
+  };
+
+  if (requestStatus !== 'pending') {
+    return (
+      <View style={[
+        styles.statusBanner,
+        { backgroundColor: requestStatus === 'accepted' ? '#E8F5E8' : '#FFE8E8' }
+      ]}>
+        <Text style={[
+          styles.statusBannerText,
+          { color: requestStatus === 'accepted' ? '#00A86B' : '#FF3B30' }
+        ]}>
+          Request {requestStatus === 'accepted' ? 'Approved' : 'Declined'}
+        </Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.rentalActions}>
+      <Text style={styles.rentalRequestTitle}>Rental Request</Text>
+      <Text style={styles.rentalRequestDetails}>
+        Aug 24 - Aug 26, 2025 • 3 days • ₱3,600
+      </Text>
+      <View style={styles.actionButtons}>
+        <TouchableOpacity 
+          style={[styles.actionButton, styles.acceptButton]} 
+          onPress={handleAccept}
+        >
+          <Text style={styles.acceptButtonText}>Accept</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.actionButton, styles.declineButton]} 
+          onPress={handleDecline}
+        >
+          <Text style={styles.declineButtonText}>Decline</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
+export default function ViewMessagesScreen() {
+  const [messageText, setMessageText] = useState('');
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const scrollViewRef = useRef<ScrollView>(null);
+  const navigation = useNavigation();
+  const params = useLocalSearchParams();
+  const isLenderView = params.isLenderView === 'true';
+  const senderName = params.senderName as string || 'Conversation';
+  const itemName = params.itemName as string || 'Canon EOS 90D DSLR Camera';
+  const itemId = params.itemId as string || 'item1';
+
+  // Update the header title dynamically
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: senderName,
+    });
+  }, [navigation, senderName]);
+
+  // Debug: Log the parameters to see what's being received
+  console.log('ViewMessagesScreen params:', {
+    senderName,
+    itemName,
+    itemId,
+    isLenderView
+  });
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
+      setKeyboardHeight(e.endCoordinates.height);
+      // Scroll to bottom when keyboard appears
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    });
+
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      keyboardDidShowListener?.remove();
+      keyboardDidHideListener?.remove();
+    };
+  }, []);
+
+  const handleBack = () => {
+    if (itemId) {
+      router.push({
+        pathname: '/item',
+        params: { 
+          itemId: itemId,
+          fromMessages: 'true'
+        }
+      });
+    } else {
+      router.back();
+    }
+  };
+
+  const handleItemPress = () => {
+    handleBack();
+  };
+
+  const handleSend = () => {
+    if (messageText.trim()) {
+      console.log('Send message:', messageText);
+      setMessageText('');
+      // Scroll to bottom after sending message
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView 
-        style={styles.keyboardAvoidingView} 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      {/* Simple Item Info */}
+      <TouchableOpacity style={styles.itemInfo} onPress={handleItemPress}>
+        <View style={styles.itemImage} />
+        <View style={styles.itemDetails}>
+          <Text style={styles.itemName}>{itemName}</Text>
+          <Text style={styles.itemPrice}>₱2,500/day</Text>
+        </View>
+        <Ionicons name="chevron-forward" size={20} color="#999" />
+      </TouchableOpacity>
+
+      {/* Rental Request Actions (Lender View) */}
+      <RentalRequestActions isLenderView={isLenderView} />
+
+      {/* Messages List */}
+      <ScrollView
+        ref={scrollViewRef}
+        style={styles.messagesContainer}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.messagesContent}
+        keyboardShouldPersistTaps="handled"
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} activeOpacity={0.7}>
-            <Ionicons name="arrow-back" size={24} color={Colors.text.primary} />
-          </TouchableOpacity>
-          <View style={styles.headerInfo}>
-            <Text style={styles.headerTitle}>Canon EOS 90D DSLR</Text>
-            <Text style={styles.headerSubtitle}>Rental Request</Text>
-          </View>
-        </View>
+        {chatMessages.map((message) => (
+          <ChatBubble key={message.id} message={message} />
+        ))}
+      </ScrollView>
 
-        {/* Permission Granted Banner */}
-        {hasPermissionGranted && (
-          <View style={styles.permissionBanner}>
-            <Ionicons name="checkmark-circle" size={20} color={Colors.success} />
-            <Text style={styles.permissionBannerText}>
-              Rental permission granted! You can now proceed with the rental form.
-            </Text>
-            <TouchableOpacity 
-              style={styles.proceedButton} 
-              onPress={proceedToRentalForm}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.proceedButtonText}>Proceed</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {/* Timeout Banner - Show after 5 minutes of no response */}
-        {showTimeoutBanner && !hasPermissionGranted && (
-          <View style={styles.timeoutBanner}>
-            <Ionicons name="time-outline" size={20} color={Colors.warning} />
-            <View style={styles.timeoutContent}>
-              <Text style={styles.timeoutTitle}>No response yet?</Text>
-              <Text style={styles.timeoutText}>
-                The lender hasn't responded in a while. Try these alternatives:
-              </Text>
-              <View style={styles.timeoutActions}>
-                <TouchableOpacity 
-                  style={styles.timeoutActionButton} 
-                  onPress={switchToVideoCall}
-                  activeOpacity={0.7}
-                >
-                  <Ionicons name="videocam-outline" size={16} color={Colors.primary[500]} />
-                  <Text style={styles.timeoutActionText}>Video Call</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={styles.timeoutActionButton} 
-                  onPress={findAlternativeItem}
-                  activeOpacity={0.7}
-                >
-                  <Ionicons name="search-outline" size={16} color={Colors.primary[500]} />
-                  <Text style={styles.timeoutActionText}>Find Alternative</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        )}
-
-        {/* Messages */}
-        <ScrollView style={styles.messagesContainer} showsVerticalScrollIndicator={false}>
-          {messages.map(renderMessage)}
-        </ScrollView>
-
-        {/* Message Input */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            placeholder="Type your message..."
-            value={message}
-            onChangeText={setMessage}
-            multiline
+      {/* Simple Message Input */}
+      <View style={[styles.inputContainer, { paddingBottom: Math.max(16, keyboardHeight > 0 ? 16 : 16) }]}>
+        <TextInput
+          style={styles.textInput}
+          placeholder="Type a message..."
+          value={messageText}
+          onChangeText={setMessageText}
+          multiline
+          returnKeyType="send"
+          blurOnSubmit={false}
+          onFocus={() => {
+            setTimeout(() => {
+              scrollViewRef.current?.scrollToEnd({ animated: true });
+            }, 100);
+          }}
+        />
+        <TouchableOpacity 
+          style={[
+            styles.sendButton,
+            messageText.trim() ? styles.sendButtonActive : styles.sendButtonInactive
+          ]}
+          onPress={handleSend}
+          disabled={!messageText.trim()}
+        >
+          <Ionicons 
+            name="send" 
+            size={20} 
+            color={messageText.trim() ? "#fff" : "#999"} 
           />
-          <TouchableOpacity style={styles.sendButton} onPress={sendMessage} activeOpacity={0.7}>
-            <Ionicons name="send" size={20} color={Colors.text.inverse} />
-          </TouchableOpacity>
-        </View>
-      </KeyboardAvoidingView>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
@@ -269,199 +268,168 @@ export default function ViewMessagesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
+  },
+  itemInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
     backgroundColor: '#f8f9fa',
-  },
-  keyboardAvoidingView: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-    backgroundColor: '#ffffff',
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: '#eee',
+    marginTop: 8,
   },
-  backButton: {
-    padding: Spacing.sm,
+  itemImage: {
+    width: 40,
+    height: 40,
+    backgroundColor: '#ddd',
+    borderRadius: 8,
+    marginRight: 12,
   },
-  headerInfo: {
+  itemDetails: {
     flex: 1,
-    marginLeft: Spacing.sm,
   },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: Colors.text.primary,
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: Colors.text.secondary,
-    marginTop: 2,
-  },
-  permissionBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#e8f5e9',
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.lg,
-    borderRadius: BorderRadius.md,
-    marginHorizontal: Spacing.lg,
-    marginTop: Spacing.md,
-    marginBottom: Spacing.sm,
-    borderWidth: 1,
-    borderColor: '#a5d6a7',
-  },
-  permissionBannerText: {
-    fontSize: 14,
-    color: Colors.success,
-    flex: 1,
-    marginLeft: Spacing.sm,
-  },
-  proceedButton: {
-    backgroundColor: Colors.primary[500],
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
-    borderRadius: BorderRadius.sm,
-  },
-  proceedButtonText: {
-    fontSize: 14,
-    color: Colors.text.inverse,
-  },
-  timeoutBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff3cd',
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.lg,
-    borderRadius: BorderRadius.md,
-    marginHorizontal: Spacing.lg,
-    marginTop: Spacing.md,
-    marginBottom: Spacing.sm,
-    borderWidth: 1,
-    borderColor: '#ffeeba',
-  },
-  timeoutContent: {
-    flex: 1,
-    marginLeft: Spacing.sm,
-  },
-  timeoutTitle: {
+  itemName: {
     fontSize: 16,
     fontWeight: '600',
-    color: Colors.warning,
+    color: '#333',
+    marginBottom: 2,
+  },
+  itemPrice: {
+    fontSize: 14,
+    color: '#666',
+  },
+  rentalActions: {
+    padding: 16,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  rentalRequestTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
     marginBottom: 4,
   },
-  timeoutText: {
+  rentalRequestDetails: {
     fontSize: 14,
-    color: Colors.warning,
+    color: '#666',
     marginBottom: 12,
   },
-  timeoutActions: {
+  actionButtons: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    gap: 12,
   },
-  timeoutActionButton: {
-    flexDirection: 'row',
+  actionButton: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 6,
     alignItems: 'center',
-    backgroundColor: Colors.primary[100],
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
-    borderRadius: BorderRadius.sm,
   },
-  timeoutActionText: {
+  acceptButton: {
+    backgroundColor: '#00A86B',
+  },
+  declineButton: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#FF3B30',
+  },
+  acceptButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  declineButtonText: {
+    color: '#FF3B30',
+    fontWeight: '600',
+  },
+  statusBanner: {
+    padding: 12,
+    alignItems: 'center',
+  },
+  statusBannerText: {
     fontSize: 14,
-    color: Colors.primary[500],
-    marginLeft: Spacing.sm,
+    fontWeight: '600',
   },
   messagesContainer: {
     flex: 1,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
+  },
+  messagesContent: {
+    padding: 16,
+    paddingBottom: 20,
   },
   messageContainer: {
     marginBottom: 12,
   },
-  renterMessage: {
+  myMessageContainer: {
     alignItems: 'flex-end',
   },
-  lenderMessage: {
+  theirMessageContainer: {
     alignItems: 'flex-start',
   },
   messageBubble: {
     maxWidth: '80%',
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
-    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 16,
   },
-  renterBubble: {
-    backgroundColor: Colors.primary[500],
-    borderBottomRightRadius: BorderRadius.sm,
+  myMessageBubble: {
+    backgroundColor: '#0066CC',
   },
-  lenderBubble: {
-    backgroundColor: '#ffffff',
-    borderBottomLeftRadius: BorderRadius.sm,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-  },
-  permissionBubble: {
-    backgroundColor: '#e8f5e9',
-    borderWidth: 1,
-    borderColor: '#a5d6a7',
+  theirMessageBubble: {
+    backgroundColor: '#f1f1f1',
   },
   messageText: {
     fontSize: 16,
-    lineHeight: 22,
-    marginBottom: 3,
+    lineHeight: 20,
+    marginBottom: 4,
   },
-  renterText: {
-    color: Colors.text.inverse,
+  myMessageText: {
+    color: '#fff',
   },
-  lenderText: {
-    color: Colors.text.primary,
-  },
-  permissionText: {
-    color: Colors.success,
+  theirMessageText: {
+    color: '#333',
   },
   timestamp: {
     fontSize: 11,
     alignSelf: 'flex-end',
   },
-  renterTimestamp: {
+  myTimestamp: {
     color: 'rgba(255, 255, 255, 0.7)',
   },
-  lenderTimestamp: {
-    color: '#999999',
+  theirTimestamp: {
+    color: '#999',
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
-    paddingBottom: 16,
+    padding: 16,
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: '#eee',
+    backgroundColor: '#fff',
   },
   textInput: {
     flex: 1,
     backgroundColor: '#f8f9fa',
     borderRadius: 20,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     marginRight: 12,
-    maxHeight: 100,
-    minHeight: 44,
     fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
+    maxHeight: 100,
+    minHeight: 40,
   },
   sendButton: {
-    backgroundColor: Colors.primary[500],
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  sendButtonActive: {
+    backgroundColor: '#0066CC',
+  },
+  sendButtonInactive: {
+    backgroundColor: '#ddd',
   },
 });

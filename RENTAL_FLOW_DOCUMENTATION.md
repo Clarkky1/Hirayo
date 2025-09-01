@@ -47,6 +47,17 @@ Click "Rent" → Choose communication method → Start conversation with lender
 Lender reviews request → Grants/declines permission → Renter proceeds to rental form
 ```
 
+#### Multiple Request Handling (Lender Side):
+```
+Multiple renters request same item → Lender sees priority list → Approves first request → Others automatically declined
+```
+
+**Key Features:**
+- **Request Queue**: Lenders see all pending requests in chronological order
+- **Priority System**: First-come-first-serve with visual indicators
+- **Automatic Conflict Resolution**: Approving one request automatically declines others
+- **Status Management**: Clear tracking of pending, approved, and declined requests
+
 ### 4. **Rental Process**
 ```
 Set rental period → Review order → Payment → Item handover
@@ -89,12 +100,58 @@ const communicationOptions = [
   - Seamless navigation to rental form
 
 #### 4. **LenderMessagesScreen** (`app/lender-messages/index.tsx`)
-- **Purpose**: Lender-side request management
+- **Purpose**: Lender-side request management and multiple rental request handling
 - **Features**:
-  - Multiple rental request handling
-  - First-come-first-serve priority system
-  - Individual request approval/decline
-  - Automatic conflict resolution
+  - **Tabbed Interface**: Three main sections for better organization
+    - **Chat Tab**: Direct conversation with renters
+    - **Requests Tab**: Manage all rental requests with approve/decline actions
+    - **Overview Tab**: Summary of all items and their request statuses
+  - **Multiple rental request management**: Handle multiple renters requesting the same item
+  - **First-come-first-serve priority system**: Automatic conflict resolution when multiple requests exist
+  - **Individual request approval/decline**: Approve one request, automatically decline others for the same item
+  - **Request status tracking**: Pending, approved, declined status management
+  - **Priority indicators**: Visual badges showing request order and status
+
+#### Multiple Request Management System
+```typescript
+// Request handling logic
+const handleRequestAction = (requestId: string, action: 'approve' | 'decline') => {
+  if (action === 'approve') {
+    // Approve selected request
+    approveRequest(requestId);
+    // Automatically decline all other pending requests for the same item
+    declineOtherRequests(itemId, requestId);
+  }
+};
+
+// Visual priority indicators
+const renderPriorityBadge = (request: RentalRequest) => {
+  if (request.isFirstRequest && request.status === 'pending') {
+    return <View style={styles.firstRequestBadge}>
+      <Text style={styles.firstRequestText}>1st</Text>
+    </View>;
+  }
+};
+```
+
+**Request States:**
+- **Pending**: Awaiting lender decision
+- **Approved**: Request accepted, others automatically declined
+- **Declined**: Request rejected (manual or automatic)
+
+#### Renter vs Lender Experience
+
+**Renter Side:**
+- **Single Request**: Each renter submits one request per item
+- **Communication**: Direct messaging/video call with lender
+- **Status Updates**: Receive notifications about request approval/decline
+- **Timeout Handling**: Get alternative suggestions if no response
+
+**Lender Side:**
+- **Multiple Requests**: See all pending requests for their items
+- **Priority Management**: Handle requests in chronological order
+- **Conflict Resolution**: Approving one request automatically declines others
+- **Request Queue**: Visual management of all rental requests
 
 #### 5. **VideoCallScreen** (`app/video-call/index.tsx`)
 - **Purpose**: Video communication with fallback options

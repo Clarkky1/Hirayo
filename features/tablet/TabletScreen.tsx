@@ -114,7 +114,8 @@ export default function TabletScreen() {
   }, [initialCategory]);
 
   const handleProductPress = (product: ProductItem) => {
-    router.push(`/item/${product.id}`);
+    // Navigate to the product detail page with the product id as a query parameter
+    router.push(`/item?id=${product.id}`);
   };
 
   const handleSort = (sortId: string) => {

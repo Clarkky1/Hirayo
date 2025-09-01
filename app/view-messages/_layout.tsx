@@ -6,12 +6,13 @@ export default function ViewMessagesLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: 'Messages',
           headerShown: true,
+          headerBackTitle: 'Back',
           headerStyle: {
             backgroundColor: '#0066CC',
           },
-          headerTintColor: '#ffffff',
+          headerTintColor: '#ffff',
+          headerShadowVisible: false,
         }}
       />
     </Stack>

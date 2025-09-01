@@ -5,16 +5,16 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import {
-  Animated,
-  Image,
-  PanResponder,
-  Platform,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+    Animated,
+    Image,
+    PanResponder,
+    Platform,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
 
 export default function ItemDetailScreen() {
@@ -59,7 +59,7 @@ export default function ItemDetailScreen() {
   const handleVideoCall = () => {
     setShowCommunicationModal(false);
     // Navigate to video call screen
-    router.push('/video-call');
+    router.push('/video-call/index');
   };
 
   const handleMessageLender = () => {
