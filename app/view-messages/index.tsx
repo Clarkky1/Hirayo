@@ -232,7 +232,7 @@ export default function ViewMessagesScreen() {
     <SafeAreaView style={styles.container}>
       {/* Simple Item Info */}
       <TouchableOpacity style={styles.itemInfo} onPress={handleItemPress}>
-        <View style={styles.itemImage} />
+      
         <View style={styles.itemDetails}>
           <Text style={styles.itemName}>{itemName}</Text>
           <Text style={styles.itemPrice}>₱2,500/day</Text>
@@ -305,32 +305,28 @@ const styles = StyleSheet.create({
   itemInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#f8f9fa',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    marginTop: 4,
-  },
-  itemImage: {
-    width: 40,
-    height: 40,
-    backgroundColor: '#ddd',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    backgroundColor: '#E3F2FD',
+    marginTop: 5,
+    marginLeft: 13,
+    marginRight: 13,
     borderRadius: 8,
-    marginRight: 12,
   },
   itemDetails: {
     flex: 1,
+    marginLeft: 8,
   },
   itemName: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     color: '#333',
     marginBottom: 2,
   },
   itemPrice: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#666',
-  },
+  },  
   demoIndicator: {
     fontSize: 12,
     color: '#999',

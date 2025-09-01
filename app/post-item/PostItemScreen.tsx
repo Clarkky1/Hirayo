@@ -3,16 +3,16 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    Alert,
-    FlatList,
-    Image,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  Alert,
+  FlatList,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { Card } from '../../components/ui/Card';
 
@@ -165,7 +165,7 @@ export default function PostItemScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Form Sections */}
-        <Card variant="filled" padding="large" style={styles.formSection}>
+        <Card variant="filled" padding="medium" style={styles.formSection}>
           <Text style={styles.sectionTitle}>Basic Information</Text>
           
           <View style={styles.inputGroup}>
@@ -218,7 +218,7 @@ export default function PostItemScreen() {
         </Card>
 
         {/* Category Selection */}
-        <Card variant="filled" padding="large" style={styles.formSection}>
+        <Card variant="filled" padding="medium" style={styles.formSection}>
           <Text style={styles.sectionTitle}>Category *</Text>
           <FlatList
             data={categories}
@@ -227,12 +227,12 @@ export default function PostItemScreen() {
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.categoriesList}
-            ItemSeparatorComponent={() => <View style={{ width: Spacing.md }} />}
+            ItemSeparatorComponent={() => <View style={{ width: Spacing.sm }} />}
           />
         </Card>
 
         {/* Price Range */}
-        <Card variant="filled" padding="large" style={styles.formSection}>
+        <Card variant="filled" padding="medium" style={styles.formSection}>
           <Text style={styles.sectionTitle}>Price Range</Text>
           <FlatList
             data={priceRanges}
@@ -241,12 +241,12 @@ export default function PostItemScreen() {
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.priceRangeList}
-            ItemSeparatorComponent={() => <View style={{ width: Spacing.md }} />}
+            ItemSeparatorComponent={() => <View style={{ width: Spacing.sm }} />}
           />
         </Card>
 
         {/* Condition */}
-        <Card variant="filled" padding="large" style={styles.formSection}>
+        <Card variant="filled" padding="medium" style={styles.formSection}>
           <Text style={styles.sectionTitle}>Condition</Text>
           <View style={styles.conditionButtons}>
             {['New', 'Like New', 'Good', 'Fair', 'Poor'].map((cond) => (
@@ -271,7 +271,7 @@ export default function PostItemScreen() {
         </Card>
 
         {/* Images */}
-        <Card variant="filled" padding="large" style={styles.formSection}>
+        <Card variant="filled" padding="medium" style={styles.formSection}>
           <Text style={styles.sectionTitle}>Images *</Text>
           <Text style={styles.imageSubtitle}>
             Upload at least 3 images, maximum 5 images ({images.length}/5)
@@ -333,20 +333,21 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.md,
+    paddingHorizontal: Spacing.md,
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.sm,
   },
   formSection: {
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.sm,
   },
   sectionTitle: {
     ...TextStyles.heading.h3,
     color: Colors.text.primary,
     fontWeight: '600',
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
   },
   inputGroup: {
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
   },
   inputLabel: {
     ...TextStyles.body.small,
@@ -357,30 +358,30 @@ const styles = StyleSheet.create({
   textInput: {
     backgroundColor: Colors.background.secondary,
     borderRadius: BorderRadius.md,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.sm,
     ...TextStyles.body.medium,
     color: Colors.text.primary,
     borderWidth: 1,
     borderColor: Colors.border.light,
   },
   textArea: {
-    height: 120,
-    paddingTop: 14,
+    height: 100,
+    paddingTop: 12,
     textAlignVertical: 'top',
   },
   categoriesList: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
-    marginTop: 12,
+    gap: Spacing.sm,
+    marginTop: Spacing.xs,
   },
   categoryItem: {
     backgroundColor: Colors.background.secondary,
     borderRadius: BorderRadius.md,
-    padding: Spacing.md,
+    padding: Spacing.sm,
     alignItems: 'center',
-    minWidth: 90,
+    minWidth: 80,
     borderWidth: 1,
     borderColor: Colors.border.light,
   },
@@ -390,9 +391,9 @@ const styles = StyleSheet.create({
   },
   categoryIconContainer: {
     marginBottom: Spacing.xs,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: Colors.background.primary,
     alignItems: 'center',
     justifyContent: 'center',
@@ -408,13 +409,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   priceRangeList: {
-    paddingBottom: 8,
+    paddingBottom: Spacing.xs,
   },
   priceRangeItem: {
     backgroundColor: Colors.background.secondary,
     borderRadius: BorderRadius.md,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
     borderWidth: 1,
     borderColor: Colors.border.light,
   },
@@ -434,13 +435,13 @@ const styles = StyleSheet.create({
   conditionButtons: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: Spacing.md,
+    gap: Spacing.sm,
   },
   conditionButton: {
     backgroundColor: Colors.background.secondary,
     borderRadius: BorderRadius.md,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
     borderWidth: 1,
     borderColor: Colors.border.light,
   },
@@ -460,14 +461,14 @@ const styles = StyleSheet.create({
   imageSubtitle: {
     ...TextStyles.body.small,
     color: Colors.text.secondary,
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.xs,
     fontWeight: '500',
   },
   imageGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: Spacing.md,
-    marginBottom: Spacing.md,
+    gap: Spacing.xs,
+    marginBottom: Spacing.xs,
     justifyContent: 'space-between',
   },
   imageBox: {
@@ -478,7 +479,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border.light,
     overflow: 'hidden',
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.xs,
   },
   selectedImage: {
     width: '100%',
@@ -495,7 +496,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: Colors.border.light,
     borderStyle: 'dashed',
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.xs,
   },
   removeImageButton: {
     position: 'absolute',
@@ -508,11 +509,11 @@ const styles = StyleSheet.create({
   imageRequirements: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: Spacing.md,
+    marginTop: Spacing.xs,
     backgroundColor: Colors.background.secondary,
     borderRadius: BorderRadius.md,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
     borderWidth: 1,
     borderColor: Colors.border.light,
   },
@@ -523,13 +524,13 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   postButtonContainer: {
-    paddingTop: 0,
-    paddingBottom: Spacing.xl * 2,
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.sm,
   },
   postButton: {
     backgroundColor: Colors.primary[500],
     borderRadius: BorderRadius.lg,
-    paddingVertical: Spacing.md,
+    paddingVertical: Spacing.sm,
     alignItems: 'center',
   },
   postButtonText: {
