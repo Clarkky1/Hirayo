@@ -3,6 +3,7 @@ import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   Keyboard,
+  Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -131,6 +132,7 @@ const RentalRequestActions: React.FC<{ isLenderView: boolean }> = ({ isLenderVie
 export default function ViewMessagesScreen() {
   const [messageText, setMessageText] = useState('');
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [localMessages, setLocalMessages] = useState(chatMessages);
   const scrollViewRef = useRef<ScrollView>(null);
   const navigation = useNavigation();
   const params = useLocalSearchParams();
@@ -157,19 +159,29 @@ export default function ViewMessagesScreen() {
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
       setKeyboardHeight(e.endCoordinates.height);
-      // Scroll to bottom when keyboard appears
+      // Platform-specific timing for better positioning
+      const delay = Platform.OS === 'ios' ? 150 : 200;
       setTimeout(() => {
         scrollViewRef.current?.scrollToEnd({ animated: true });
-      }, 100);
+      }, delay);
     });
 
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
       setKeyboardHeight(0);
     });
 
+    const keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', (e) => {
+      // Platform-specific pre-emptive scrolling
+      const delay = Platform.OS === 'ios' ? 100 : 150;
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, delay);
+    });
+
     return () => {
       keyboardDidShowListener?.remove();
       keyboardDidHideListener?.remove();
+      keyboardWillShowListener?.remove();
     };
   }, []);
 
@@ -193,12 +205,26 @@ export default function ViewMessagesScreen() {
 
   const handleSend = () => {
     if (messageText.trim()) {
-      console.log('Send message:', messageText);
+      // Create new message
+      const newMessage: ChatMessage = {
+        id: Date.now().toString(),
+        text: messageText.trim(),
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        isFromMe: true,
+      };
+      
+      // Add to local messages
+      setLocalMessages(prev => [...prev, newMessage]);
+      
+      // Clear input
       setMessageText('');
+      
       // Scroll to bottom after sending message
       setTimeout(() => {
         scrollViewRef.current?.scrollToEnd({ animated: true });
       }, 100);
+      
+      console.log('Message sent (local):', newMessage.text);
     }
   };
 
@@ -210,6 +236,7 @@ export default function ViewMessagesScreen() {
         <View style={styles.itemDetails}>
           <Text style={styles.itemName}>{itemName}</Text>
           <Text style={styles.itemPrice}>₱2,500/day</Text>
+          
         </View>
         <Ionicons name="chevron-forward" size={20} color="#999" />
       </TouchableOpacity>
@@ -225,13 +252,18 @@ export default function ViewMessagesScreen() {
         contentContainerStyle={styles.messagesContent}
         keyboardShouldPersistTaps="handled"
       >
-        {chatMessages.map((message) => (
+        {localMessages.map((message) => (
           <ChatBubble key={message.id} message={message} />
         ))}
       </ScrollView>
 
       {/* Simple Message Input */}
-      <View style={[styles.inputContainer, { paddingBottom: Math.max(16, keyboardHeight > 0 ? 16 : 16) }]}>
+      <View style={[
+        styles.inputContainer,
+        { 
+          marginBottom: keyboardHeight > 0 ? keyboardHeight + 20 : 0
+        }
+      ]}>
         <TextInput
           style={styles.textInput}
           placeholder="Type a message..."
@@ -277,7 +309,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
-    marginTop: 8,
+    marginTop: 4,
   },
   itemImage: {
     width: 40,
@@ -298,6 +330,11 @@ const styles = StyleSheet.create({
   itemPrice: {
     fontSize: 14,
     color: '#666',
+  },
+  demoIndicator: {
+    fontSize: 12,
+    color: '#999',
+    marginTop: 4,
   },
   rentalActions: {
     padding: 16,
@@ -356,7 +393,7 @@ const styles = StyleSheet.create({
   },
   messagesContent: {
     padding: 16,
-    paddingBottom: 20,
+    paddingBottom: 40,
   },
   messageContainer: {
     marginBottom: 12,
@@ -407,17 +444,34 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#eee',
     backgroundColor: '#fff',
+    minHeight: 60,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: -2,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
   },
   textInput: {
     flex: 1,
     backgroundColor: '#f8f9fa',
     borderRadius: 20,
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 12,
     marginRight: 12,
     fontSize: 16,
     maxHeight: 100,
-    minHeight: 40,
+    minHeight: 44,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
   },
   sendButton: {
     width: 36,
