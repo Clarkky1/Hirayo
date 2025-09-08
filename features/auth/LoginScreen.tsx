@@ -2,14 +2,14 @@ import { BorderRadius, Colors, Shadows, Spacing, TextStyles } from '@/constants/
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 export default function LoginScreen() {
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: Spacing.xxl,
+    marginBottom: Spacing['2xl'],
   },
   title: {
     ...TextStyles.display.small,
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: Colors.border.primary,
+    borderColor: Colors.border.light,
     borderRadius: BorderRadius.md,
     padding: Spacing.md,
     fontSize: 16,
@@ -135,12 +135,12 @@ const styles = StyleSheet.create({
   },
   forgotPassword: {
     ...TextStyles.body.medium,
-    color: Colors.primary[500],
+    color: Colors.text.primary,
     textAlign: 'right',
     marginBottom: Spacing.xl,
   },
   loginButton: {
-    backgroundColor: Colors.primary[500],
+    backgroundColor: Colors.text.primary,
     borderRadius: BorderRadius.lg,
     paddingVertical: Spacing.md,
     alignItems: 'center',
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
   },
   signupLink: {
     ...TextStyles.body.medium,
-    color: Colors.primary[500],
+    color: Colors.text.primary,
     fontWeight: '600',
   },
 });
