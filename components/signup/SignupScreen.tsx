@@ -31,6 +31,7 @@ export default function SignupScreen() {
   const [email, setEmail] = useState('kinclark@gmail.com');
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [showOTP, setShowOTP] = useState(false);
   
   // ID Upload states
   const [idType, setIdType] = useState('');
@@ -39,6 +40,34 @@ export default function SignupScreen() {
 
   const handleBack = () => {
     router.back();
+  };
+
+  const handleBackFromOTP = () => {
+    setShowOTP(false);
+  };
+
+  const handleCompleteSignup = async (otp: string) => {
+    try {
+      // Handle form submission with OTP verification
+      const userData = { 
+        firstName, 
+        surname, 
+        phoneNumber,
+        dateOfBirth: formatDate(dateOfBirth), 
+        email,
+        otp
+      };
+      console.log('Completing signup with OTP:', userData);
+      
+      // Use authentication hook to signup
+      await signup(userData);
+      
+      // Navigate to main app after successful signup
+      router.replace('/(tabs)');
+    } catch (error) {
+      console.error('Signup error:', error);
+      Alert.alert('Signup Failed', 'Failed to complete signup. Please try again.');
+    }
   };
 
   // ID Type options
@@ -107,25 +136,29 @@ export default function SignupScreen() {
     });
   };
 
-  const handleAgreeAndContinue = () => {
+  const handleAgreeAndContinue = async () => {
     if (!termsAccepted) {
       setShowTermsModal(true);
       return;
     }
     
-    // Handle form submission
-    const userData = { 
-      firstName, 
-      surname, 
-      phoneNumber,
-      dateOfBirth: formatDate(dateOfBirth), 
-      email 
-    };
-    console.log('Form submitted:', userData);
-    // Use authentication hook to signup
-    signup(userData);
-    // Navigate to main app after successful signup
-    router.replace('/(tabs)');
+    // Validate phone number before sending OTP
+    if (!isValidPhoneNumber(phoneNumber)) {
+      Alert.alert('Invalid Phone Number', 'Please enter a valid Philippine phone number (09XXXXXXXXX)');
+      return;
+    }
+    
+    try {
+      console.log('Sending OTP to:', phoneNumber);
+      // Simulate sending OTP
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Show OTP verification screen
+      setShowOTP(true);
+    } catch (error) {
+      console.error('Send OTP error:', error);
+      Alert.alert('Error', 'Failed to send OTP. Please try again.');
+    }
   };
 
   const handleTermsAccept = () => {
@@ -136,6 +169,13 @@ export default function SignupScreen() {
 
   const handleTermsDecline = () => {
     setShowTermsModal(false);
+  };
+
+  // Phone number validation for Philippine numbers (11 digits starting with 09)
+  const isValidPhoneNumber = (phone: string) => {
+    const cleanPhone = phone.replace(/\D/g, ''); // Remove non-digits
+    // Philippine mobile numbers: 11 digits starting with 09
+    return cleanPhone.length === 11 && cleanPhone.startsWith('09');
   };
 
   const isFormValid = firstName.trim() && surname.trim() && phoneNumber.trim() && dateOfBirth && email.trim() && termsAccepted;

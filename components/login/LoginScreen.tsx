@@ -16,6 +16,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import OTPVerificationScreen from './OTPVerificationScreen';
 
 const { width, height } = Dimensions.get('window');
 
@@ -24,6 +25,7 @@ export default function LoginScreen() {
   const { login } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showOTP, setShowOTP] = useState(false);
 
   // Phone number validation for Philippine numbers (11 digits starting with 09)
   const isValidPhoneNumber = (phone: string) => {
@@ -39,17 +41,14 @@ export default function LoginScreen() {
     
     setIsLoading(true);
     try {
-      console.log('Continue with:', phoneNumber);
-      // Use authentication hook to login
-      await login({ phoneNumber });
+      console.log('Sending OTP to:', phoneNumber);
+      // Simulate sending OTP
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Add a small delay to ensure smooth transition
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      // Navigate to main app after successful login
-      router.push('/(tabs)');
+      // Show OTP verification screen
+      setShowOTP(true);
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Send OTP error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -96,6 +95,20 @@ export default function LoginScreen() {
   const handleSignup = () => {
     router.push('/signup');
   };
+
+  const handleBackFromOTP = () => {
+    setShowOTP(false);
+  };
+
+  // Show OTP verification screen if OTP step is active
+  if (showOTP) {
+    return (
+      <OTPVerificationScreen 
+        phoneNumber={phoneNumber} 
+        onBack={handleBackFromOTP} 
+      />
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -170,7 +183,7 @@ export default function LoginScreen() {
                 </View>
 
                 <Text style={styles.termsText}>
-                  We'll send you a verification code via SMS. Standard message rates apply.
+                  We'll send you a 6-digit verification code via SMS. Standard message rates apply.
                 </Text>
 
                 {phoneNumber.length > 0 && !isValidPhoneNumber(phoneNumber) && (
@@ -192,10 +205,10 @@ export default function LoginScreen() {
                 {isLoading ? (
                   <View style={styles.loadingContainer}>
                     <View style={styles.loadingSpinner} />
-                    <Text style={styles.primaryButtonText}>Signing in...</Text>
+                    <Text style={styles.primaryButtonText}>Sending OTP...</Text>
                   </View>
                 ) : (
-                  <Text style={styles.primaryButtonText}>Continue</Text>
+                  <Text style={styles.primaryButtonText}>Send OTP</Text>
                 )}
                 </TouchableOpacity>
               </View>
