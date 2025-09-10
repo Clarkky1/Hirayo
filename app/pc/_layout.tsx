@@ -1,6 +1,9 @@
 import { Stack } from 'expo-router';
-import React from 'react';
+import { LogBox } from 'react-native';
 import PCScreen from './PCScreen';
+
+LogBox.ignoreAllLogs(true);
+
 
 export default function PCLayout() {
   return (

@@ -1,17 +1,18 @@
 import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { useLender } from '@/contexts/LenderContext';
+import { useSearch } from '@/contexts/SearchContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
-  FlatList,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
+    FlatList,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import { WideCard } from '../ui/WideCard';
 
@@ -56,12 +57,20 @@ const popularItems: ExploreItem[] = [
 ];
 
 export default function HomeScreen() {
-  const [searchQuery, setSearchQuery] = useState('');
   const [isNavigating, setIsNavigating] = useState(false);
   const { setHasClickedGetStarted } = useLender();
+  const { searchQuery, setSearchQuery, addToHistory } = useSearch();
 
   const handleSearch = () => {
-    console.log('Searching for:', searchQuery);
+    if (searchQuery.trim()) {
+      addToHistory(searchQuery);
+      preventMultipleNavigation(() => 
+        router.push({
+          pathname: '/discover',
+          params: { search: searchQuery.trim() }
+        })
+      );
+    }
   };
 
   const preventMultipleNavigation = async (navigationFunction: () => void) => {

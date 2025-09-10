@@ -1,13 +1,13 @@
 import { BorderRadius, Colors, Shadows, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { useRouter } from 'expo-router';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import {
-  Animated,
-  Dimensions,
-  Image,
-  StyleSheet,
-  Text,
-  View
+    Animated,
+    Dimensions,
+    Image,
+    StyleSheet,
+    Text,
+    View
 } from 'react-native';
 
 const { width, height } = Dimensions.get('window');

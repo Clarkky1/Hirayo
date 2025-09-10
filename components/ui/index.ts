@@ -3,5 +3,6 @@ export { IconSymbol } from './IconSymbol';
 export { LenderDrawer } from './LenderDrawer';
 export { ProductCard } from './ProductCard';
 export { default as TabBarBackground } from './TabBarBackground';
+export { TermsConditionsModal } from './TermsConditionsModal';
 export { WideCard } from './WideCard';
 

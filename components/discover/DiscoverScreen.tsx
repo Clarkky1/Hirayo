@@ -1,7 +1,9 @@
 import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
+import { useSearch } from '@/contexts/SearchContext';
+import { debounce, SearchableItem, searchItems } from '@/utils';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   FlatList,
   SafeAreaView,
@@ -14,7 +16,7 @@ import {
 } from 'react-native';
 import { ProductCard } from '../ui/ProductCard';
 
-interface ProductItem {
+interface ProductItem extends SearchableItem {
   id: string;
   name: string;
   rating: number;
@@ -40,15 +42,46 @@ const filterCategories = ['Camera', 'Laptop', 'Phone', 'Tablet/iPad', 'Drone', '
 
 export default function DiscoverScreen() {
   const params = useLocalSearchParams();
-  const [searchQuery, setSearchQuery] = useState('');
+  const { searchQuery, setSearchQuery, addToHistory } = useSearch();
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showFiltersDropdown, setShowFiltersDropdown] = useState(false);
   const [selectedSort, setSelectedSort] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<ProductItem[]>(products);
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+
+  // Debounced search function
+  const debouncedSearch = useCallback(
+    debounce((query: string) => {
+      const results = searchItems(products, query, {
+        category: selectedCategories.length > 0 ? selectedCategories[0] : undefined,
+        location: selectedLocation || undefined,
+      });
+      setFilteredProducts(results as ProductItem[]);
+    }, 300),
+    [selectedCategories, selectedLocation]
+  );
+
+  // Handle search input changes
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    debouncedSearch(query);
+  };
+
+  // Handle search button press
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      addToHistory(searchQuery);
+      const results = searchItems(products, searchQuery, {
+        category: selectedCategories.length > 0 ? selectedCategories[0] : undefined,
+        location: selectedLocation || undefined,
+      });
+      setFilteredProducts(results as ProductItem[]);
+    }
+  };
 
   const categories = [
     { id: 'camera', name: 'Camera', icon: 'camera' },
@@ -130,6 +163,28 @@ export default function DiscoverScreen() {
     }
   }, [params.category]);
 
+  // Handle search parameter from navigation
+  useEffect(() => {
+    if (params.search) {
+      const searchParam = params.search as string;
+      setSearchQuery(searchParam);
+      const results = searchItems(products, searchParam, {
+        category: selectedCategories.length > 0 ? selectedCategories[0] : undefined,
+        location: selectedLocation || undefined,
+      });
+      setFilteredProducts(results as ProductItem[]);
+    }
+  }, [params.search, selectedCategories, selectedLocation]);
+
+  // Update filtered products when filters change
+  useEffect(() => {
+    const results = searchItems(products, searchQuery, {
+      category: selectedCategories.length > 0 ? selectedCategories[0] : undefined,
+      location: selectedLocation || undefined,
+    });
+    setFilteredProducts(results as ProductItem[]);
+  }, [selectedCategories, selectedLocation, searchQuery]);
+
   const handleSortBy = () => {
     setShowSortDropdown(!showSortDropdown);
     setShowFiltersDropdown(false);
@@ -196,58 +251,41 @@ export default function DiscoverScreen() {
     handleCategoryToggle(categoryId);
   };
 
-  const getSortedProducts = () => {
-    let sorted = [...products];
-    
-    // Filter by price range instead of sorting
-    if (selectedSort) {
-      sorted = sorted.filter(product => {
-        switch (selectedSort) {
-          case '₱500 - ₱1,500':
-            return product.price >= 500 && product.price <= 1500;
-          case '₱1,500 - ₱2,500':
-            return product.price >= 1500 && product.price <= 2500;
-          case '₱2,500 - ₱3,500':
-            return product.price >= 2500 && product.price <= 3500;
-          case '₱3,500 - ₱4,500':
-            return product.price >= 3500 && product.price <= 4500;
-          case '₱4,500 - ₱5,500':
-            return product.price >= 4500 && product.price <= 5500;
-          case '₱5,500 - ₱6,500':
-            return product.price >= 5500 && product.price <= 6500;
-          case '₱6,500 - ₱7,500':
-            return product.price >= 6500 && product.price <= 7500;
-          case '₱7,500 - ₱8,500':
-            return product.price >= 7500 && product.price <= 8500;
-          case '₱8,500 - ₱9,500':
-            return product.price >= 8500 && product.price <= 9500;
-          case '₱9,500 - ₱10,000':
-            return product.price >= 9500 && product.price <= 10000;
-          default:
-            return true;
-        }
-      });
+  // Apply price range filtering to the already filtered products
+  const getPriceFilteredProducts = () => {
+    if (!selectedSort) {
+      return filteredProducts;
     }
-    
-    return sorted;
+
+    return filteredProducts.filter(product => {
+      switch (selectedSort) {
+        case '₱500 - ₱1,500':
+          return product.price >= 500 && product.price <= 1500;
+        case '₱1,500 - ₱2,500':
+          return product.price >= 1500 && product.price <= 2500;
+        case '₱2,500 - ₱3,500':
+          return product.price >= 2500 && product.price <= 3500;
+        case '₱3,500 - ₱4,500':
+          return product.price >= 3500 && product.price <= 4500;
+        case '₱4,500 - ₱5,500':
+          return product.price >= 4500 && product.price <= 5500;
+        case '₱5,500 - ₱6,500':
+          return product.price >= 5500 && product.price <= 6500;
+        case '₱6,500 - ₱7,500':
+          return product.price >= 6500 && product.price <= 7500;
+        case '₱7,500 - ₱8,500':
+          return product.price >= 7500 && product.price <= 8500;
+        case '₱8,500 - ₱9,500':
+          return product.price >= 8500 && product.price <= 9500;
+        case '₱9,500 - ₱10,000':
+          return product.price >= 9500 && product.price <= 10000;
+        default:
+          return true;
+      }
+    });
   };
 
-  const getFilteredProducts = () => {
-    let filtered = getSortedProducts();
-    
-    // Only apply category filtering if there are active filters
-    if (selectedCategories.length > 0) {
-      filtered = filtered.filter(product => 
-        selectedCategories.some(cat => 
-          product.category.toLowerCase() === cat.toLowerCase()
-        )
-      );
-    }
-    
-    return filtered;
-  };
-
-  const filteredProducts = getFilteredProducts();
+  const finalFilteredProducts = getPriceFilteredProducts();
 
   const renderProductItem = ({ item }: { item: ProductItem }) => (
     <ProductCard
@@ -273,9 +311,11 @@ export default function DiscoverScreen() {
             placeholder="Search for gadgets..."
             placeholderTextColor={Colors.text.tertiary}
             value={searchQuery}
-            onChangeText={setSearchQuery}
+            onChangeText={handleSearchChange}
+            onSubmitEditing={handleSearch}
+            returnKeyType="search"
           />
-          <TouchableOpacity style={styles.searchButton}>
+          <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
             <Ionicons name="search" size={16} color={Colors.text.inverse} />
           </TouchableOpacity>
         </View>
@@ -447,7 +487,7 @@ export default function DiscoverScreen() {
         {/* Products Grid */}
         <View style={styles.productsSection}>
           <FlatList
-            data={filteredProducts}
+            data={finalFilteredProducts}
             renderItem={renderProductItem}
             keyExtractor={(item) => item.id}
             numColumns={2}

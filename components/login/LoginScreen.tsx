@@ -1,46 +1,93 @@
-import { BorderRadius, Colors, Shadows, Spacing } from '@/constants/DesignSystem';
+import { BorderRadius, Colors, Shadows, Spacing, TextStyles, Typography } from '@/constants/DesignSystem';
 import { useAuth } from '@/hooks/useAuth';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
-    KeyboardAvoidingView,
-    Platform,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Animated,
+  Dimensions,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
+
+const { width, height } = Dimensions.get('window');
 
 export default function LoginScreen() {
   const router = useRouter();
   const { login } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [focusedInput, setFocusedInput] = useState(false);
+  const fadeAnim = new Animated.Value(0);
+  const slideAnim = new Animated.Value(50);
 
-  const handleContinue = () => {
-    console.log('Continue with:', phoneNumber);
-    // Use authentication hook to login
-    login({ phoneNumber });
-    // Navigate to main app after successful login
-    router.replace('/(tabs)');
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
+  const handleContinue = async () => {
+    if (phoneNumber.length === 0) return;
+    
+    setIsLoading(true);
+    try {
+      console.log('Continue with:', phoneNumber);
+      // Use authentication hook to login
+      await login({ phoneNumber });
+      // Navigate to main app after successful login
+      router.replace('/(tabs)');
+    } catch (error) {
+      console.error('Login error:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleFacebookLogin = () => {
-    console.log('Facebook login');
-    // Use authentication hook to login
-    login({ provider: 'facebook' });
-    // Navigate to main app after successful login
-    router.replace('/(tabs)');
+  const handleFacebookLogin = async () => {
+    setIsLoading(true);
+    try {
+      console.log('Facebook login');
+      // Use authentication hook to login
+      await login({ provider: 'facebook' });
+      // Navigate to main app after successful login
+      router.replace('/(tabs)');
+    } catch (error) {
+      console.error('Facebook login error:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleGoogleLogin = () => {
-    console.log('Google login');
-    // Use authentication hook to login
-    login({ provider: 'google' });
-    // Navigate to main app after successful login
-    router.replace('/(tabs)');
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    try {
+      console.log('Google login');
+      // Use authentication hook to login
+      await login({ provider: 'google' });
+      // Navigate to main app after successful login
+      router.replace('/(tabs)');
+    } catch (error) {
+      console.error('Google login error:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSignup = () => {
@@ -53,60 +100,128 @@ export default function LoginScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
-        <View style={styles.content}>
-          <Text style={styles.header}>Log in or Sign up</Text>
-
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.inputField}
-              placeholder="Phone Number"
-              value={phoneNumber}
-              onChangeText={setPhoneNumber}
-              keyboardType="phone-pad"
-              autoFocus={false}
-            />
-          </View>
-
-          <Text style={styles.termsText}>
-            We will text you to confirm your number. Standard message and data rates apply.
-          </Text>
-
-          <TouchableOpacity 
-            style={[styles.continueButton, phoneNumber.length > 0 && styles.continueButtonActive]}
-            onPress={handleContinue}
-            disabled={phoneNumber.length === 0}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.continueButtonText}>Continue</Text>
-          </TouchableOpacity>
-
-          <View style={styles.dividerContainer}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>or</Text>
-            <View style={styles.dividerLine} />
-          </View>
-
-          <TouchableOpacity style={styles.socialButton} onPress={handleFacebookLogin} activeOpacity={0.7}>
-            <View style={styles.socialButtonContent}>
-              <Ionicons name="logo-facebook" size={20} color="#1877F2" />
-              <Text style={styles.socialButtonText}>Continue with Facebook</Text>
+        {/* Background Gradient */}
+        <View style={styles.backgroundGradient} />
+        
+        <Animated.View 
+          style={[
+            styles.content,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }],
+            },
+          ]}
+        >
+          {/* Logo Section */}
+          <View style={styles.logoSection}>
+            <View style={styles.logoContainer}>
+              <Image 
+                source={require('@/assets/splash/h-logo.png')} 
+                style={styles.logo}
+                resizeMode="contain"
+              />
             </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.socialButton} onPress={handleGoogleLogin} activeOpacity={0.7}>
-            <View style={styles.socialButtonContent}>
-              <Ionicons name="logo-google" size={20} color="#DB4437" />
-              <Text style={styles.socialButtonText}>Continue with Google</Text>
-            </View>
-          </TouchableOpacity>
-
-          <View style={styles.signupContainer}>
-            <Text style={styles.signupText}>Don&apos;t have an account? </Text>
-            <TouchableOpacity onPress={handleSignup} activeOpacity={0.7}>
-              <Text style={styles.signupLink}>Sign up</Text>
-            </TouchableOpacity>
+            <Text style={styles.appName}>Hirayo</Text>
+            <Text style={styles.tagline}>Rent anything, anywhere</Text>
           </View>
-        </View>
+
+          {/* Main Content */}
+          <View style={styles.mainContent}>
+            <Text style={styles.welcomeText}>Welcome back!</Text>
+            <Text style={styles.subtitleText}>Sign in to continue your journey</Text>
+
+            {/* Phone Input Section */}
+            <View style={styles.inputSection}>
+              <View style={styles.inputContainer}>
+                <View style={[
+                  styles.inputWrapper,
+                  focusedInput && styles.inputWrapperFocused
+                ]}>
+                  <Ionicons 
+                    name="call-outline" 
+                    size={20} 
+                    color={focusedInput ? Colors.primary[500] : Colors.text.tertiary} 
+                    style={styles.inputIcon}
+                  />
+                  <TextInput
+                    style={styles.inputField}
+                    placeholder="Enter your phone number"
+                    placeholderTextColor={Colors.text.tertiary}
+                    value={phoneNumber}
+                    onChangeText={setPhoneNumber}
+                    onFocus={() => setFocusedInput(true)}
+                    onBlur={() => setFocusedInput(false)}
+                    keyboardType="phone-pad"
+                    autoFocus={false}
+                    editable={!isLoading}
+                  />
+                </View>
+              </View>
+
+              <Text style={styles.termsText}>
+                We'll send you a verification code via SMS. Standard message rates apply.
+              </Text>
+
+              <TouchableOpacity 
+                style={[
+                  styles.continueButton, 
+                  phoneNumber.length > 0 && styles.continueButtonActive,
+                  isLoading && styles.continueButtonLoading
+                ]}
+                onPress={handleContinue}
+                disabled={phoneNumber.length === 0 || isLoading}
+                activeOpacity={0.8}
+              >
+                {isLoading ? (
+                  <View style={styles.loadingContainer}>
+                    <Animated.View style={styles.loadingSpinner} />
+                    <Text style={styles.continueButtonText}>Signing in...</Text>
+                  </View>
+                ) : (
+                  <Text style={styles.continueButtonText}>Continue</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+
+            {/* Divider */}
+            <View style={styles.dividerContainer}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>or continue with</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
+            {/* Social Login Buttons */}
+            <View style={styles.socialButtonsContainer}>
+              <TouchableOpacity 
+                style={[styles.socialButton, styles.facebookButton]} 
+                onPress={handleFacebookLogin} 
+                disabled={isLoading}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="logo-facebook" size={20} color="#FFFFFF" />
+                <Text style={styles.socialButtonText}>Facebook</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={[styles.socialButton, styles.googleButton]} 
+                onPress={handleGoogleLogin} 
+                disabled={isLoading}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="logo-google" size={20} color="#DB4437" />
+                <Text style={[styles.socialButtonText, styles.googleButtonText]}>Google</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Sign Up Link */}
+            <View style={styles.signupContainer}>
+              <Text style={styles.signupText}>New to Hirayo? </Text>
+              <TouchableOpacity onPress={handleSignup} activeOpacity={0.7}>
+                <Text style={styles.signupLink}>Create account</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Animated.View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -115,106 +230,212 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: Colors.background.primary,
   },
   keyboardView: {
     flex: 1,
   },
+  backgroundGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: height * 0.4,
+    backgroundColor: Colors.primary[50],
+    borderBottomLeftRadius: BorderRadius['3xl'],
+    borderBottomRightRadius: BorderRadius['3xl'],
+  },
   content: {
     flex: 1,
-    paddingHorizontal: Spacing.lg,
-    paddingTop: 48,
-    paddingBottom: 32,
+    paddingHorizontal: Spacing['2xl'],
+    paddingTop: Spacing['4xl'],
+    paddingBottom: Spacing['2xl'],
   },
-  header: {
-    fontSize: 24,
-    fontWeight: '600',
+  
+  // Logo Section
+  logoSection: {
+    alignItems: 'center',
+    marginBottom: Spacing['6xl'],
+  },
+  logoContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: Colors.primary[500],
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: Spacing.lg,
+    ...Shadows.softLg,
+  },
+  logo: {
+    width: 50,
+    height: 50,
+  },
+  appName: {
+    ...TextStyles.heading.h1,
+    color: Colors.primary[500],
+    marginBottom: Spacing.xs,
+  },
+  tagline: {
+    ...TextStyles.body.medium,
+    color: Colors.text.secondary,
     textAlign: 'center',
-    marginBottom: 32,
-    color: '#000000',
+  },
+
+  // Main Content
+  mainContent: {
+    flex: 1,
+  },
+  welcomeText: {
+    ...TextStyles.heading.h2,
+    textAlign: 'center',
+    marginBottom: Spacing.xs,
+  },
+  subtitleText: {
+    ...TextStyles.body.medium,
+    color: Colors.text.secondary,
+    textAlign: 'center',
+    marginBottom: Spacing['6xl'],
+  },
+
+  // Input Section
+  inputSection: {
+    marginBottom: Spacing['6xl'],
   },
   inputContainer: {
-    marginBottom: 12,
+    marginBottom: Spacing.lg,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.background.secondary,
+    borderRadius: BorderRadius.xl,
+    borderWidth: 2,
+    borderColor: Colors.border.light,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.lg,
+    ...Shadows.softSm,
+  },
+  inputWrapperFocused: {
+    borderColor: Colors.primary[500],
+    backgroundColor: Colors.background.primary,
+    ...Shadows.softBase,
+  },
+  inputIcon: {
+    marginRight: Spacing.md,
   },
   inputField: {
-    backgroundColor: Colors.background.secondary,
-    borderRadius: BorderRadius.lg,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.md,
-    marginBottom: Spacing.md,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
-    ...Shadows.softXs,
+    flex: 1,
+    fontSize: Typography.fontSize.base,
+    fontFamily: Typography.fontFamily.regular,
+    color: Colors.text.primary,
+    paddingVertical: 0,
+  },
+  inputFieldFocused: {
+    // Focus styles handled by inputWrapper border
   },
   termsText: {
-    fontSize: 14,
-    color: '#666666',
+    ...TextStyles.caption,
     textAlign: 'center',
-    marginBottom: 24,
-    lineHeight: 20,
+    marginBottom: Spacing['2xl'],
+    lineHeight: 18,
   },
+
+  // Continue Button
   continueButton: {
-    backgroundColor: Colors.primary[500],
-    borderRadius: BorderRadius.lg,
-    paddingVertical: Spacing.md,
+    backgroundColor: Colors.neutral[300],
+    borderRadius: BorderRadius.xl,
+    paddingVertical: Spacing.lg,
     alignItems: 'center',
-    marginTop: Spacing.lg,
     ...Shadows.softButton,
   },
   continueButtonActive: {
-    backgroundColor: '#0066cc',
+    backgroundColor: Colors.primary[500],
+    ...Shadows.primary,
+  },
+  continueButtonLoading: {
+    backgroundColor: Colors.primary[400],
   },
   continueButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
+    ...TextStyles.button.medium,
+    color: Colors.text.inverse,
   },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  loadingSpinner: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: Colors.text.inverse,
+    borderTopColor: 'transparent',
+    marginRight: Spacing.sm,
+  },
+
+  // Divider
   dividerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: Spacing['2xl'],
   },
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#E1E1E1',
+    backgroundColor: Colors.border.light,
   },
   dividerText: {
-    marginHorizontal: Spacing.md,
-    color: '#666666',
-    fontSize: 14,
+    marginHorizontal: Spacing.lg,
+    ...TextStyles.caption,
+    color: Colors.text.tertiary,
+  },
+
+  // Social Buttons
+  socialButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: Spacing['6xl'],
   },
   socialButton: {
-    borderWidth: 1,
-    borderColor: '#E1E1E1',
-    borderRadius: 8,
-    paddingVertical: 12,
-    marginBottom: 10,
-    backgroundColor: '#ffffff',
-  },
-  socialButtonContent: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: BorderRadius.lg,
+    paddingVertical: Spacing.lg,
+    marginHorizontal: Spacing.xs,
+    ...Shadows.softSm,
+  },
+  facebookButton: {
+    backgroundColor: '#1877F2',
+  },
+  googleButton: {
+    backgroundColor: Colors.background.primary,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
   },
   socialButtonText: {
-    marginLeft: 10,
-    fontSize: 16,
-    color: '#000000',
-    fontWeight: '500',
+    ...TextStyles.button.small,
+    marginLeft: Spacing.sm,
+    color: Colors.text.inverse,
   },
+  googleButtonText: {
+    color: Colors.text.primary,
+  },
+
+  // Sign Up
   signupContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: Spacing.lg,
+    alignItems: 'center',
   },
   signupText: {
-    fontSize: 14,
-    color: '#666666',
+    ...TextStyles.body.small,
+    color: Colors.text.secondary,
   },
   signupLink: {
-    fontSize: 14,
-    color: Colors.primary[500],
-    fontWeight: '600',
+    ...TextStyles.link,
+    fontSize: Typography.fontSize.sm,
   },
 });

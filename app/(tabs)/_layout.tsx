@@ -2,8 +2,11 @@ import { LenderDrawer } from '@/components/ui';
 import { useLender } from '@/contexts/LenderContext';
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
-import React, { useState } from 'react';
-import { Platform, TouchableOpacity } from 'react-native';
+import { useState } from 'react';
+import { LogBox, Platform, TouchableOpacity } from 'react-native';
+
+LogBox.ignoreAllLogs(true);
+
 
 export default function TabLayout() {
   const { hasClickedGetStarted } = useLender();
@@ -14,7 +17,7 @@ export default function TabLayout() {
       <Tabs
       screenOptions={{
         tabBarActiveTintColor: '#0066CC',
-        tabBarInactiveTintColor: '#666666',
+        tabBarInactiveTintColor: '#6b66666',
         headerShown: true,
         headerStyle: {
           backgroundColor: '#0066CC',

@@ -1,25 +1,28 @@
 import { BorderRadius, Colors, Spacing } from '@/constants/DesignSystem';
+import { useLender } from '@/contexts/LenderContext';
 import { useSelectedItem } from '@/contexts/SelectedItemContext';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import React, { useRef, useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import { useRef, useState } from 'react';
 import {
-    Animated,
-    Image,
-    PanResponder,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  Animated,
+  Image,
+  PanResponder,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
 export default function ItemDetailScreen() {
   const { selectedItem } = useSelectedItem();
   const { validateAndNavigate } = useNavigationGuard();
+  const { isLender } = useLender();
+  const { lenderId, lenderName, lenderAvatar } = useLocalSearchParams();
   const [activeTab, setActiveTab] = useState<'description' | 'review'>('description');
   const [showMore, setShowMore] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -59,13 +62,40 @@ export default function ItemDetailScreen() {
   const handleVideoCall = () => {
     setShowCommunicationModal(false);
     // Navigate to video call screen
-    router.push('/video-call/index');
+    router.push('/video-call' as any);
   };
 
   const handleMessageLender = () => {
     setShowCommunicationModal(false);
-    // Navigate to conversation with lender
-    router.push('/lender-messages');
+    
+    // Check if user is a lender or renter to route to appropriate interface
+    if (isLender) {
+      // For lenders: Navigate to lender messages interface
+      router.push({
+        pathname: '/lender-messages',
+        params: { 
+          itemId: selectedItem?.id,
+          itemName: selectedItem?.name,
+          lenderId: lenderId as string || selectedItem?.lenderId || 'lender-123',
+          lenderName: lenderName as string || selectedItem?.lenderName || 'Item Owner',
+          lenderAvatar: lenderAvatar as string || selectedItem?.lenderAvatar || ''
+        }
+      });
+    } else {
+      // For renters: Navigate to view-messages with renter perspective
+      router.push({
+        pathname: '/view-messages',
+        params: { 
+          messageId: selectedItem?.id || 'new-conversation',
+          senderName: lenderName as string || selectedItem?.lenderName || 'Item Owner',
+          itemName: selectedItem?.name || 'Item',
+          itemId: selectedItem?.id || 'item1',
+          isLenderView: 'false',
+          requestStatus: 'pending',
+          hasReplied: 'false'
+        }
+      });
+    }
   };
 
   const handleShowMore = () => {

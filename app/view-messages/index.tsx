@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams, useNavigation } from 'expo-router';
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   Alert,
   Keyboard,
+  LogBox,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -13,6 +14,9 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+
+LogBox.ignoreAllLogs(true);
+
 
 interface ChatMessage {
   id: string;
@@ -361,7 +365,7 @@ export default function ViewMessagesScreen() {
         <Ionicons name="chevron-forward" size={20} color="#999" />
       </TouchableOpacity>
 
-      {/* Rental Request Actions (Renter View) */}
+      {/* Rental Request Actions */}
       <RentalRequestActions 
         isLenderView={isLenderView}
         requestStatus={requestStatus}

@@ -1,6 +1,9 @@
 import { Stack } from 'expo-router';
-import React from 'react';
+import { LogBox } from 'react-native';
 import DroneScreen from './DroneScreen';
+
+LogBox.ignoreAllLogs(true);
+
 
 export default function DroneLayout() {
   return (

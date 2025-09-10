@@ -1,6 +1,9 @@
 import { Stack } from 'expo-router';
-import React from 'react';
+import { LogBox } from 'react-native';
 import GamingScreen from './GamingScreen';
+
+LogBox.ignoreAllLogs(true);
+
 
 export default function GamingLayout() {
   return (

@@ -1,5 +1,8 @@
 import { Stack } from 'expo-router';
-import React from 'react';
+import { LogBox } from 'react-native';
+
+LogBox.ignoreAllLogs(true);
+
 
 export default function AnalyticsLayout() {
   return (

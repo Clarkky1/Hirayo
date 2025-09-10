@@ -1,6 +1,9 @@
 import { Stack } from 'expo-router';
-import React from 'react';
+import { LogBox } from 'react-native';
 import AudioScreen from './AudioScreen';
+
+LogBox.ignoreAllLogs(true);
+
 
 export default function AudioLayout() {
   return (

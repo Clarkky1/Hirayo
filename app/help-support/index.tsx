@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
+    LogBox,
     SafeAreaView,
     ScrollView,
     StyleSheet,
@@ -8,6 +9,9 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+
+LogBox.ignoreAllLogs(true);
+
 
 export default function HelpSupportScreen() {
   const [expandedFaq, setExpandedFaq] = useState<string | null>(null);

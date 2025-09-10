@@ -1,8 +1,11 @@
+import { useSearch } from '@/contexts/SearchContext';
+import { debounce, SearchableItem, searchItems } from '@/utils';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
     FlatList,
+    LogBox,
     SafeAreaView,
     ScrollView,
     StyleSheet,
@@ -12,7 +15,10 @@ import {
     View
 } from 'react-native';
 
-interface ProductItem {
+LogBox.ignoreAllLogs(true);
+
+
+interface ProductItem extends SearchableItem {
   id: string;
   name: string;
   rating: number;
@@ -62,12 +68,13 @@ const priceRanges = [
 
 export default function PhoneScreen() {
   const { initialCategory } = useLocalSearchParams();
-  const [searchQuery, setSearchQuery] = useState('');
+  const { searchQuery, setSearchQuery, addToHistory } = useSearch();
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showFiltersDropdown, setShowFiltersDropdown] = useState(false);
   const [selectedSort, setSelectedSort] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedPriceRange, setSelectedPriceRange] = useState('');
+  const [filteredProducts, setFilteredProducts] = useState<ProductItem[]>(products);
 
   useEffect(() => {
     if (initialCategory) {
@@ -75,8 +82,40 @@ export default function PhoneScreen() {
     }
   }, [initialCategory]);
 
+  // Update filtered products when filters change
+  useEffect(() => {
+    const results = searchItems(products, searchQuery, {
+      category: 'phone',
+    });
+    setFilteredProducts(results as ProductItem[]);
+  }, [searchQuery]);
+
+  // Debounced search function
+  const debouncedSearch = useCallback(
+    debounce((query: string) => {
+      const results = searchItems(products, query, {
+        category: 'phone',
+      });
+      setFilteredProducts(results as ProductItem[]);
+    }, 300),
+    []
+  );
+
+  // Handle search input changes
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    debouncedSearch(query);
+  };
+
+  // Handle search button press
   const handleSearch = () => {
-    console.log('Searching for:', searchQuery);
+    if (searchQuery.trim()) {
+      addToHistory(searchQuery);
+      const results = searchItems(products, searchQuery, {
+        category: 'phone',
+      });
+      setFilteredProducts(results as ProductItem[]);
+    }
   };
 
   const handleSortBy = () => {
@@ -292,7 +331,9 @@ export default function PhoneScreen() {
               style={styles.searchInput}
               placeholder="Search phones, accessories, cases..."
               value={searchQuery}
-              onChangeText={setSearchQuery}
+              onChangeText={handleSearchChange}
+              onSubmitEditing={handleSearch}
+              returnKeyType="search"
             />
             <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
               <Ionicons name="arrow-forward" size={20} color="#fff" />
@@ -417,7 +458,7 @@ export default function PhoneScreen() {
         {/* Products Grid */}
         <View style={styles.productsContainer}>
           <FlatList
-            data={getFilteredProducts()}
+            data={filteredProducts}
             renderItem={({ item }) => <ProductCard item={item} />}
             keyExtractor={(item) => item.id}
             numColumns={2}

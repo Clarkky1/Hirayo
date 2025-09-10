@@ -1,6 +1,6 @@
 import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
@@ -94,11 +94,6 @@ const slides = [
         <>
           <Text style={styles.highlight}>Verified</Text> users, protected payments, and{' '}
           <Text style={styles.highlight}>worry-free</Text> transactions.
-        </>
-      ),
-      text2: (
-        <>
-          Get started today!
         </>
       ),
     },

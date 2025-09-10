@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     FlatList,
     Image,
+    LogBox,
     SafeAreaView,
     ScrollView,
     StyleSheet,
@@ -12,6 +13,9 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+
+LogBox.ignoreAllLogs(true);
+
 
 interface ProductItem {
   id: string;

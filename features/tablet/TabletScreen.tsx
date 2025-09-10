@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     FlatList,
     Image,
@@ -115,7 +115,10 @@ export default function TabletScreen() {
 
   const handleProductPress = (product: ProductItem) => {
     // Navigate to the product detail page with the product id as a query parameter
-    router.push(`/item?id=${product.id}`);
+    router.push({
+      pathname: '/item',
+      params: { id: product.id }
+    });
   };
 
   const handleSort = (sortId: string) => {

@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
 import {
+    LogBox,
     SafeAreaView,
     ScrollView,
     StyleSheet,
@@ -8,6 +8,9 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+
+LogBox.ignoreAllLogs(true);
+
 
 export default function AboutScreen() {
   const appInfo = {

@@ -1,39 +1,76 @@
 import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
+import { useUser } from '@/contexts/UserContext';
 import { useAuth } from '@/hooks/useAuth';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
-  Alert,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Switch,
-  Text,
-  TouchableOpacity,
-  View,
+    Alert,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Switch,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { Card } from '../ui/Card';
+import { ProfileEditModal } from './ProfileEditModal';
 
 
 
 
 
 export default function ProfileScreen() {
-  const [userData] = useState({
-    firstName: 'Kin Clark',
-    surname: 'Perez',
-    email: 'clarkperez906@gmail.com',
-    memberSince: 'August 2024',
-  });
-
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [emailNotifications, setEmailNotifications] = useState(true);
-
+  const { profile, updatePreferences, updateProfile, isLoading } = useUser();
   const { logout } = useAuth();
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  // Show loading state while profile is being loaded
+  if (isLoading || !profile) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Loading profile...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   const handleEditProfile = () => {
-    router.push('/personal-information' as any);
+    setShowEditModal(true);
+  };
+
+  const handleProfileImagePress = () => {
+    Alert.alert(
+      'Change Profile Photo',
+      'Choose an option',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Take Photo', 
+          onPress: () => {
+            // In a real app, this would open the camera
+            Alert.alert('Camera', 'Camera functionality would be implemented here');
+          }
+        },
+        { 
+          text: 'Choose from Library', 
+          onPress: () => {
+            // In a real app, this would open the image picker
+            Alert.alert('Photo Library', 'Image picker functionality would be implemented here');
+          }
+        },
+        { 
+          text: 'Remove Photo', 
+          onPress: () => {
+            updateProfile({ profileImage: undefined });
+            Alert.alert('Success', 'Profile photo removed');
+          },
+          style: 'destructive'
+        },
+      ]
+    );
   };
 
   const handlePaymentMethods = () => {
@@ -123,19 +160,51 @@ export default function ProfileScreen() {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Profile Section */}
         <View style={styles.profileSection}>
-          <View style={styles.avatarContainer}>
+          <TouchableOpacity 
+            style={styles.avatarContainer} 
+            onPress={handleProfileImagePress}
+            activeOpacity={0.7}
+          >
             <View style={styles.avatar}>
-              <Text style={styles.avatarText}>
-                {userData.firstName.split(' ').map(n => n[0]).join('')}
-              </Text>
+              {profile.profileImage ? (
+                <View style={styles.profileImageContainer}>
+                  <Text style={styles.profileImageText}>IMG</Text>
+                </View>
+              ) : (
+                <Text style={styles.avatarText}>
+                  {profile.firstName.split(' ').map(n => n[0]).join('')}
+                </Text>
+              )}
             </View>
             <View style={styles.onlineIndicator} />
-          </View>
+            <View style={styles.editImageOverlay}>
+              <Ionicons name="camera" size={16} color={Colors.text.inverse} />
+            </View>
+          </TouchableOpacity>
           
           <View style={styles.profileInfo}>
-            <Text style={styles.userName}>{userData.firstName} {userData.surname}</Text>
-            <Text style={styles.userEmail}>{userData.email}</Text>
-            <Text style={styles.memberSince}>Member since {userData.memberSince}</Text>
+            <Text style={styles.userName}>{profile.firstName} {profile.surname}</Text>
+            <Text style={styles.userEmail}>{profile.email}</Text>
+            <Text style={styles.memberSince}>Member since {profile.memberSince}</Text>
+            {profile.bio && <Text style={styles.userBio}>{profile.bio}</Text>}
+          </View>
+        </View>
+
+        {/* Stats Section */}
+        <View style={styles.statsSection}>
+          <View style={styles.statsRow}>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{profile.stats.totalRentals}</Text>
+              <Text style={styles.statLabel}>Rentals</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{profile.stats.rating}</Text>
+              <Text style={styles.statLabel}>Rating</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{profile.stats.itemsListed}</Text>
+              <Text style={styles.statLabel}>Items Listed</Text>
+            </View>
           </View>
         </View>
 
@@ -158,8 +227,8 @@ export default function ProfileScreen() {
             undefined,
             false,
             true,
-            notificationsEnabled,
-            setNotificationsEnabled
+            profile.preferences.notifications.push,
+            (value) => updatePreferences('notifications', { push: value })
           )}
           {renderSettingItem(
             'mail-outline', 
@@ -168,8 +237,18 @@ export default function ProfileScreen() {
             undefined,
             false,
             true,
-            emailNotifications,
-            setEmailNotifications
+            profile.preferences.notifications.email,
+            (value) => updatePreferences('notifications', { email: value })
+          )}
+          {renderSettingItem(
+            'chatbubble-outline', 
+            'SMS Notifications', 
+            'Get updates via text message',
+            undefined,
+            false,
+            true,
+            profile.preferences.notifications.sms,
+            (value) => updatePreferences('notifications', { sms: value })
           )}
         </View>
 
@@ -177,6 +256,51 @@ export default function ProfileScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Security & Privacy</Text>
           {renderSettingItem('shield-outline', 'Privacy & Security', 'Control your data and visibility', handlePrivacy)}
+          {renderSettingItem(
+            'eye-outline', 
+            'Show Profile', 
+            'Make your profile visible to other users',
+            undefined,
+            false,
+            true,
+            profile.preferences.privacy.showProfile,
+            (value) => updatePreferences('privacy', { showProfile: value })
+          )}
+          {renderSettingItem(
+            'location-outline', 
+            'Show Location', 
+            'Display your location to other users',
+            undefined,
+            false,
+            true,
+            profile.preferences.privacy.showLocation,
+            (value) => updatePreferences('privacy', { showLocation: value })
+          )}
+        </View>
+
+        {/* Rental Preferences Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Rental Preferences</Text>
+          {renderSettingItem(
+            'checkmark-circle-outline', 
+            'Auto Accept', 
+            'Automatically accept rental requests',
+            undefined,
+            false,
+            true,
+            profile.preferences.rental.autoAccept,
+            (value) => updatePreferences('rental', { autoAccept: value })
+          )}
+          {renderSettingItem(
+            'flash-outline', 
+            'Instant Booking', 
+            'Allow instant booking without approval',
+            undefined,
+            false,
+            true,
+            profile.preferences.rental.instantBooking,
+            (value) => updatePreferences('rental', { instantBooking: value })
+          )}
         </View>
 
         {/* Support Section */}
@@ -201,6 +325,12 @@ export default function ProfileScreen() {
           <Text style={styles.versionText}>App Version 1.0.0</Text>
         </View>
       </ScrollView>
+
+      {/* Profile Edit Modal */}
+      <ProfileEditModal
+        visible={showEditModal}
+        onClose={() => setShowEditModal(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -343,6 +473,71 @@ const styles = StyleSheet.create({
     ...TextStyles.caption,
     color: Colors.text.tertiary,
   },
-
-
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    ...TextStyles.body.medium,
+    color: Colors.text.secondary,
+  },
+  profileImageContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: Colors.neutral[200],
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileImageText: {
+    ...TextStyles.caption,
+    color: Colors.text.tertiary,
+  },
+  userBio: {
+    ...TextStyles.body.small,
+    color: Colors.text.secondary,
+    textAlign: 'center',
+    marginTop: Spacing.xs,
+    fontStyle: 'italic',
+  },
+  statsSection: {
+    backgroundColor: Colors.background.secondary,
+    marginHorizontal: Spacing.lg,
+    marginBottom: Spacing.lg,
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.md,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  statItem: {
+    alignItems: 'center',
+  },
+  statNumber: {
+    ...TextStyles.heading.h2,
+    color: Colors.primary[500],
+    fontWeight: 'bold',
+    marginBottom: Spacing.xs,
+  },
+  statLabel: {
+    ...TextStyles.caption,
+    color: Colors.text.secondary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  editImageOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: Colors.primary[500],
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: Colors.background.primary,
+  },
 });

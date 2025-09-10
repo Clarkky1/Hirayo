@@ -1,9 +1,10 @@
 import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     Alert,
+    LogBox,
     SafeAreaView,
     ScrollView,
     StyleSheet,
@@ -12,6 +13,9 @@ import {
     View
 } from 'react-native';
 import { Card } from '../../components/ui/Card';
+
+LogBox.ignoreAllLogs(true);
+
 
 interface ItemLocation {
   latitude: number;

@@ -1,6 +1,5 @@
 import { BorderRadius, Colors, Shadows, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { useRouter } from 'expo-router';
-import React from 'react';
 import {
     ScrollView,
     StyleSheet,
@@ -13,7 +12,7 @@ export default function HomeScreen() {
   const router = useRouter();
 
   const handleCategoryPress = (category: string) => {
-    router.push(`/${category}`);
+    router.push(`/${category}` as any);
   };
 
   const categories = [

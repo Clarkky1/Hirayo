@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode, useContext, useState } from 'react';
+import { createContext, ReactNode, useContext, useState } from 'react';
 
 export interface SelectedItem {
   id: string;
@@ -8,6 +8,9 @@ export interface SelectedItem {
   location: string;
   image?: string;
   category?: string;
+  lenderId?: string;
+  lenderName?: string;
+  lenderAvatar?: string;
 }
 
 interface SelectedItemContextType {

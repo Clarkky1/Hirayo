@@ -1,15 +1,15 @@
 import { BorderRadius, Colors, Shadows, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 export default function SignupScreen() {
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: Spacing.xxl,
+    marginBottom: Spacing['2xl'],
   },
   title: {
     ...TextStyles.display.small,
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: Colors.border.primary,
+    borderColor: Colors.border.light,
     borderRadius: BorderRadius.md,
     padding: Spacing.md,
     fontSize: 16,

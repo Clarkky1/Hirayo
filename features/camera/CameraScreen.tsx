@@ -1,15 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
-    FlatList,
-    Image,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  FlatList,
+  Image,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
 interface ProductItem {
@@ -19,6 +19,9 @@ interface ProductItem {
   rating: number;
   image: string;
   category: string;
+  lenderId?: string;
+  lenderName?: string;
+  lenderAvatar?: string;
 }
 
 const products: ProductItem[] = [
@@ -28,7 +31,10 @@ const products: ProductItem[] = [
     price: 3899,
     rating: 4.9,
     image: 'https://via.placeholder.com/150x150?text=Sony+A7R+V',
-    category: 'camera'
+    category: 'camera',
+    lenderId: 'lender-001',
+    lenderName: 'John Smith',
+    lenderAvatar: 'https://via.placeholder.com/40x40?text=JS'
   },
   {
     id: '2',
@@ -36,7 +42,10 @@ const products: ProductItem[] = [
     price: 3499,
     rating: 4.8,
     image: 'https://via.placeholder.com/150x150?text=Canon+EOS+R5',
-    category: 'camera'
+    category: 'camera',
+    lenderId: 'lender-002',
+    lenderName: 'Sarah Johnson',
+    lenderAvatar: 'https://via.placeholder.com/40x40?text=SJ'
   },
   {
     id: '3',
@@ -44,7 +53,10 @@ const products: ProductItem[] = [
     price: 5499,
     rating: 4.9,
     image: 'https://via.placeholder.com/150x150?text=Nikon+Z9',
-    category: 'camera'
+    category: 'camera',
+    lenderId: 'lender-003',
+    lenderName: 'Mike Chen',
+    lenderAvatar: 'https://via.placeholder.com/40x40?text=MC'
   },
   {
     id: '4',
@@ -52,7 +64,10 @@ const products: ProductItem[] = [
     price: 1699,
     rating: 4.7,
     image: 'https://via.placeholder.com/150x150?text=Fujifilm+X-T5',
-    category: 'camera'
+    category: 'camera',
+    lenderId: 'lender-004',
+    lenderName: 'Emma Davis',
+    lenderAvatar: 'https://via.placeholder.com/40x40?text=ED'
   },
   {
     id: '5',
@@ -60,7 +75,10 @@ const products: ProductItem[] = [
     price: 1999,
     rating: 4.6,
     image: 'https://via.placeholder.com/150x150?text=Lumix+S5+II',
-    category: 'camera'
+    category: 'camera',
+    lenderId: 'lender-005',
+    lenderName: 'Alex Wilson',
+    lenderAvatar: 'https://via.placeholder.com/40x40?text=AW'
   },
   {
     id: '6',
@@ -68,7 +86,10 @@ const products: ProductItem[] = [
     price: 8999,
     rating: 4.9,
     image: 'https://via.placeholder.com/150x150?text=Leica+M11',
-    category: 'camera'
+    category: 'camera',
+    lenderId: 'lender-006',
+    lenderName: 'Lisa Brown',
+    lenderAvatar: 'https://via.placeholder.com/40x40?text=LB'
   }
 ];
 
@@ -114,7 +135,15 @@ export default function CameraScreen() {
   }, [initialCategory]);
 
   const handleProductPress = (product: ProductItem) => {
-    router.push(`/item/${product.id}`);
+    router.push({
+      pathname: '/item',
+      params: { 
+        id: product.id,
+        lenderId: product.lenderId || 'lender-123',
+        lenderName: product.lenderName || 'Item Owner',
+        lenderAvatar: product.lenderAvatar || ''
+      }
+    });
   };
 
   const handleSort = (sortId: string) => {

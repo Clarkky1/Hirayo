@@ -1,7 +1,7 @@
 import { BorderRadius, Colors, Spacing } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     FlatList,
     SafeAreaView,
@@ -165,7 +165,8 @@ export default function MessagesScreen() {
             messageId: existingConversation.id,
             senderName: existingConversation.senderName,
             itemName: existingConversation.itemName || '',
-            itemId: existingConversation.id || 'item1'
+            itemId: existingConversation.id || 'item1',
+            isLenderView: 'false'
           }
         });
       } else {
@@ -178,6 +179,7 @@ export default function MessagesScreen() {
             senderName: params.ownerName as string,
             itemName: params.itemName as string,
             itemId: params.itemId as string || 'item1',
+            isLenderView: 'false',
             isNewConversation: 'true'
           }
         });

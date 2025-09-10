@@ -1,6 +1,8 @@
 import { Stack } from 'expo-router';
-import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { LogBox, Text, TouchableOpacity, View } from 'react-native';
+
+LogBox.ignoreAllLogs(true);
+
 
 export default function Test() {
   return (

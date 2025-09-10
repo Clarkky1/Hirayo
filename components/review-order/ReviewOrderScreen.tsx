@@ -2,7 +2,7 @@ import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSys
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   Animated,
   Image,

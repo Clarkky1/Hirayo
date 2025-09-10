@@ -1,15 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
-    FlatList,
-    Image,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  FlatList,
+  Image,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
 interface ProductItem {
@@ -114,7 +114,10 @@ export default function PhoneScreen() {
   }, [initialCategory]);
 
   const handleProductPress = (product: ProductItem) => {
-    router.push(`/item/${product.id}`);
+    router.push({
+      pathname: '/item',
+      params: { id: product.id }
+    });
   };
 
   const handleSort = (sortId: string) => {

@@ -1,8 +1,9 @@
+import { TermsConditionsModal } from '@/components/ui';
 import { BorderRadius, Colors, Shadows, Spacing } from '@/constants/DesignSystem';
 import { useAuth } from '@/hooks/useAuth';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
     KeyboardAvoidingView,
     Platform,
@@ -22,12 +23,19 @@ export default function SignupScreen() {
   const [surname, setSurname] = useState('Perez');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [email, setEmail] = useState('kinclark@gmail.com');
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const handleBack = () => {
     router.back();
   };
 
   const handleAgreeAndContinue = () => {
+    if (!termsAccepted) {
+      setShowTermsModal(true);
+      return;
+    }
+    
     // Handle form submission
     const userData = { firstName, surname, dateOfBirth, email };
     console.log('Form submitted:', userData);
@@ -35,6 +43,21 @@ export default function SignupScreen() {
     signup(userData);
     // Navigate to main app after successful signup
     router.replace('/(tabs)');
+  };
+
+  const handleTermsAccept = () => {
+    setTermsAccepted(true);
+    setShowTermsModal(false);
+    
+    // Proceed with registration after accepting terms
+    const userData = { firstName, surname, dateOfBirth, email };
+    console.log('Form submitted:', userData);
+    signup(userData);
+    router.replace('/(tabs)');
+  };
+
+  const handleTermsDecline = () => {
+    setShowTermsModal(false);
   };
 
   const isFormValid = firstName.trim() && surname.trim() && dateOfBirth.trim() && email.trim();
@@ -116,13 +139,13 @@ export default function SignupScreen() {
                 By selecting{' '}
                 <Text style={styles.linkText}>Agree and continue</Text>
                 , I agree to Hirayo&apos;s{' '}
-                <Text style={styles.linkText}>Terms of Service</Text>
+                <Text style={styles.linkText} onPress={() => setShowTermsModal(true)}>Terms of Service</Text>
                 ,{' '}
-                <Text style={styles.linkText}>Payment of Terms of Service</Text>
+                <Text style={styles.linkText} onPress={() => setShowTermsModal(true)}>Payment of Terms of Service</Text>
                 {' '}and{' '}
-                <Text style={styles.linkText}>Anti-Discrimination Policy</Text>
+                <Text style={styles.linkText} onPress={() => setShowTermsModal(true)}>Anti-Discrimination Policy</Text>
                 , and acknowledge the{' '}
-                <Text style={styles.linkText}>Privacy Policy</Text>
+                <Text style={styles.linkText} onPress={() => setShowTermsModal(true)}>Privacy Policy</Text>
                 .
               </Text>
             </View>
@@ -145,6 +168,12 @@ export default function SignupScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+      
+      <TermsConditionsModal
+        visible={showTermsModal}
+        onClose={handleTermsDecline}
+        onAccept={handleTermsAccept}
+      />
     </SafeAreaView>
   );
 }

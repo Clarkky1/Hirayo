@@ -9,9 +9,15 @@ import SplashScreen from '@/components/SplashScreen';
 import { LenderProvider } from '@/contexts/LenderContext';
 import { RentalFlowProvider } from '@/contexts/RentalFlowContext';
 import { SavedItemsProvider } from '@/contexts/SavedItemsContext';
+import { SearchProvider } from '@/contexts/SearchContext';
 import { SelectedItemProvider } from '@/contexts/SelectedItemContext';
+import { UserProvider } from '@/contexts/UserContext';
 import { AuthProvider } from '@/hooks/useAuth';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { LogBox } from 'react-native';
+
+LogBox.ignoreAllLogs(true);
+
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -38,10 +44,12 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
-      <SavedItemsProvider>
-        <SelectedItemProvider>
-          <LenderProvider>
-            <RentalFlowProvider>
+      <UserProvider>
+        <SearchProvider>
+          <SavedItemsProvider>
+            <SelectedItemProvider>
+              <LenderProvider>
+                <RentalFlowProvider>
               <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
                 <Stack initialRouteName="onboarding">
                   <Stack.Screen name="onboarding" options={{ headerShown: false }} />
@@ -71,10 +79,12 @@ export default function RootLayout() {
                 </Stack>
                 <StatusBar style="auto" />
               </ThemeProvider>
-            </RentalFlowProvider>
-          </LenderProvider>
-        </SelectedItemProvider>
-      </SavedItemsProvider>
+                </RentalFlowProvider>
+              </LenderProvider>
+            </SelectedItemProvider>
+          </SavedItemsProvider>
+        </SearchProvider>
+      </UserProvider>
     </AuthProvider>
   );
 }

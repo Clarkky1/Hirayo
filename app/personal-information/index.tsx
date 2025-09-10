@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
+    LogBox,
     SafeAreaView,
     ScrollView,
     StyleSheet,
@@ -9,6 +10,9 @@ import {
     View,
 } from 'react-native';
 import { Spacing } from '../../constants/DesignSystem';
+
+LogBox.ignoreAllLogs(true);
+
 
 export default function PersonalInformationScreen() {
   const [userData] = useState({

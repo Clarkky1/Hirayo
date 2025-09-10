@@ -1,8 +1,11 @@
+import { useSearch } from '@/contexts/SearchContext';
+import { debounce, SearchableItem, searchItems } from '@/utils';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   FlatList,
+  LogBox,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -13,7 +16,10 @@ import {
 } from 'react-native';
 import { BorderRadius, Colors, Spacing } from '../../constants/DesignSystem';
 
-interface ProductItem {
+LogBox.ignoreAllLogs(true);
+
+
+interface ProductItem extends SearchableItem {
   id: string;
   name: string;
   rating: number;
@@ -63,7 +69,7 @@ const priceRanges = [
 
 export default function CameraScreen() {
   const { initialCategory } = useLocalSearchParams();
-  const [searchQuery, setSearchQuery] = useState('');
+  const { searchQuery, setSearchQuery, addToHistory } = useSearch();
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showFiltersDropdown, setShowFiltersDropdown] = useState(false);
   const [selectedSort, setSelectedSort] = useState('');
@@ -72,6 +78,7 @@ export default function CameraScreen() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [filteredProducts, setFilteredProducts] = useState<ProductItem[]>(products);
 
   const categories = [
     { id: 'dslr', name: 'DSLR', icon: 'camera' },
@@ -119,8 +126,43 @@ export default function CameraScreen() {
     }
   }, [initialCategory]);
 
+  // Update filtered products when filters change
+  useEffect(() => {
+    const results = searchItems(products, searchQuery, {
+      category: 'camera',
+      location: selectedLocation || undefined,
+    });
+    setFilteredProducts(results as ProductItem[]);
+  }, [selectedLocation, searchQuery]);
+
+  // Debounced search function
+  const debouncedSearch = useCallback(
+    debounce((query: string) => {
+      const results = searchItems(products, query, {
+        category: 'camera',
+        location: selectedLocation || undefined,
+      });
+      setFilteredProducts(results as ProductItem[]);
+    }, 300),
+    [selectedLocation]
+  );
+
+  // Handle search input changes
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    debouncedSearch(query);
+  };
+
+  // Handle search button press
   const handleSearch = () => {
-    console.log('Searching for:', searchQuery);
+    if (searchQuery.trim()) {
+      addToHistory(searchQuery);
+      const results = searchItems(products, searchQuery, {
+        category: 'camera',
+        location: selectedLocation || undefined,
+      });
+      setFilteredProducts(results as ProductItem[]);
+    }
   };
 
   const handleSortBy = () => {
@@ -360,7 +402,9 @@ export default function CameraScreen() {
               style={styles.searchInput}
               placeholder="Search cameras, lenses, accessories..."
               value={searchQuery}
-              onChangeText={setSearchQuery}
+              onChangeText={handleSearchChange}
+              onSubmitEditing={handleSearch}
+              returnKeyType="search"
             />
             <TouchableOpacity style={styles.searchButton} onPress={handleSearch} activeOpacity={0.7}>
               <Ionicons name="arrow-forward" size={20} color="#fff" />
@@ -488,7 +532,7 @@ export default function CameraScreen() {
         {/* Products Grid */}
         <View style={styles.productsContainer}>
           <FlatList
-            data={getFilteredProducts()}
+            data={filteredProducts}
             renderItem={({ item }) => <ProductCard item={item} />}
             keyExtractor={(item) => item.id}
             numColumns={2}

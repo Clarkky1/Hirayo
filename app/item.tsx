@@ -1,6 +1,9 @@
 import { Stack } from 'expo-router';
-import React from 'react';
+import { LogBox } from 'react-native';
 import { ItemDetailScreen } from '../components/item';
+
+LogBox.ignoreAllLogs(true);
+
 
 export default function Item() {
   return (
