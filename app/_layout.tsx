@@ -3,6 +3,7 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
+import { View } from 'react-native';
 import 'react-native-reanimated';
 
 import SplashScreen from '@/components/SplashScreen';
@@ -76,7 +77,8 @@ export default function RootLayout() {
                   <Stack.Screen name="laptop" options={{ headerShown: false }} />
                   <Stack.Screen name="+not-found" />
                 </Stack>
-                <StatusBar style="auto" />
+                <StatusBar style="light" />
+      <View style={{ backgroundColor: '#667EEA', height: 0 }} />
               </ThemeProvider>
                 </RentalFlowProvider>
               </LenderProvider>

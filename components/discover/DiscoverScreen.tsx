@@ -3,6 +3,7 @@ import { useSearch } from '@/contexts/SearchContext';
 import { debounce, SearchableItem, searchItems } from '@/utils';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useState } from 'react';
 import {
   FlatList,
@@ -300,6 +301,8 @@ export default function DiscoverScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar style="light" />
+      <View style={{ backgroundColor: '#667EEA', height: 0 }} />
       {/* Sticky Header Section */}
       <View style={styles.stickyHeader}>
 
@@ -309,21 +312,21 @@ export default function DiscoverScreen() {
           <TextInput
             style={styles.searchInput}
             placeholder="Search for gadgets..."
-            placeholderTextColor={Colors.text.tertiary}
+            placeholderTextColor="#9CA3AF"
             value={searchQuery}
             onChangeText={handleSearchChange}
             onSubmitEditing={handleSearch}
             returnKeyType="search"
           />
           <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-            <Ionicons name="search" size={16} color={Colors.text.inverse} />
+            <Ionicons name="search" size={16} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
 
         {/* Sort and Filter Controls */}
         <View style={styles.controlsContainer}>
           <TouchableOpacity style={styles.controlButton} onPress={handleSortBy} activeOpacity={0.7}>
-            <Ionicons name="funnel-outline" size={16} color={Colors.text.primary} />
+            <Ionicons name="funnel-outline" size={16} color="#1F2937" />
             <Text style={styles.controlButtonText}>
               {selectedSort || 'Price Range'}
             </Text>

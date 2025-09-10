@@ -2,8 +2,9 @@ import { LenderDrawer } from '@/components/ui';
 import { useLender } from '@/contexts/LenderContext';
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
-import { LogBox, Platform, TouchableOpacity } from 'react-native';
+import { LogBox, Platform, TouchableOpacity, View } from 'react-native';
 
 LogBox.ignoreAllLogs(true);
 
@@ -14,13 +15,15 @@ export default function TabLayout() {
   
   return (
     <>
+      <StatusBar style="light" />
+      <View style={{ backgroundColor: '#667EEA', height: 0 }} />
       <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#0066CC',
-        tabBarInactiveTintColor: '#6b66666',
+        tabBarActiveTintColor: '#667EEA',
+        tabBarInactiveTintColor: '#9CA3AF',
         headerShown: true,
         headerStyle: {
-          backgroundColor: '#0066CC',
+          backgroundColor: '#667EEA',
         },
         headerTintColor: '#ffffff',
         tabBarStyle: Platform.select({

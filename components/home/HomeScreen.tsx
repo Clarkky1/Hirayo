@@ -2,6 +2,7 @@ import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSys
 import { useLender } from '@/contexts/LenderContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
   FlatList,
@@ -123,6 +124,8 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar style="light" />
+      <View style={{ backgroundColor: '#667EEA', height: 0 }} />
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
 
         {/* Categories Section */}

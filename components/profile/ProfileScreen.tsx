@@ -3,6 +3,7 @@ import { useUser } from '@/contexts/UserContext';
 import { useAuth } from '@/hooks/useAuth';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
   Alert,
@@ -30,6 +31,8 @@ export default function ProfileScreen() {
   if (isLoading || !profile) {
     return (
       <SafeAreaView style={styles.container}>
+        <StatusBar style="light" />
+        <View style={{ backgroundColor: '#667EEA', height: 0 }} />
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>Loading profile...</Text>
         </View>
@@ -133,6 +136,8 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar style="light" />
+      <View style={{ backgroundColor: '#667EEA', height: 0 }} />
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Profile Section */}
         <View style={styles.profileSection}>

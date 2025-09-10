@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
   Alert,
@@ -25,6 +26,7 @@ export default function SignupScreen() {
   const { signup } = useAuth();
   const [firstName, setFirstName] = useState('Kin Clark');
   const [surname, setSurname] = useState('Perez');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState(new Date(1990, 0, 1)); // January 1, 1990
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [email, setEmail] = useState('kinclark@gmail.com');
@@ -116,6 +118,7 @@ export default function SignupScreen() {
     const userData = { 
       firstName, 
       surname, 
+      phoneNumber,
       dateOfBirth: formatDate(dateOfBirth), 
       email 
     };
@@ -136,10 +139,12 @@ export default function SignupScreen() {
     setShowTermsModal(false);
   };
 
-  const isFormValid = firstName.trim() && surname.trim() && dateOfBirth && email.trim() && termsAccepted;
+  const isFormValid = firstName.trim() && surname.trim() && phoneNumber.trim() && dateOfBirth && email.trim() && termsAccepted;
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar style="light" />
+      <View style={{ backgroundColor: '#667EEA', height: 0 }} />
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
@@ -221,7 +226,7 @@ export default function SignupScreen() {
                 <Text style={styles.sectionLabel}>Legal Name</Text>
                 <View style={styles.inputRow}>
                   <View style={styles.inputGroup}>
-                    <Text style={styles.inputLabel}>First Name</Text>
+                    <Text style={styles.inputLabel}>First Name <Text style={styles.requiredAsterisk}>*</Text></Text>
                     <View style={styles.inputWrapper}>
                       <Ionicons name="person-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
                       <TextInput
@@ -235,7 +240,7 @@ export default function SignupScreen() {
                     </View>
                   </View>
                   <View style={styles.inputGroup}>
-                    <Text style={styles.inputLabel}>Surname</Text>
+                    <Text style={styles.inputLabel}>Surname <Text style={styles.requiredAsterisk}>*</Text></Text>
                     <View style={styles.inputWrapper}>
                       <Ionicons name="person-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
                       <TextInput
@@ -254,11 +259,33 @@ export default function SignupScreen() {
                 </Text>
               </View>
 
+              {/* Phone Number Section */}
+              <View style={styles.formSection}>
+                <Text style={styles.sectionLabel}>Phone Number</Text>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Phone <Text style={styles.requiredAsterisk}>*</Text></Text>
+                  <View style={styles.inputWrapper}>
+                    <Ionicons name="call-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Enter your phone number"
+                      value={phoneNumber}
+                      onChangeText={setPhoneNumber}
+                      keyboardType="phone-pad"
+                      placeholderTextColor="#9CA3AF"
+                    />
+                  </View>
+                </View>
+                <Text style={styles.helperText}>
+                  We'll use this to send you verification codes and important updates
+                </Text>
+              </View>
+
               {/* Date of Birth Section */}
               <View style={styles.formSection}>
                 <Text style={styles.sectionLabel}>Date of Birth</Text>
                 <View style={styles.inputGroup}>
-                  <Text style={styles.inputLabel}>Birth Date</Text>
+                  <Text style={styles.inputLabel}>Birth Date <Text style={styles.requiredAsterisk}>*</Text></Text>
                   <TouchableOpacity 
                     style={styles.inputWrapper}
                     onPress={showDatePickerModal}
@@ -280,7 +307,7 @@ export default function SignupScreen() {
               <View style={styles.formSection}>
                 <Text style={styles.sectionLabel}>Email Address</Text>
                 <View style={styles.inputGroup}>
-                  <Text style={styles.inputLabel}>Email</Text>
+                  <Text style={styles.inputLabel}>Email <Text style={styles.requiredAsterisk}>*</Text></Text>
                   <View style={styles.inputWrapper}>
                     <Ionicons name="mail-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
                     <TextInput
@@ -777,5 +804,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     color: '#374151',
+  },
+  requiredAsterisk: {
+    color: '#EF4444',
+    fontWeight: 'bold',
   },
 });

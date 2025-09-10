@@ -1,7 +1,8 @@
-import { Colors, Shadows, Spacing } from '@/constants/DesignSystem';
+import { Shadows, Spacing } from '@/constants/DesignSystem';
 import { useAuth } from '@/hooks/useAuth';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
   Dimensions,
@@ -23,11 +24,18 @@ export default function LoginScreen() {
   const { login } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [focusedInput, setFocusedInput] = useState(false);
+
+  // Phone number validation for Philippine numbers (11 digits starting with 09)
+  const isValidPhoneNumber = (phone: string) => {
+    const cleanPhone = phone.replace(/\D/g, ''); // Remove non-digits
+    // Philippine mobile numbers: 11 digits starting with 09
+    return cleanPhone.length === 11 && cleanPhone.startsWith('09');
+  };
+
 
 
   const handleContinue = async () => {
-    if (phoneNumber.length === 0) return;
+    if (!isValidPhoneNumber(phoneNumber)) return;
     
     setIsLoading(true);
     try {
@@ -91,6 +99,8 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar style="light" />
+      <View style={{ backgroundColor: '#667EEA', height: 0 }} />
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
@@ -135,25 +145,26 @@ export default function LoginScreen() {
                   <Text style={styles.inputLabel}>Phone Number</Text>
                   <View style={[
                     styles.inputWrapper,
-                    focusedInput && styles.inputWrapperFocused
+                    styles.inputWrapperFocused
                   ]}>
                     <Ionicons 
                       name="call-outline" 
                       size={20} 
-                      color={focusedInput ? Colors.primary[500] : Colors.text.tertiary} 
+                      color="#9CA3AF" 
                       style={styles.inputIcon}
                     />
                     <TextInput
                       style={styles.inputField}
-                      placeholder="Enter your phone number"
-                      placeholderTextColor={Colors.text.tertiary}
+                      placeholder="09XXXXXXXXX"
+                      placeholderTextColor="#9CA3AF"
                       value={phoneNumber}
                       onChangeText={setPhoneNumber}
-                      onFocus={() => setFocusedInput(true)}
-                      onBlur={() => setFocusedInput(false)}
                       keyboardType="phone-pad"
-                      autoFocus={false}
-                      editable={!isLoading}
+                      autoCorrect={false}
+                      autoCapitalize="none"
+                      returnKeyType="done"
+                      editable={true}
+                      selectTextOnFocus={false}
                     />
                   </View>
                 </View>
@@ -162,14 +173,20 @@ export default function LoginScreen() {
                   We'll send you a verification code via SMS. Standard message rates apply.
                 </Text>
 
+                {phoneNumber.length > 0 && !isValidPhoneNumber(phoneNumber) && (
+                  <Text style={styles.errorText}>
+                    Please enter a valid Philippine phone number (09XXXXXXXXX)
+                  </Text>
+                )}
+
                 <TouchableOpacity 
                   style={[
                     styles.primaryButton, 
-                    phoneNumber.length > 0 && styles.primaryButtonActive,
+                    isValidPhoneNumber(phoneNumber) && styles.primaryButtonActive,
                     isLoading && styles.primaryButtonLoading
                   ]}
                   onPress={handleContinue}
-                  disabled={phoneNumber.length === 0 || isLoading}
+                  disabled={!isValidPhoneNumber(phoneNumber) || isLoading}
                   activeOpacity={0.8}
                 >
                 {isLoading ? (
@@ -402,6 +419,13 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     textAlign: 'center',
     marginBottom: Spacing['2xl'],
+    lineHeight: 18,
+  },
+  errorText: {
+    fontSize: 12,
+    color: '#EF4444',
+    textAlign: 'center',
+    marginBottom: Spacing.md,
     lineHeight: 18,
   },
 
