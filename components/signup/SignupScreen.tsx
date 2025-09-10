@@ -27,7 +27,7 @@ export default function SignupScreen() {
   const [firstName, setFirstName] = useState('');
   const [surname, setSurname] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [dateOfBirth, setDateOfBirth] = useState(new Date()); // January 1, 1990
+  const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [email, setEmail] = useState('');
   const [showTermsModal, setShowTermsModal] = useState(false);
@@ -54,7 +54,7 @@ export default function SignupScreen() {
         firstName, 
         surname, 
         phoneNumber,
-        dateOfBirth: formatDate(dateOfBirth), 
+        dateOfBirth: dateOfBirth ? formatDate(dateOfBirth) : '', 
         email,
         otp
       };
@@ -129,7 +129,8 @@ export default function SignupScreen() {
     setShowDatePicker(true);
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: Date | null) => {
+    if (!date) return 'mm/dd/yyyy';
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: '2-digit',
@@ -179,7 +180,7 @@ export default function SignupScreen() {
     return cleanPhone.length === 11 && cleanPhone.startsWith('09');
   };
 
-  const isFormValid = firstName.trim() && surname.trim() && phoneNumber.trim() && dateOfBirth && email.trim() && termsAccepted && idImage;
+  const isFormValid = firstName.trim() && surname.trim() && phoneNumber.trim() && dateOfBirth !== null && email.trim() && termsAccepted && idImage;
 
   // Show OTP verification screen if OTP step is active
   if (showOTP) {
@@ -275,7 +276,10 @@ export default function SignupScreen() {
 
               {/* Legal Name Section */}
               <View style={styles.formSection}>
-                <Text style={styles.sectionLabel}>Legal Name</Text>
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionLabel}>Legal Name</Text>
+                  <Text style={styles.idMatchMessage}>Name and birthdate must match your ID</Text>
+                </View>
                 <View style={styles.inputRow}>
                   <View style={styles.inputGroup}>
                     <Text style={styles.inputLabel}>First Name <Text style={styles.requiredAsterisk}>*</Text></Text>
@@ -283,7 +287,7 @@ export default function SignupScreen() {
                       <Ionicons name="person-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
                       <TextInput
                         style={styles.input}
-                        placeholder="First name on ID"
+                        placeholder="First name"
                         value={firstName}
                         onChangeText={setFirstName}
                         autoCapitalize="words"
@@ -297,7 +301,7 @@ export default function SignupScreen() {
                       <Ionicons name="person-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
                       <TextInput
                         style={styles.input}
-                        placeholder="Surname on ID"
+                        placeholder="Surname"
                         value={surname}
                         onChangeText={setSurname}
                         autoCapitalize="words"
@@ -468,7 +472,7 @@ export default function SignupScreen() {
       {/* Date Picker Modal */}
       {showDatePicker && (
         <DateTimePicker
-          value={dateOfBirth}
+          value={dateOfBirth || new Date()}
           mode="date"
           display={Platform.OS === 'ios' ? 'spinner' : 'default'}
           onChange={handleDateChange}
@@ -859,5 +863,16 @@ const styles = StyleSheet.create({
   requiredAsterisk: {
     color: '#EF4444',
     fontWeight: 'bold',
+  },
+  sectionHeader: {
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+  },
+  idMatchMessage: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginTop: Spacing.xs,
   },
 });
