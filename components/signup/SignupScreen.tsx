@@ -10,7 +10,6 @@ import { useState } from 'react';
 import {
   Alert,
   Image,
-  KeyboardAvoidingView,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -145,10 +144,6 @@ export default function SignupScreen() {
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
       <View style={{ backgroundColor: '#667EEA', height: 0 }} />
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
-      >
         {/* Background */}
         <View style={styles.backgroundContainer}>
           <View style={styles.gradientOverlay} />
@@ -159,7 +154,12 @@ export default function SignupScreen() {
           </View>
         </View>
 
-        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.scrollView} 
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ flexGrow: 1 }}
+        >
           <View style={styles.content}>
             {/* Header */}
             <View style={styles.header}>
@@ -375,7 +375,6 @@ export default function SignupScreen() {
             </View>
           </View>
         </ScrollView>
-      </KeyboardAvoidingView>
       
       <TermsConditionsModal
         visible={showTermsModal}
