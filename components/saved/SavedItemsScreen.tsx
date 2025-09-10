@@ -3,14 +3,15 @@ import { useSavedItems } from '@/contexts/SavedItemsContext';
 import { useSelectedItem } from '@/contexts/SelectedItemContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
-    FlatList,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
 export default function SavedItemsScreen() {
@@ -38,6 +39,8 @@ export default function SavedItemsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar style="light" />
+      <View style={{ backgroundColor: '#667EEA', height: 0 }} />
              {/* Header */}
        <View style={styles.header}>
          <View style={styles.backButton} />
@@ -108,8 +111,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: Spacing.lg,
-    paddingVertical: 4,
-    marginBottom: 4,
+    paddingVertical: Spacing.md,
+    backgroundColor: '#667EEA',
   },
   backButton: {
     padding: 4,

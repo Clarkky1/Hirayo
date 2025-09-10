@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams, useNavigation } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   Alert,
@@ -354,6 +355,8 @@ export default function ViewMessagesScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar style="light" />
+      <View style={{ backgroundColor: '#667EEA', height: 0 }} />
       {/* Simple Item Info */}
       <TouchableOpacity style={styles.itemInfo} onPress={handleItemPress}>
       

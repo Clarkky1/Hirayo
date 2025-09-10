@@ -5,11 +5,12 @@ import { useEffect, useState } from 'react';
 import {
     FlatList,
     SafeAreaView,
+    StatusBar,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 
 interface LenderMessage {
@@ -216,6 +217,8 @@ export default function LenderMessagesScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar style="light" />
+      <View style={{ backgroundColor: '#667EEA', height: 0 }} />
     
 
       {/* Search Bar */}

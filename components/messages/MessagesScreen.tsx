@@ -5,11 +5,12 @@ import { useEffect, useState } from 'react';
 import {
     FlatList,
     SafeAreaView,
+    StatusBar,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 
 interface Message {
@@ -198,6 +199,8 @@ export default function MessagesScreen() {
 
     return (
     <SafeAreaView style={styles.container}>
+      <StatusBar style="light" />
+      <View style={{ backgroundColor: '#667EEA', height: 0 }} />
        <View style={styles.header}>
          <View style={styles.backButton} />
          <View style={styles.searchButton} />

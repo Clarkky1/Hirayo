@@ -1,14 +1,15 @@
 import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
-import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { router, useLocalSearchParams, useNavigation } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect, useState } from 'react';
 import {
-    FlatList,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
 interface Transaction {
@@ -132,6 +133,27 @@ export default function TransactionsScreen() {
   const [activeFilter, setActiveFilter] = useState<'all' | 'completed' | 'active' | 'cancelled'>('all');
   const [showFiltersDropdown, setShowFiltersDropdown] = useState(false);
   const params = useLocalSearchParams();
+  const navigation = useNavigation();
+
+  // Configure header with filter icon
+  useEffect(() => {
+    navigation.setOptions({
+      title: 'Transactions',
+      headerStyle: {
+        backgroundColor: '#667EEA',
+      },
+      headerTintColor: '#ffffff',
+      headerRight: () => (
+        <TouchableOpacity 
+          style={{ marginRight: 16, padding: 4 }} 
+          onPress={toggleFiltersDropdown}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="filter" size={24} color="#FFFFFF" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, showFiltersDropdown]);
   
   // We'll use these params to enhance the receipt when coming from payment
   const showReceipt = params.showReceipt === 'true';
@@ -214,24 +236,17 @@ export default function TransactionsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.backButton} />
-        <View style={styles.searchButton} />
-      </View>
+      <StatusBar style="light" />
+      <View style={{ backgroundColor: '#667EEA', height: 0 }} />
 
       {/* Filter Dropdown */}
-      <View style={styles.filterContainer}>
-        <TouchableOpacity style={styles.filterDropdownButton} onPress={toggleFiltersDropdown} activeOpacity={0.7}>
-          <Text style={styles.filterDropdownText}>
-            {activeFilter === 'all' ? 'All' : 
-             activeFilter === 'active' ? 'Active' : 
-             activeFilter === 'completed' ? 'Completed' : 'Cancelled'}
-          </Text>
-          <Ionicons name="chevron-down" size={16} color="#333" />
-        </TouchableOpacity>
-        
-        {showFiltersDropdown && (
+      {showFiltersDropdown && (
+        <>
+          <TouchableOpacity 
+            style={styles.backdrop} 
+            onPress={() => setShowFiltersDropdown(false)}
+            activeOpacity={1}
+          />
           <View style={styles.filtersDropdown}>
             <TouchableOpacity 
               style={[styles.filterOption, activeFilter === 'all' && styles.activeFilterOption]} 
@@ -241,9 +256,9 @@ export default function TransactionsScreen() {
               <Text style={[styles.filterOptionText, activeFilter === 'all' && styles.activeFilterOptionText]}>
                 All
               </Text>
-              {activeFilter === 'all' && (
-                <Ionicons name="checkmark" size={16} color="#007AFF" />
-              )}
+               {activeFilter === 'all' && (
+                 <Ionicons name="checkmark" size={16} color="#667EEA" />
+               )}
             </TouchableOpacity>
             
             <TouchableOpacity 
@@ -254,9 +269,9 @@ export default function TransactionsScreen() {
               <Text style={[styles.filterOptionText, activeFilter === 'active' && styles.activeFilterOptionText]}>
                 Active
               </Text>
-              {activeFilter === 'active' && (
-                <Ionicons name="checkmark" size={16} color="#007AFF" />
-              )}
+               {activeFilter === 'active' && (
+                 <Ionicons name="checkmark" size={16} color="#667EEA" />
+               )}
             </TouchableOpacity>
             
             <TouchableOpacity 
@@ -267,9 +282,9 @@ export default function TransactionsScreen() {
               <Text style={[styles.filterOptionText, activeFilter === 'completed' && styles.activeFilterOptionText]}>
                 Completed
               </Text>
-              {activeFilter === 'completed' && (
-                <Ionicons name="checkmark" size={16} color="#007AFF" />
-              )}
+               {activeFilter === 'completed' && (
+                 <Ionicons name="checkmark" size={16} color="#667EEA" />
+               )}
             </TouchableOpacity>
             
             <TouchableOpacity 
@@ -280,13 +295,13 @@ export default function TransactionsScreen() {
               <Text style={[styles.filterOptionText, activeFilter === 'cancelled' && styles.activeFilterOptionText]}>
                 Cancelled
               </Text>
-              {activeFilter === 'cancelled' && (
-                <Ionicons name="checkmark" size={16} color="#007AFF" />
-              )}
+               {activeFilter === 'cancelled' && (
+                 <Ionicons name="checkmark" size={16} color="#667EEA" />
+               )}
             </TouchableOpacity>
           </View>
-        )}
-      </View>
+        </>
+      )}
 
       {/* Transactions List */}
       <FlatList
@@ -321,13 +336,28 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: Spacing.lg,
-    paddingBottom: 12,
+    paddingVertical: Spacing.md,
+    backgroundColor: '#667EEA',
   },
   backButton: {
     padding: 4,
   },
-  searchButton: {
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  filterButton: {
     padding: 4,
+  },
+  backdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    zIndex: 999,
   },
   title: {
     fontSize: 24,
@@ -362,43 +392,44 @@ const styles = StyleSheet.create({
   },
   filtersDropdown: {
     position: 'absolute',
-    top: 45,
-    right: 0,
+    top: 0,
+    right: Spacing.lg,
     backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderRadius: 16,
+    shadowColor: '#667EEA',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
+    elevation: 12,
     zIndex: 1000,
-    minWidth: 150,
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
+    minWidth: 180,
+    borderWidth: 0,
+    overflow: 'hidden',
   },
   filterOption: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    borderBottomColor: '#F8FAFC',
   },
   filterOptionText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '500',
-    color: '#333333',
+    color: '#374151',
   },
   activeFilterOption: {
-    backgroundColor: '#F0F8FF',
+    backgroundColor: '#F0F4FF',
   },
   activeFilterOptionText: {
-    color: '#007AFF',
+    color: '#667EEA',
     fontWeight: '600',
   },
   listContainer: {
     paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.lg,
     paddingBottom: 80,
   },
   listHeader: {

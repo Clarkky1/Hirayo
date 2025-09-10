@@ -4,6 +4,7 @@ import { useSelectedItem } from '@/contexts/SelectedItemContext';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useRef, useState } from 'react';
 import {
   Animated,
@@ -147,6 +148,8 @@ export default function ItemDetailScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar style="light" />
+      <View style={{ backgroundColor: '#667EEA', height: 0 }} />
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Product Header */}
         <View style={styles.productHeader}>
