@@ -268,7 +268,7 @@ export default function SignupScreen() {
                     <Ionicons name="call-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
                     <TextInput
                       style={styles.input}
-                      placeholder="Enter your phone number"
+                      placeholder="09XXXXXXXXX"
                       value={phoneNumber}
                       onChangeText={setPhoneNumber}
                       keyboardType="phone-pad"
