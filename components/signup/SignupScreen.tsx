@@ -3,9 +3,12 @@ import { Shadows, Spacing } from '@/constants/DesignSystem';
 import { useAuth } from '@/hooks/useAuth';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
+  Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
@@ -27,9 +30,61 @@ export default function SignupScreen() {
   const [email, setEmail] = useState('kinclark@gmail.com');
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  
+  // ID Upload states
+  const [idType, setIdType] = useState('');
+  const [idImage, setIdImage] = useState<string | null>(null);
+  const [showIdTypeModal, setShowIdTypeModal] = useState(false);
 
   const handleBack = () => {
     router.back();
+  };
+
+  // ID Type options
+  const idTypes = [
+    { id: 'government', label: 'Government ID', icon: 'card-outline' },
+    { id: 'student', label: 'Student ID', icon: 'school-outline' },
+    { id: 'passport', label: 'Passport', icon: 'airplane-outline' },
+    { id: 'driver', label: 'Driver\'s License', icon: 'car-outline' },
+  ];
+
+  const handleIdTypeSelect = (type: string) => {
+    setIdType(type);
+    setShowIdTypeModal(false);
+    // Automatically open image picker after selecting type
+    handleImagePicker();
+  };
+
+  const handleImagePicker = async () => {
+    try {
+      // Request permission
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      
+      if (permissionResult.granted === false) {
+        Alert.alert('Permission Required', 'Permission to access camera roll is required!');
+        return;
+      }
+
+      // Launch image picker
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [16, 10], // ID card aspect ratio
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        setIdImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Error picking image:', error);
+      Alert.alert('Error', 'Failed to pick image. Please try again.');
+    }
+  };
+
+  const handleRemoveIdImage = () => {
+    setIdImage(null);
+    setIdType('');
   };
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
@@ -116,6 +171,51 @@ export default function SignupScreen() {
 
             {/* Form Card */}
             <View style={styles.formCard}>
+              {/* ID Upload Section */}
+              <View style={styles.formSection}>
+                <Text style={styles.sectionLabel}>Identity Verification</Text>
+                <Text style={styles.sectionSubtitle}>Upload a photo of your ID for verification</Text>
+                
+                {idImage ? (
+                  <View style={styles.idImageContainer}>
+                    <Image source={{ uri: idImage }} style={styles.idImage} />
+                    <View style={styles.idImageOverlay}>
+                      <Text style={styles.idTypeText}>
+                        {idTypes.find(type => type.id === idType)?.label}
+                      </Text>
+                      <View style={styles.idImageActions}>
+                        <TouchableOpacity 
+                          style={styles.idActionButton}
+                          onPress={handleImagePicker}
+                          activeOpacity={0.7}
+                        >
+                          <Ionicons name="camera-outline" size={16} color="#667EEA" />
+                          <Text style={styles.idActionText}>Retake</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                          style={styles.idActionButton}
+                          onPress={handleRemoveIdImage}
+                          activeOpacity={0.7}
+                        >
+                          <Ionicons name="trash-outline" size={16} color="#EF4444" />
+                          <Text style={[styles.idActionText, { color: '#EF4444' }]}>Remove</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </View>
+                ) : (
+                  <TouchableOpacity 
+                    style={styles.idUploadButton}
+                    onPress={() => setShowIdTypeModal(true)}
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons name="cloud-upload-outline" size={32} color="#9CA3AF" />
+                    <Text style={styles.idUploadText}>Upload ID Photo</Text>
+                    <Text style={styles.idUploadSubtext}>Tap to select ID type and upload</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+
               {/* Legal Name Section */}
               <View style={styles.formSection}>
                 <Text style={styles.sectionLabel}>Legal Name</Text>
@@ -256,6 +356,37 @@ export default function SignupScreen() {
         onAccept={handleTermsAccept}
       />
       
+      {/* ID Type Selection Modal */}
+      {showIdTypeModal && (
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Select ID Type</Text>
+              <TouchableOpacity 
+                onPress={() => setShowIdTypeModal(false)}
+                style={styles.modalCloseButton}
+              >
+                <Ionicons name="close" size={24} color="#6B7280" />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.idTypeList}>
+              {idTypes.map((type) => (
+                <TouchableOpacity
+                  key={type.id}
+                  style={styles.idTypeItem}
+                  onPress={() => handleIdTypeSelect(type.id)}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name={type.icon as any} size={24} color="#667EEA" />
+                  <Text style={styles.idTypeLabel}>{type.label}</Text>
+                  <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        </View>
+      )}
+      
       {/* Date Picker Modal */}
       {showDatePicker && (
         <DateTimePicker
@@ -393,6 +524,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: '#1F2937',
+    marginBottom: Spacing.sm,
+  },
+  sectionSubtitle: {
+    fontSize: 14,
+    color: '#6B7280',
     marginBottom: Spacing.lg,
   },
   inputRow: {
@@ -519,5 +655,127 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#667EEA',
+  },
+
+  // ID Upload Styles
+  idUploadButton: {
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    borderStyle: 'dashed',
+    borderRadius: 16,
+    padding: Spacing['2xl'],
+    alignItems: 'center',
+    backgroundColor: '#F9FAFB',
+  },
+  idUploadText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#374151',
+    marginTop: Spacing.sm,
+  },
+  idUploadSubtext: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    marginTop: Spacing.xs,
+  },
+  idImageContainer: {
+    position: 'relative',
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: '#F9FAFB',
+  },
+  idImage: {
+    width: '100%',
+    height: 200,
+    resizeMode: 'cover',
+  },
+  idImageOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    padding: Spacing.md,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  idTypeText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  idImageActions: {
+    flexDirection: 'row',
+    gap: Spacing.md,
+  },
+  idActionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    borderRadius: 8,
+    gap: Spacing.xs,
+  },
+  idActionText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '500',
+  },
+
+  // Modal Styles
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  modalContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    margin: Spacing.lg,
+    maxHeight: '80%',
+    width: '90%',
+    ...Shadows.softLg,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: Spacing.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1F2937',
+  },
+  modalCloseButton: {
+    padding: Spacing.xs,
+  },
+  idTypeList: {
+    padding: Spacing.lg,
+  },
+  idTypeItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: Spacing.lg,
+    borderRadius: 12,
+    backgroundColor: '#F9FAFB',
+    marginBottom: Spacing.sm,
+    gap: Spacing.md,
+  },
+  idTypeLabel: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#374151',
   },
 });
