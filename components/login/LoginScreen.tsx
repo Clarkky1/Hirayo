@@ -205,10 +205,10 @@ export default function LoginScreen() {
                 {isLoading ? (
                   <View style={styles.loadingContainer}>
                     <View style={styles.loadingSpinner} />
-                    <Text style={styles.primaryButtonText}>Sending OTP...</Text>
+                    <Text style={styles.primaryButtonText}>Logging in...</Text>
                   </View>
                 ) : (
-                  <Text style={styles.primaryButtonText}>Send OTP</Text>
+                  <Text style={styles.primaryButtonText}>Log in</Text>
                 )}
                 </TouchableOpacity>
               </View>

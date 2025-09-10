@@ -21,9 +21,10 @@ const { width, height } = Dimensions.get('window');
 interface OTPVerificationScreenProps {
   phoneNumber: string;
   onBack: () => void;
+  onComplete?: (otp: string) => void;
 }
 
-export default function OTPVerificationScreen({ phoneNumber, onBack }: OTPVerificationScreenProps) {
+export default function OTPVerificationScreen({ phoneNumber, onBack, onComplete }: OTPVerificationScreenProps) {
   const router = useRouter();
   const { login } = useAuth();
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -77,11 +78,15 @@ export default function OTPVerificationScreen({ phoneNumber, onBack }: OTPVerifi
       // Simulate OTP verification
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Use authentication hook to login
-      await login({ phoneNumber });
-      
-      // Navigate to main app after successful verification
-      router.push('/(tabs)');
+      if (onComplete) {
+        // For signup flow - call the onComplete callback
+        onComplete(otp.join(''));
+      } else {
+        // For login flow - use authentication hook to login
+        await login({ phoneNumber });
+        // Navigate to main app after successful verification
+        router.push('/(tabs)');
+      }
     } catch (error) {
       console.error('OTP verification error:', error);
       Alert.alert('Verification Failed', 'Invalid OTP. Please try again.');

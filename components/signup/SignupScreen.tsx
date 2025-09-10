@@ -1,3 +1,4 @@
+import { OTPVerificationScreen } from '@/components/login';
 import { TermsConditionsModal } from '@/components/ui';
 import { Shadows, Spacing } from '@/constants/DesignSystem';
 import { useAuth } from '@/hooks/useAuth';
@@ -178,7 +179,18 @@ export default function SignupScreen() {
     return cleanPhone.length === 11 && cleanPhone.startsWith('09');
   };
 
-  const isFormValid = firstName.trim() && surname.trim() && phoneNumber.trim() && dateOfBirth && email.trim() && termsAccepted;
+  const isFormValid = firstName.trim() && surname.trim() && phoneNumber.trim() && dateOfBirth && email.trim() && termsAccepted && idImage;
+
+  // Show OTP verification screen if OTP step is active
+  if (showOTP) {
+    return (
+      <OTPVerificationScreen 
+        phoneNumber={phoneNumber} 
+        onBack={handleBackFromOTP}
+        onComplete={handleCompleteSignup}
+      />
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -218,7 +230,7 @@ export default function SignupScreen() {
             <View style={styles.formCard}>
               {/* ID Upload Section */}
               <View style={styles.formSection}>
-                <Text style={styles.sectionLabel}>Identity Verification</Text>
+                <Text style={styles.sectionLabel}>Identity Verification <Text style={styles.requiredAsterisk}>*</Text></Text>
                 <Text style={styles.sectionSubtitle}>Upload a photo of your ID for verification</Text>
                 
                 {idImage ? (
