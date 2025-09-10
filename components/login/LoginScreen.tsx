@@ -175,7 +175,7 @@ export default function LoginScreen() {
 
                 {phoneNumber.length > 0 && !isValidPhoneNumber(phoneNumber) && (
                   <Text style={styles.errorText}>
-                    Please enter a valid Philippine phone number (09XXXXXXXXX)
+                    Please enter a valid phone number (09XXXXXXXXX)
                   </Text>
                 )}
 
