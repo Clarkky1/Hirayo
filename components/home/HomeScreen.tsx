@@ -1,18 +1,16 @@
 import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { useLender } from '@/contexts/LenderContext';
-import { useSearch } from '@/contexts/SearchContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import {
-    FlatList,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  FlatList,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { WideCard } from '../ui/WideCard';
 
@@ -59,19 +57,6 @@ const popularItems: ExploreItem[] = [
 export default function HomeScreen() {
   const [isNavigating, setIsNavigating] = useState(false);
   const { setHasClickedGetStarted } = useLender();
-  const { searchQuery, setSearchQuery, addToHistory } = useSearch();
-
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      addToHistory(searchQuery);
-      preventMultipleNavigation(() => 
-        router.push({
-          pathname: '/discover',
-          params: { search: searchQuery.trim() }
-        })
-      );
-    }
-  };
 
   const preventMultipleNavigation = async (navigationFunction: () => void) => {
     if (isNavigating) return;
@@ -139,21 +124,6 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Search Bar */}
-        <View style={styles.searchBarContainer}>
-                    <View style={styles.searchBar}>
-            <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Search for items to rent..."
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-            <TouchableOpacity style={styles.searchButton} onPress={handleSearch} activeOpacity={0.7}>
-              <Ionicons name="arrow-forward" size={20} color="#fff" />
-            </TouchableOpacity>
-          </View>
-        </View>
 
         {/* Categories Section */}
         <View style={styles.categoriesSectionContainer}>
@@ -249,10 +219,6 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     paddingBottom: 100, // Add padding to the bottom of the ScrollView
   },
-  searchBarContainer: {
-    paddingHorizontal: Spacing.lg,
-    marginBottom: Spacing.md,
-  },
   categoriesSectionContainer: {
     paddingHorizontal: Spacing.lg,
     marginBottom: Spacing.md,
@@ -269,34 +235,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     marginBottom: Spacing['6xl'],
     marginTop: Spacing.xs,
-  },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 25,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: 6,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: '#333',
-  },
-  searchButton: {
-    backgroundColor: '#007AFF',
-    borderRadius: 16,
-    width: 32,
-    height: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.border.light,
   },
   categoriesSection: {
     marginBottom: 0,
