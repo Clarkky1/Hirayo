@@ -2,18 +2,19 @@ import { TermsConditionsModal } from '@/components/ui';
 import { Shadows, Spacing } from '@/constants/DesignSystem';
 import { useAuth } from '@/hooks/useAuth';
 import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
-    KeyboardAvoidingView,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 export default function SignupScreen() {
@@ -21,13 +22,33 @@ export default function SignupScreen() {
   const { signup } = useAuth();
   const [firstName, setFirstName] = useState('Kin Clark');
   const [surname, setSurname] = useState('Perez');
-  const [dateOfBirth, setDateOfBirth] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState(new Date(1990, 0, 1)); // January 1, 1990
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [email, setEmail] = useState('kinclark@gmail.com');
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
 
   const handleBack = () => {
     router.back();
+  };
+
+  const handleDateChange = (event: any, selectedDate?: Date) => {
+    setShowDatePicker(Platform.OS === 'ios');
+    if (selectedDate) {
+      setDateOfBirth(selectedDate);
+    }
+  };
+
+  const showDatePickerModal = () => {
+    setShowDatePicker(true);
+  };
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
   };
 
   const handleAgreeAndContinue = () => {
@@ -37,7 +58,12 @@ export default function SignupScreen() {
     }
     
     // Handle form submission
-    const userData = { firstName, surname, dateOfBirth, email };
+    const userData = { 
+      firstName, 
+      surname, 
+      dateOfBirth: formatDate(dateOfBirth), 
+      email 
+    };
     console.log('Form submitted:', userData);
     // Use authentication hook to signup
     signup(userData);
@@ -48,19 +74,14 @@ export default function SignupScreen() {
   const handleTermsAccept = () => {
     setTermsAccepted(true);
     setShowTermsModal(false);
-    
-    // Proceed with registration after accepting terms
-    const userData = { firstName, surname, dateOfBirth, email };
-    console.log('Form submitted:', userData);
-    signup(userData);
-    router.replace('/(tabs)');
+    // Modal closes and checkbox gets checked, user can then click Signup button
   };
 
   const handleTermsDecline = () => {
     setShowTermsModal(false);
   };
 
-  const isFormValid = firstName.trim() && surname.trim() && dateOfBirth.trim() && email.trim();
+  const isFormValid = firstName.trim() && surname.trim() && dateOfBirth && email.trim() && termsAccepted;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -138,16 +159,17 @@ export default function SignupScreen() {
                 <Text style={styles.sectionLabel}>Date of Birth</Text>
                 <View style={styles.inputGroup}>
                   <Text style={styles.inputLabel}>Birth Date</Text>
-                  <View style={styles.inputWrapper}>
+                  <TouchableOpacity 
+                    style={styles.inputWrapper}
+                    onPress={showDatePickerModal}
+                    activeOpacity={0.7}
+                  >
                     <Ionicons name="calendar-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
-                    <TextInput
-                      style={styles.input}
-                      placeholder="MM/DD/YYYY"
-                      value={dateOfBirth}
-                      onChangeText={setDateOfBirth}
-                      placeholderTextColor="#9CA3AF"
-                    />
-                  </View>
+                    <Text style={[styles.input, styles.dateInputText]}>
+                      {formatDate(dateOfBirth)}
+                    </Text>
+                    <Ionicons name="chevron-down" size={16} color="#9CA3AF" />
+                  </TouchableOpacity>
                 </View>
                 <Text style={styles.helperText}>
                   To sign up, you need to be at least 18. Other people who use Hirayo won't see your date of birth
@@ -177,21 +199,29 @@ export default function SignupScreen() {
                 </Text>
               </View>
 
-              {/* Terms Agreement */}
+              {/* Terms Agreement with Checkbox */}
               <View style={styles.agreementContainer}>
-                <Text style={styles.agreementText}>
-                  By selecting{' '}
-                  <Text style={styles.linkText}>Agree and continue</Text>
-                  , I agree to Hirayo's{' '}
-                  <Text style={styles.linkText} onPress={() => setShowTermsModal(true)}>Terms of Service</Text>
-                  ,{' '}
-                  <Text style={styles.linkText} onPress={() => setShowTermsModal(true)}>Payment Terms</Text>
-                  {' '}and{' '}
-                  <Text style={styles.linkText} onPress={() => setShowTermsModal(true)}>Anti-Discrimination Policy</Text>
-                  , and acknowledge the{' '}
-                  <Text style={styles.linkText} onPress={() => setShowTermsModal(true)}>Privacy Policy</Text>
-                  .
-                </Text>
+                <TouchableOpacity 
+                  style={styles.checkboxContainer}
+                  onPress={() => setShowTermsModal(true)}
+                  activeOpacity={0.7}
+                >
+                  <View style={[styles.checkbox, termsAccepted && styles.checkboxChecked]}>
+                    {termsAccepted && (
+                      <Ionicons name="checkmark" size={16} color="#FFFFFF" />
+                    )}
+                  </View>
+                  <Text style={styles.checkboxLabel}>
+                    I agree to Hirayo's{' '}
+                    <Text style={styles.linkText}>Terms of Service</Text>
+                    ,{' '}
+                    <Text style={styles.linkText}>Payment Terms</Text>
+                    {' '}and{' '}
+                    <Text style={styles.linkText}>Anti-Discrimination Policy</Text>
+                    , and acknowledge the{' '}
+                    <Text style={styles.linkText}>Privacy Policy</Text>
+                  </Text>
+                </TouchableOpacity>
               </View>
 
               {/* Continue Button */}
@@ -204,7 +234,7 @@ export default function SignupScreen() {
                 disabled={!isFormValid}
                 activeOpacity={0.8}
               >
-                <Text style={styles.primaryButtonText}>Agree and continue</Text>
+                <Text style={styles.primaryButtonText}>Signup</Text>
                 <Ionicons name="arrow-forward" size={20} color="#FFFFFF" style={styles.buttonIcon} />
               </TouchableOpacity>
 
@@ -225,6 +255,18 @@ export default function SignupScreen() {
         onClose={handleTermsDecline}
         onAccept={handleTermsAccept}
       />
+      
+      {/* Date Picker Modal */}
+      {showDatePicker && (
+        <DateTimePicker
+          value={dateOfBirth}
+          mode="date"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={handleDateChange}
+          maximumDate={new Date()}
+          minimumDate={new Date(1900, 0, 1)}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -387,6 +429,10 @@ const styles = StyleSheet.create({
     color: '#1F2937',
     paddingVertical: 0,
   },
+  dateInputText: {
+    color: '#1F2937',
+    fontSize: 16,
+  },
   helperText: {
     fontSize: 12,
     color: '#6B7280',
@@ -397,13 +443,34 @@ const styles = StyleSheet.create({
   // Terms Agreement
   agreementContainer: {
     marginBottom: Spacing['2xl'],
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
     padding: Spacing.lg,
     backgroundColor: '#F9FAFB',
     borderRadius: 16,
     borderWidth: 1,
     borderColor: '#E5E7EB',
   },
-  agreementText: {
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: '#D1D5DB',
+    backgroundColor: '#FFFFFF',
+    marginRight: Spacing.md,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 2,
+  },
+  checkboxChecked: {
+    backgroundColor: '#667EEA',
+    borderColor: '#667EEA',
+  },
+  checkboxLabel: {
+    flex: 1,
     fontSize: 12,
     color: '#6B7280',
     lineHeight: 18,

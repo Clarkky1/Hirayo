@@ -1,10 +1,9 @@
 import { Colors, Shadows, Spacing } from '@/constants/DesignSystem';
 import { useAuth } from '@/hooks/useAuth';
 import { Ionicons } from '@expo/vector-icons';
-import { useFocusEffect, useRouter } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import {
-  Animated,
   Dimensions,
   Image,
   KeyboardAvoidingView,
@@ -25,38 +24,7 @@ export default function LoginScreen() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [focusedInput, setFocusedInput] = useState(false);
-  const fadeAnim = new Animated.Value(0);
-  const slideAnim = new Animated.Value(50);
 
-  const startAnimations = useCallback(() => {
-    // Reset animations
-    fadeAnim.setValue(0);
-    slideAnim.setValue(50);
-    
-    // Start animations
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [fadeAnim, slideAnim]);
-
-  useEffect(() => {
-    startAnimations();
-  }, [startAnimations]);
-
-  useFocusEffect(
-    useCallback(() => {
-      startAnimations();
-    }, [startAnimations])
-  );
 
   const handleContinue = async () => {
     if (phoneNumber.length === 0) return;
@@ -66,8 +34,12 @@ export default function LoginScreen() {
       console.log('Continue with:', phoneNumber);
       // Use authentication hook to login
       await login({ phoneNumber });
+      
+      // Add a small delay to ensure smooth transition
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
       // Navigate to main app after successful login
-      router.replace('/(tabs)');
+      router.push('/(tabs)');
     } catch (error) {
       console.error('Login error:', error);
     } finally {
@@ -81,8 +53,12 @@ export default function LoginScreen() {
       console.log('Facebook login');
       // Use authentication hook to login
       await login({ provider: 'facebook' });
+      
+      // Add a small delay to ensure smooth transition
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
       // Navigate to main app after successful login
-      router.replace('/(tabs)');
+      router.push('/(tabs)');
     } catch (error) {
       console.error('Facebook login error:', error);
     } finally {
@@ -96,8 +72,12 @@ export default function LoginScreen() {
       console.log('Google login');
       // Use authentication hook to login
       await login({ provider: 'google' });
+      
+      // Add a small delay to ensure smooth transition
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
       // Navigate to main app after successful login
-      router.replace('/(tabs)');
+      router.push('/(tabs)');
     } catch (error) {
       console.error('Google login error:', error);
     } finally {
@@ -125,15 +105,7 @@ export default function LoginScreen() {
           </View>
         </View>
         
-        <Animated.View 
-          style={[
-            styles.content,
-            {
-              opacity: fadeAnim,
-              transform: [{ translateY: slideAnim }],
-            },
-          ]}
-        >
+        <View style={styles.content}>
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.logoContainer}>
@@ -200,14 +172,14 @@ export default function LoginScreen() {
                   disabled={phoneNumber.length === 0 || isLoading}
                   activeOpacity={0.8}
                 >
-                  {isLoading ? (
-                    <View style={styles.loadingContainer}>
-                      <Animated.View style={styles.loadingSpinner} />
-                      <Text style={styles.primaryButtonText}>Signing in...</Text>
-                    </View>
-                  ) : (
-                    <Text style={styles.primaryButtonText}>Continue</Text>
-                  )}
+                {isLoading ? (
+                  <View style={styles.loadingContainer}>
+                    <View style={styles.loadingSpinner} />
+                    <Text style={styles.primaryButtonText}>Signing in...</Text>
+                  </View>
+                ) : (
+                  <Text style={styles.primaryButtonText}>Continue</Text>
+                )}
                 </TouchableOpacity>
               </View>
 
@@ -250,7 +222,7 @@ export default function LoginScreen() {
               </TouchableOpacity>
             </View>
           </View>
-        </Animated.View>
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -368,9 +340,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 24,
     padding: Spacing['2xl'],
-    ...Shadows.softLg,
     borderWidth: 1,
     borderColor: 'rgba(0, 0, 0, 0.05)',
+    ...Shadows.softLg,
   },
   cardHeader: {
     alignItems: 'center',
