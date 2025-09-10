@@ -24,12 +24,12 @@ import {
 export default function SignupScreen() {
   const router = useRouter();
   const { signup } = useAuth();
-  const [firstName, setFirstName] = useState('Kin Clark');
-  const [surname, setSurname] = useState('Perez');
+  const [firstName, setFirstName] = useState('');
+  const [surname, setSurname] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [dateOfBirth, setDateOfBirth] = useState(new Date(1990, 0, 1)); // January 1, 1990
+  const [dateOfBirth, setDateOfBirth] = useState(new Date()); // January 1, 1990
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [email, setEmail] = useState('kinclark@gmail.com');
+  const [email, setEmail] = useState('');
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showOTP, setShowOTP] = useState(false);
