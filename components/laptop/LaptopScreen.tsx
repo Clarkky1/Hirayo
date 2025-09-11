@@ -219,7 +219,10 @@ export default function LaptopScreen() {
   const renderProductItem = ({ item }: { item: ProductItem }) => (
     <TouchableOpacity 
       style={styles.productItem}
-      onPress={() => router.push('/item')}
+      onPress={() => router.push({
+        pathname: '/item',
+        params: { itemId: item.id }
+      })}
       activeOpacity={0.7}
     >
       <Image source={{ uri: item.image }} style={styles.productImage} />

@@ -8,12 +8,12 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import {
-    FlatList,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { ItemCardSkeleton } from '../common/SkeletonLoader';
 
@@ -77,7 +77,10 @@ export default function SavedItemsScreen() {
     setSelectedItem(item);
     
     try {
-      await router.push('/item');
+      await router.push({
+        pathname: '/item',
+        params: { itemId: item.id }
+      });
     } catch (error) {
       console.error('Navigation error:', error);
     } finally {

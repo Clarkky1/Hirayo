@@ -2,15 +2,15 @@ import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
-  FlatList,
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    FlatList,
+    Image,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 
 interface ProductItem {
@@ -219,7 +219,10 @@ export default function CameraScreen() {
   const renderProductItem = ({ item }: { item: ProductItem }) => (
     <TouchableOpacity 
       style={styles.productItem}
-      onPress={() => router.push('/item')}
+      onPress={() => router.push({
+        pathname: '/item',
+        params: { itemId: item.id }
+      })}
       activeOpacity={0.7}
     >
       <Image source={{ uri: item.image }} style={styles.productImage} />

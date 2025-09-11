@@ -90,7 +90,10 @@ export default function HomeScreen() {
   };
 
   const handleExploreItemPress = (item: Item) => {
-    preventMultipleNavigation(() => router.push('/item'));
+    preventMultipleNavigation(() => router.push({
+      pathname: '/item',
+      params: { itemId: item.id }
+    }));
   };
 
   const handleMessageLender = (item: Item) => {

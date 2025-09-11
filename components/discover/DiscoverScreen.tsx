@@ -388,7 +388,10 @@ export default function DiscoverScreen() {
   const renderProductItem = ({ item }: { item: ProductItem }) => (
     <ProductCard
       item={item}
-      onPress={() => router.push('/item')}
+      onPress={() => router.push({
+        pathname: '/item',
+        params: { itemId: item.id }
+      })}
       showFavoriteIcon={true}
       variant="default"
     />

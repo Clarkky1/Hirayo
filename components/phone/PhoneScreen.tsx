@@ -219,7 +219,10 @@ export default function PhoneScreen() {
   const renderProductItem = ({ item }: { item: ProductItem }) => (
     <TouchableOpacity 
       style={styles.productItem}
-      onPress={() => router.push('/item')}
+      onPress={() => router.push({
+        pathname: '/item',
+        params: { itemId: item.id }
+      })}
     >
       <Image source={{ uri: item.image }} style={styles.productImage} />
       <View style={styles.productInfo}>

@@ -2,14 +2,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
-    FlatList,
-    Image,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  FlatList,
+  Image,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
 interface ProductItem {
@@ -114,7 +114,10 @@ export default function LaptopScreen() {
   }, [initialCategory]);
 
   const handleProductPress = (product: ProductItem) => {
-    router.push('/item');
+    router.push({
+      pathname: '/item',
+      params: { itemId: product.id }
+    });
   };
 
   const handleSort = (sortId: string) => {
