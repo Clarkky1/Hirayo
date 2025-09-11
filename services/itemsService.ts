@@ -25,14 +25,34 @@ export const itemsService = {
         console.log('Current user:', user ? `${user.email} (${user.id})` : 'Not authenticated');
       }
       
-      // Try to list buckets
+      // Try to list buckets first
       console.log('Attempting to list storage buckets...');
       const { data: buckets, error: bucketsError } = await client.storage.listBuckets();
       
       if (bucketsError) {
         console.error('Error listing buckets:', bucketsError);
         console.error('Buckets error details:', JSON.stringify(bucketsError, null, 2));
-        return { success: false, error: bucketsError };
+        console.error('Error message:', bucketsError.message);
+        console.error('Error status:', bucketsError.statusCode);
+        
+        // If listing buckets fails, try to directly access the item-images bucket
+        console.log('Bucket listing failed, trying direct access to item-images bucket...');
+        try {
+          const { data: files, error: filesError } = await client.storage
+            .from('item-images')
+            .list('', { limit: 1 });
+          
+          if (filesError) {
+            console.error('Direct bucket access failed:', filesError);
+            return { success: false, error: `Cannot access storage: ${filesError.message}` };
+          } else {
+            console.log('Direct bucket access successful, item-images bucket is accessible');
+            return { success: true, bucket: 'item-images' };
+          }
+        } catch (directError) {
+          console.error('Direct bucket access error:', directError);
+          return { success: false, error: `Cannot access storage: ${directError}` };
+        }
       }
       
       console.log('Available buckets:', buckets?.map(b => b.name));
@@ -81,6 +101,8 @@ export const itemsService = {
       const testFileName = `test-${Date.now()}.txt`;
       
       console.log('Attempting test upload to item-images bucket...');
+      console.log('Test file name:', testFileName);
+      
       const { data, error } = await client.storage
         .from('item-images')
         .upload(`test/${testFileName}`, testData, {
@@ -90,15 +112,23 @@ export const itemsService = {
       
       if (error) {
         console.error('Test upload error:', error);
+        console.error('Upload error details:', JSON.stringify(error, null, 2));
+        console.error('Error message:', error.message);
+        console.error('Error status:', error.statusCode);
         return { success: false, error };
       }
       
       console.log('Test upload successful:', data);
       
       // Clean up test file
-      await client.storage
-        .from('item-images')
-        .remove([`test/${testFileName}`]);
+      try {
+        await client.storage
+          .from('item-images')
+          .remove([`test/${testFileName}`]);
+        console.log('Test file cleaned up successfully');
+      } catch (cleanupError) {
+        console.warn('Failed to clean up test file:', cleanupError);
+      }
       
       return { success: true };
     } catch (error) {

@@ -101,21 +101,15 @@ const PostItemScreen = () => {
 
     setLoading(true);
     try {
-      // Test storage connection first
-      console.log('Testing storage connection...');
-      const storageTest = await itemsService.testStorageConnection();
-      if (!storageTest.success) {
-        throw new Error(`Storage connection failed: ${storageTest.error}`);
-      }
-      console.log('Storage connection successful, using bucket:', storageTest.bucket);
-
-      // Test upload functionality
+      // Test upload functionality directly (skip bucket listing)
       console.log('Testing upload functionality...');
       const uploadTest = await itemsService.testUpload();
       if (!uploadTest.success) {
-        throw new Error(`Upload test failed: ${uploadTest.error}`);
+        console.warn('Upload test failed, but continuing with actual upload...');
+        console.warn('Upload test error:', uploadTest.error);
+      } else {
+        console.log('Upload test successful');
       }
-      console.log('Upload test successful');
 
       // Upload images first
       const uploadedImageUrls: string[] = [];
