@@ -2,6 +2,7 @@
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { LenderAnalytics, lenderService } from '@/services/lenderService';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import {
     LogBox,
@@ -175,6 +176,21 @@ export default function AnalyticsScreen() {
       >
         {loading ? (
           renderSkeletonLoader()
+        ) : !analytics ? (
+          <View style={styles.emptyStateContainer}>
+            <Ionicons name="analytics-outline" size={80} color={Colors.neutral[400]} />
+            <Text style={styles.emptyStateTitle}>No Analytics Data</Text>
+            <Text style={styles.emptyStateText}>
+              Start renting out items to see your analytics and performance metrics
+            </Text>
+            <TouchableOpacity 
+              style={styles.emptyStateButton}
+              onPress={() => router.push('/post-item' as any)}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.emptyStateButtonText}>Post Your First Item</Text>
+            </TouchableOpacity>
+          </View>
         ) : (
           <>
             {/* Period Selector */}
@@ -634,5 +650,37 @@ const styles = StyleSheet.create({
     ...TextStyles.body.medium,
     color: Colors.text.secondary,
     marginTop: Spacing.sm,
+  },
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing['6xl'],
+  },
+  emptyStateTitle: {
+    ...TextStyles.heading.h2,
+    color: Colors.text.primary,
+    marginTop: Spacing.lg,
+    marginBottom: Spacing.sm,
+    textAlign: 'center',
+  },
+  emptyStateText: {
+    ...TextStyles.body.medium,
+    color: Colors.text.secondary,
+    textAlign: 'center',
+    marginBottom: Spacing.xl,
+    lineHeight: 24,
+  },
+  emptyStateButton: {
+    backgroundColor: Colors.primary[500],
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.md,
+    borderRadius: BorderRadius.lg,
+  },
+  emptyStateButtonText: {
+    ...TextStyles.body.medium,
+    color: Colors.text.inverse,
+    fontWeight: '600',
   },
 });

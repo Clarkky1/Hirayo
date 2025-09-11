@@ -258,18 +258,16 @@ CREATE TABLE categories (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Insert default categories
+-- Insert tech-focused categories
 INSERT INTO categories (name, description, icon) VALUES
-('Electronics', 'Electronic devices and gadgets', 'phone-portrait-outline'),
-('Photography', 'Cameras, lenses, and photography equipment', 'camera-outline'),
-('Gaming', 'Gaming consoles, accessories, and games', 'game-controller-outline'),
-('Sports & Fitness', 'Sports equipment and fitness gear', 'fitness-outline'),
-('Home & Garden', 'Home improvement and gardening tools', 'home-outline'),
-('Transportation', 'Vehicles and transportation equipment', 'car-outline'),
-('Fashion', 'Clothing, accessories, and fashion items', 'shirt-outline'),
-('Tools', 'Professional and DIY tools', 'construct-outline'),
-('Entertainment', 'Musical instruments and entertainment equipment', 'musical-notes-outline'),
-('Other', 'Miscellaneous items', 'ellipsis-horizontal-outline');
+('Camera', 'Cameras, lenses, and photography equipment', 'camera-outline'),
+('Laptop', 'Laptops, notebooks, and portable computers', 'laptop-outline'),
+('Phone', 'Smartphones and mobile devices', 'phone-portrait-outline'),
+('Tablet/iPad', 'Tablets, iPads, and touchscreen devices', 'tablet-portrait-outline'),
+('Drone', 'Drones, quadcopters, and aerial devices', 'airplane-outline'),
+('PC', 'Desktop computers and workstations', 'desktop-outline'),
+('Gaming', 'Gaming consoles, accessories, and equipment', 'game-controller-outline'),
+('Audio', 'Audio equipment, headphones, and speakers', 'headset-outline');
 ```
 
 ### 14. **Create User Settings Table**

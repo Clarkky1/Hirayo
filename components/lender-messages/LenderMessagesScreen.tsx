@@ -1,9 +1,12 @@
 import { BorderRadius, Colors, Spacing } from '@/constants/DesignSystem';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
+import { messagesService } from '@/services/messagesService';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   FlatList,
+  RefreshControl,
   SafeAreaView,
   StatusBar,
   StyleSheet,
@@ -12,6 +15,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { MessageSkeleton } from '../common/SkeletonLoader';
 
 interface LenderMessage {
   id: string;
@@ -33,77 +37,17 @@ interface LenderMessage {
   };
 }
 
-// Sample data for lender messages
-const lenderMessages: LenderMessage[] = [
-  {
-    id: '1',
-    renterName: 'John Smith',
-    lastMessage: 'Hi! Is the camera still available for rent this weekend?',
-    timestamp: '2m ago',
-    unreadCount: 2,
-    isOnline: true,
-    itemName: 'Canon EOS 90D DSLR Camera',
-    itemPrice: 1200,
-    rentalRequest: {
-      startDate: 'Aug 24, 2025',
-      endDate: 'Aug 26, 2025',
-      totalDays: 3,
-      totalAmount: 3600,
-      status: 'pending',
-    },
-  },
-  {
-    id: '2',
-    renterName: 'Sarah Johnson',
-    lastMessage: 'Thanks for accepting my rental request! What time can I pick it up?',
-    timestamp: '1h ago',
-    unreadCount: 0,
-    isOnline: false,
-    itemName: 'MacBook Pro 16" M2',
-    itemPrice: 800,
-    rentalRequest: {
-      startDate: 'Aug 20, 2025',
-      endDate: 'Aug 22, 2025',
-      totalDays: 3,
-      totalAmount: 2400,
-      status: 'accepted',
-    },
-  },
-  {
-    id: '3',
-    renterName: 'Mike Wilson',
-    lastMessage: 'Can you deliver it to my location? I\'m in downtown area.',
-    timestamp: '3h ago',
-    unreadCount: 1,
-    isOnline: true,
-    itemName: 'iPhone 15 Pro Max',
-    itemPrice: 500,
-    rentalRequest: {
-      startDate: 'Aug 25, 2025',
-      endDate: 'Aug 27, 2025',
-      totalDays: 3,
-      totalAmount: 1500,
-      status: 'pending',
-    },
-  },
-  {
-    id: '4',
-    renterName: 'Emma Davis',
-    lastMessage: 'Perfect! I\'ll pick it up tomorrow.',
-    timestamp: '1d ago',
-    unreadCount: 0,
-    isOnline: false,
-    itemName: 'Sony A7 III Mirrorless',
-    itemPrice: 900,
-    rentalRequest: {
-      startDate: 'Aug 18, 2025',
-      endDate: 'Aug 20, 2025',
-      totalDays: 3,
-      totalAmount: 2700,
-      status: 'accepted',
-    },
-  },
-];
+// Rental request interface
+interface RentalRequest {
+  id: string;
+  itemId: string;
+  renterId: string;
+  startDate: string;
+  endDate: string;
+  totalDays: number;
+  totalAmount: number;
+  status: 'pending' | 'accepted' | 'declined';
+}
 
 const MessageCard: React.FC<{ item: LenderMessage }> = ({ item }) => {
   const handleMessagePress = () => {
@@ -200,20 +144,58 @@ const MessageCard: React.FC<{ item: LenderMessage }> = ({ item }) => {
 };
 
 export default function LenderMessagesScreen() {
+  const { user } = useSupabaseAuth();
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredMessages, setFilteredMessages] = useState(lenderMessages);
+  const [conversations, setConversations] = useState<LenderMessage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [activeRequests, setActiveRequests] = useState<RentalRequest[]>([]);
+
+  // Load conversations from Supabase
+  const loadConversations = useCallback(async () => {
+    if (!user) return;
+    
+    try {
+      setLoading(true);
+      const conversations = await messagesService.getConversations(user.id);
+      
+      // Convert conversations to LenderMessage format
+      const convertedConversations: LenderMessage[] = (conversations || []).map((conv: any) => ({
+        id: conv.id,
+        renterName: conv.senderName || 'Unknown Renter',
+        lastMessage: conv.lastMessage || 'No messages yet',
+        timestamp: conv.timestamp || 'Just now',
+        unreadCount: conv.unreadCount || 0,
+        isOnline: conv.isOnline || false,
+        itemName: conv.itemName || 'Unknown Item',
+        itemPrice: conv.itemPrice || 0,
+        rentalRequest: conv.rentalRequest || undefined,
+      }));
+      
+      setConversations(convertedConversations);
+    } catch (error) {
+      console.error('Error loading conversations:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await loadConversations();
+    setRefreshing(false);
+  }, [loadConversations]);
 
   useEffect(() => {
-    if (searchQuery.trim() !== '') {
-      const filtered = lenderMessages.filter(message =>
+    loadConversations();
+  }, [loadConversations]);
+
+  const filteredMessages = searchQuery.trim() !== '' 
+    ? conversations.filter(message =>
         message.renterName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         message.itemName.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredMessages(filtered);
-    } else {
-      setFilteredMessages(lenderMessages);
-    }
-  }, [searchQuery]);
+      )
+    : conversations;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -236,22 +218,38 @@ export default function LenderMessagesScreen() {
       </View>
 
       {/* Messages List */}
-      <FlatList
-        data={filteredMessages}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <MessageCard item={item} />}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.listContainer}
-        ListEmptyComponent={
-          <View style={styles.emptyState}>
-            <Ionicons name="chatbubble-outline" size={40} color="#E0E0E0" />
-            <Text style={styles.emptyStateText}>No messages found</Text>
-            <Text style={styles.emptyStateSubtext}>
-              Rental requests and conversations will appear here
-            </Text>
-          </View>
-        }
-      />
+      {loading ? (
+        <View style={styles.listContainer}>
+          {Array.from({ length: 5 }).map((_, index) => (
+            <MessageSkeleton key={index} />
+          ))}
+        </View>
+      ) : (
+        <FlatList
+          data={filteredMessages}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <MessageCard item={item} />}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContainer}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              colors={['#667EEA']}
+              tintColor="#667EEA"
+            />
+          }
+          ListEmptyComponent={
+            <View style={styles.emptyState}>
+              <Ionicons name="chatbubble-outline" size={40} color="#E0E0E0" />
+              <Text style={styles.emptyStateText}>No messages found</Text>
+              <Text style={styles.emptyStateSubtext}>
+                Rental requests and conversations will appear here
+              </Text>
+            </View>
+          }
+        />
+      )}
     </SafeAreaView>
   );
 }

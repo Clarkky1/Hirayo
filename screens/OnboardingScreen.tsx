@@ -1,7 +1,7 @@
 import { BorderRadius, Colors, Spacing } from '@/constants/DesignSystem';
 import { useAuthState } from '@/contexts/AuthStateContext';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
@@ -107,7 +107,27 @@ const slides = [
 export default function OnboardingScreen() {
   const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const { setFirstTimeCompleted } = useAuthState();
+
+  // Preload images to prevent distortion
+  useEffect(() => {
+    const preloadImages = async () => {
+      try {
+        await Promise.all(
+          slides.map(slide => 
+            Image.prefetch(Image.resolveAssetSource(slide.image).uri)
+          )
+        );
+        setImageLoaded(true);
+      } catch (error) {
+        console.log('Error preloading images:', error);
+        setImageLoaded(true); // Continue anyway
+      }
+    };
+    
+    preloadImages();
+  }, []);
 
   const handleNext = () => {
     if (currentSlide < slides.length - 1) {
@@ -130,11 +150,13 @@ export default function OnboardingScreen() {
       />
 
       {/* Illustration */}
-      <Image
-        source={slides[currentSlide].image}
-        style={styles.image}
-        resizeMode="contain"
-      />
+      {imageLoaded && (
+        <Image
+          source={slides[currentSlide].image}
+          style={styles.image}
+          resizeMode="contain"
+        />
+      )}
 
       {/* Description */}
       <View style={styles.textContainer}>

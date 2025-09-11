@@ -312,7 +312,6 @@ export default function SignupScreen() {
               </TouchableOpacity>
               <View style={styles.headerContent}>
                 <Text style={styles.headerTitle}>Create your account</Text>
-                <Text style={styles.headerSubtitle}>Join thousands of users on Hirayo</Text>
               </View>
             </View>
 
@@ -321,7 +320,6 @@ export default function SignupScreen() {
               {/* ID Upload Section */}
               <View style={styles.formSection}>
                 <Text style={styles.sectionLabel}>Identity Verification <Text style={styles.requiredAsterisk}>*</Text></Text>
-                <Text style={styles.sectionSubtitle}>Upload a photo of your ID for verification</Text>
                 
                 {idImage ? (
                   <View style={styles.idImageContainer}>
@@ -399,14 +397,10 @@ export default function SignupScreen() {
                     </View>
                   </View>
                 </View>
-                <Text style={styles.helperText}>
-                  Make sure this matches the name on your government-issued ID.
-                </Text>
               </View>
 
               {/* Password Section */}
               <View style={styles.formSection}>
-                <Text style={styles.sectionLabel}>Password</Text>
                 <View style={styles.inputGroup}>
                   <Text style={styles.inputLabel}>Password <Text style={styles.requiredAsterisk}>*</Text></Text>
                   <View style={styles.inputWrapper}>
@@ -435,9 +429,6 @@ export default function SignupScreen() {
                     />
                   </View>
                 </View>
-                <Text style={styles.helperText}>
-                  Password must be at least 6 characters long
-                </Text>
               </View>
 
               {/* Phone Number Section - commented out temporarily */}
@@ -464,9 +455,8 @@ export default function SignupScreen() {
 
               {/* Date of Birth Section */}
               <View style={styles.formSection}>
-                <Text style={styles.sectionLabel}>Date of Birth</Text>
                 <View style={styles.inputGroup}>
-                  <Text style={styles.inputLabel}>Birth Date <Text style={styles.requiredAsterisk}>*</Text></Text>
+                  <Text style={styles.inputLabel}>Date of Birth <Text style={styles.requiredAsterisk}>*</Text></Text>
                   <TouchableOpacity 
                     style={styles.inputWrapper}
                     onPress={showDatePickerModal}
@@ -479,16 +469,12 @@ export default function SignupScreen() {
                     <Ionicons name="chevron-down" size={16} color="#9CA3AF" />
                   </TouchableOpacity>
                 </View>
-                <Text style={styles.helperText}>
-                  To sign up, you need to be at least 18. Other people who use Hirayo won't see your date of birth
-                </Text>
               </View>
 
               {/* Email Section */}
               <View style={styles.formSection}>
-                <Text style={styles.sectionLabel}>Email Address</Text>
                 <View style={styles.inputGroup}>
-                  <Text style={styles.inputLabel}>Email <Text style={styles.requiredAsterisk}>*</Text></Text>
+                  <Text style={styles.inputLabel}>Email Address <Text style={styles.requiredAsterisk}>*</Text></Text>
                   <View style={styles.inputWrapper}>
                     <Ionicons name="mail-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
                     <TextInput
