@@ -14,6 +14,8 @@ export interface WideCardProps {
     image?: string;
     ownerName?: string;
     ownerAvatar?: string;
+    category?: string;
+    description?: string;
   };
   onPress: () => void;
   showFavoriteIcon?: boolean;
@@ -40,6 +42,10 @@ export const WideCard: React.FC<WideCardProps> = ({
         rating: item.rating,
         location: item.location,
         image: item.image,
+        category: item.category,
+        description: item.description,
+        ownerName: item.ownerName,
+        ownerAvatar: item.ownerAvatar,
       };
       addSavedItem(savedItem);
     }

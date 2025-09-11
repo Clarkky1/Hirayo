@@ -2,12 +2,10 @@ import { Spacing } from '@/constants/DesignSystem';
 import { useSavedItems } from '@/contexts/SavedItemsContext';
 import { useSelectedItem } from '@/contexts/SelectedItemContext';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
-import { savedItemsService } from '@/services/savedItemsService';
 import { Ionicons } from '@expo/vector-icons';
-import { useFocusEffect } from '@react-navigation/native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   FlatList,
   SafeAreaView,
@@ -15,7 +13,6 @@ import {
   Text,
   View
 } from 'react-native';
-import { ItemCardSkeleton } from '../common/SkeletonLoader';
 import { ProductCard } from '../ui/ProductCard';
 
 interface ProductItem {
@@ -37,51 +34,25 @@ export default function SavedItemsScreen() {
   const { setSelectedItem } = useSelectedItem();
   const { user } = useSupabaseAuth();
   const [isNavigating, setIsNavigating] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [products, setProducts] = useState<ProductItem[]>([]);
+
+  // Convert savedItems from context to ProductItem format
+  const products: ProductItem[] = savedItems.map((savedItem) => ({
+    id: savedItem.id,
+    name: savedItem.name,
+    rating: savedItem.rating || 0,
+    location: savedItem.location,
+    price: savedItem.price,
+    category: savedItem.category || 'General',
+    images: savedItem.image ? [savedItem.image] : undefined,
+    description: savedItem.description,
+    image: savedItem.image,
+    ownerName: savedItem.ownerName || 'Unknown Owner',
+    ownerAvatar: savedItem.ownerAvatar,
+  }));
 
   const hasSavedItems = products.length > 0;
-
-  // Load saved items from Supabase
-  const loadSavedItems = useCallback(async () => {
-    if (!user) return;
-    
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const { data, error } = await savedItemsService.getSavedItems(user.id);
-      
-      if (error) {
-        console.error('Error loading saved items:', error);
-        setError('Failed to load saved items');
-        return;
-      }
-      
-      // Convert Supabase saved items to ProductItem format
-      const convertedItems: ProductItem[] = (data || []).map((savedItem: any) => ({
-        id: savedItem.item.id,
-        name: savedItem.item.name,
-        rating: savedItem.item.rating || 0,
-        location: savedItem.item.location,
-        price: savedItem.item.price_per_day,
-        category: savedItem.item.category,
-        images: savedItem.item.images,
-        description: savedItem.item.description,
-        image: savedItem.item.images && savedItem.item.images.length > 0 ? savedItem.item.images[0] : undefined,
-        ownerName: savedItem.item.lender ? `${savedItem.item.lender.first_name} ${savedItem.item.lender.last_name}` : 'Unknown Owner',
-        ownerAvatar: savedItem.item.lender?.avatar_url,
-      }));
-      
-      setProducts(convertedItems);
-    } catch (err) {
-      console.error('Error loading saved items:', err);
-      setError('Failed to load saved items');
-    } finally {
-      setLoading(false);
-    }
-  }, [user]);
 
   // Cleanup function to prevent state updates after unmount
   useEffect(() => {
@@ -90,13 +61,6 @@ export default function SavedItemsScreen() {
       setError(null);
     };
   }, []);
-
-  // Load items on mount and refresh when screen comes into focus
-  useFocusEffect(
-    useCallback(() => {
-      loadSavedItems();
-    }, [loadSavedItems])
-  );
 
   const handleItemPress = async (item: ProductItem) => {
     if (isNavigating) return; // Prevent multiple clicks
@@ -126,23 +90,6 @@ export default function SavedItemsScreen() {
     />
   );
 
-  const renderLoadingState = () => {
-    const skeletonData = Array.from({ length: 8 }, (_, index) => ({ id: `skeleton-${index}` }));
-    
-    return (
-      <FlatList
-        data={skeletonData}
-        renderItem={() => <ItemCardSkeleton />}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-        columnWrapperStyle={styles.productsRow}
-        contentContainerStyle={styles.productsList}
-        showsVerticalScrollIndicator={false}
-        scrollEnabled={false}
-        ItemSeparatorComponent={() => <View style={{ height: Spacing.md }} />}
-      />
-    );
-  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -155,12 +102,7 @@ export default function SavedItemsScreen() {
        </View>
 
       {/* Conditional Rendering based on saved items */}
-      {loading ? (
-        /* Loading State - Grid Layout like Discover */
-        <View style={styles.savedItemsContainer}>
-          {renderLoadingState()}
-        </View>
-      ) : !hasSavedItems ? (
+      {!hasSavedItems ? (
         /* Empty State - No Saved Items */
         <View style={styles.emptyStateContainer}>
           <Ionicons name="heart-outline" size={80} color="#E0E0E0" />

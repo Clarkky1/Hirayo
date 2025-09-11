@@ -7,6 +7,10 @@ export interface SavedItem {
   rating: number;
   location: string;
   image?: string;
+  category?: string;
+  description?: string;
+  ownerName?: string;
+  ownerAvatar?: string;
 }
 
 interface SavedItemsContextType {
