@@ -101,11 +101,29 @@ const PostItemScreen = () => {
 
     setLoading(true);
     try {
+      // Test storage connection first
+      console.log('Testing storage connection...');
+      const storageTest = await itemsService.testStorageConnection();
+      if (!storageTest.success) {
+        throw new Error(`Storage connection failed: ${storageTest.error}`);
+      }
+      console.log('Storage connection successful, using bucket:', storageTest.bucket);
+
+      // Test upload functionality
+      console.log('Testing upload functionality...');
+      const uploadTest = await itemsService.testUpload();
+      if (!uploadTest.success) {
+        throw new Error(`Upload test failed: ${uploadTest.error}`);
+      }
+      console.log('Upload test successful');
+
       // Upload images first
       const uploadedImageUrls: string[] = [];
       for (const imageUri of images) {
+        console.log('Uploading image:', imageUri);
         const url = await itemsService.uploadItemImage(imageUri, user.id);
         uploadedImageUrls.push(url);
+        console.log('Image uploaded successfully:', url);
       }
 
       // Create item
@@ -132,7 +150,24 @@ const PostItemScreen = () => {
       ]);
     } catch (error) {
       console.error('Error posting item:', error);
-      Alert.alert('Error', 'Failed to post item. Please try again.');
+      
+      let errorMessage = 'Failed to post item. Please try again.';
+      
+      if (error instanceof Error) {
+        if (error.message.includes('Storage connection failed')) {
+          errorMessage = 'Storage connection failed. Please check your internet connection and try again.';
+        } else if (error.message.includes('Failed to fetch image')) {
+          errorMessage = 'Failed to process the selected image. Please try selecting a different image.';
+        } else if (error.message.includes('not found') || error.message.includes('does not exist')) {
+          errorMessage = 'Storage bucket not found. Please contact support.';
+        } else if (error.message.includes('permission denied') || error.message.includes('unauthorized')) {
+          errorMessage = 'Permission denied. Please make sure you are logged in and try again.';
+        } else {
+          errorMessage = `Error: ${error.message}`;
+        }
+      }
+      
+      Alert.alert('Error', errorMessage);
     } finally {
       setLoading(false);
     }

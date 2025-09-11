@@ -1,6 +1,102 @@
-import { Item, supabase } from '../lib/supabase';
+
+\import { Item, supabase } from '../lib/supabase';
 
 export const itemsService = {
+  // Test storage connection
+  async testStorageConnection() {
+    try {
+      console.log('Testing storage connection...');
+      console.log('Supabase client URL:', process.env.EXPO_PUBLIC_SUPABASE_URL);
+      console.log('Supabase client key exists:', !!process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY);
+      
+      // Check authentication status
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError) {
+        console.error('Auth error:', authError);
+      } else {
+        console.log('Current user:', user ? `${user.email} (${user.id})` : 'Not authenticated');
+      }
+      
+      // Try to list buckets
+      console.log('Attempting to list storage buckets...');
+      const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
+      
+      if (bucketsError) {
+        console.error('Error listing buckets:', bucketsError);
+        console.error('Buckets error details:', JSON.stringify(bucketsError, null, 2));
+        return { success: false, error: bucketsError };
+      }
+      
+      console.log('Available buckets:', buckets?.map(b => b.name));
+      console.log('Total buckets found:', buckets?.length || 0);
+      
+      // Check if item-images bucket exists
+      const itemImagesBucket = buckets?.find(b => b.name === 'item-images');
+      if (itemImagesBucket) {
+        console.log('item-images bucket found:', itemImagesBucket);
+        console.log('Bucket details:', {
+          name: itemImagesBucket.name,
+          id: itemImagesBucket.id,
+          public: itemImagesBucket.public,
+          created_at: itemImagesBucket.created_at,
+          updated_at: itemImagesBucket.updated_at
+        });
+        return { success: true, bucket: 'item-images' };
+      } else {
+        console.log('item-images bucket not found, checking other buckets...');
+        console.log('All available buckets:', buckets);
+        
+        // Try to find any available bucket
+        if (buckets && buckets.length > 0) {
+          const firstBucket = buckets[0];
+          console.log('Using first available bucket:', firstBucket.name);
+          return { success: true, bucket: firstBucket.name };
+        } else {
+          return { success: false, error: 'No storage buckets found' };
+        }
+      }
+    } catch (error) {
+      console.error('Storage connection test failed:', error);
+      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+      return { success: false, error };
+    }
+  },
+
+  // Test upload functionality
+  async testUpload() {
+    try {
+      console.log('Testing upload functionality...');
+      
+      // Create a simple test blob
+      const testData = new Blob(['test content'], { type: 'text/plain' });
+      const testFileName = `test-${Date.now()}.txt`;
+      
+      console.log('Attempting test upload to item-images bucket...');
+      const { data, error } = await supabase.storage
+        .from('item-images')
+        .upload(`test/${testFileName}`, testData, {
+          contentType: 'text/plain',
+          upsert: false
+        });
+      
+      if (error) {
+        console.error('Test upload error:', error);
+        return { success: false, error };
+      }
+      
+      console.log('Test upload successful:', data);
+      
+      // Clean up test file
+      await supabase.storage
+        .from('item-images')
+        .remove([`test/${testFileName}`]);
+      
+      return { success: true };
+    } catch (error) {
+      console.error('Test upload failed:', error);
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    }
+  },
   // Get all available items
   async getItems(filters?: {
     category?: string;
@@ -113,34 +209,86 @@ export const itemsService = {
   // Upload item image to Supabase Storage
   async uploadItemImage(imageUri: string, userId?: string): Promise<string> {
     try {
+      console.log('Starting image upload for user:', userId);
+      console.log('Image URI:', imageUri);
+      
       // Convert image URI to blob
       const response = await fetch(imageUri);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`);
+      }
       const blob = await response.blob();
+      console.log('Image blob size:', blob.size, 'bytes');
       
       // Generate unique filename
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.jpg`;
       const filePath = userId ? `${userId}/${fileName}` : fileName;
+      console.log('Upload path:', filePath);
       
-      // Upload to Supabase Storage
+      // Upload directly to item-images bucket
+      const bucketName = 'item-images';
+      console.log('Attempting upload to bucket:', bucketName);
+      console.log('File path:', filePath);
+      console.log('Blob size:', blob.size, 'bytes');
+      
       const { data, error } = await supabase.storage
-        .from('item-images')
+        .from(bucketName)
         .upload(filePath, blob, {
           contentType: 'image/jpeg',
           upsert: false
         });
       
       if (error) {
-        throw error;
+        console.error('Upload error:', error);
+        console.error('Error details:', JSON.stringify(error, null, 2));
+        console.error('Error message:', error.message);
+        console.error('Error status:', (error as any).statusCode);
+        
+        // Provide more specific error information
+        if (error.message?.includes('permission denied') || error.message?.includes('unauthorized')) {
+          throw new Error('Permission denied. Please check your authentication and RLS policies.');
+        } else if (error.message?.includes('not found') || error.message?.includes('does not exist')) {
+          throw new Error('Storage bucket not found. Please check your Supabase storage configuration.');
+        } else if (error.message?.includes('duplicate') || error.message?.includes('already exists')) {
+          // Try with a different filename
+          const newFileName = `${Date.now()}-${Math.random().toString(36).substring(2)}-${Math.random().toString(36).substring(2)}.jpg`;
+          const newFilePath = userId ? `${userId}/${newFileName}` : newFileName;
+          console.log('Trying with new filename:', newFilePath);
+          
+          const retryResult = await supabase.storage
+            .from(bucketName)
+            .upload(newFilePath, blob, {
+              contentType: 'image/jpeg',
+              upsert: false
+            });
+          
+          if (retryResult.error) {
+            throw retryResult.error;
+          }
+          
+          const { data: { publicUrl } } = supabase.storage
+            .from(bucketName)
+            .getPublicUrl(newFilePath);
+          
+          console.log('Successfully uploaded with new filename:', publicUrl);
+          return publicUrl;
+        } else {
+          throw error;
+        }
       }
+      
+      console.log('Successfully uploaded to item-images bucket');
       
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
-        .from('item-images')
+        .from(bucketName)
         .getPublicUrl(filePath);
       
+      console.log('Public URL:', publicUrl);
       return publicUrl;
     } catch (error) {
       console.error('Error uploading image:', error);
+      console.error('Error stack:', error.stack);
       throw error;
     }
   },
@@ -154,29 +302,47 @@ export const itemsService = {
       
       // Generate unique filename
       const fileName = `avatar-${Date.now()}.jpg`;
-      const filePath = `${userId}/${fileName}`;
+      const filePath = `avatars/${userId}/${fileName}`;
       
-      // Upload to Supabase Storage
-      const { data, error } = await supabase.storage
-        .from('user-avatars')
+      // Try to upload to user-avatars bucket first, fallback to public bucket
+      let bucketName = 'user-avatars';
+      let { data, error } = await supabase.storage
+        .from(bucketName)
         .upload(filePath, blob, {
           contentType: 'image/jpeg',
           upsert: true // Allow overwriting existing avatar
         });
       
+      // If user-avatars bucket doesn't exist, try public bucket
+      if (error && error.message?.includes('not found')) {
+        console.log('user-avatars bucket not found, trying public bucket...');
+        bucketName = 'public';
+        const publicFilePath = `user-avatars/${filePath}`;
+        const result = await supabase.storage
+          .from(bucketName)
+          .upload(publicFilePath, blob, {
+            contentType: 'image/jpeg',
+            upsert: true
+          });
+        data = result.data;
+        error = result.error;
+        // filePath = publicFilePath; // This line was causing the error, removed
+      }
+      
       if (error) {
+        console.error('Storage upload error:', error);
         throw error;
       }
       
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
-        .from('user-avatars')
+        .from(bucketName)
         .getPublicUrl(filePath);
       
       return publicUrl;
     } catch (error) {
       console.error('Error uploading avatar:', error);
-      throw error;
+      throw error instanceof Error ? error : new Error('Unknown error occurred');
     }
   },
 
