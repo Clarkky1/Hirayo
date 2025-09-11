@@ -174,7 +174,9 @@ export default function LoginScreen() {
       setIsResetting(true);
 
       // Send password reset email using Supabase
-      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail);
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: 'https://google.com',
+      });
 
       if (error) {
         console.error('Password reset error:', error);

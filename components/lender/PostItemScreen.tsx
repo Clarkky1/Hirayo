@@ -373,7 +373,16 @@ const styles = StyleSheet.create({
   imageContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: Spacing.sm,
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+    marginHorizontal: -Spacing.xs,
+    paddingHorizontal: Spacing.xs,
+    width: '100%',
+    minHeight: 100,
+    maxHeight: 300,
+    overflow: 'hidden',
+    position: 'relative',
+    zIndex: 1,
   },
   imageSkeleton: {
     marginRight: Spacing.sm,

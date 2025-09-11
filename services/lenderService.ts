@@ -220,7 +220,7 @@ export const lenderService = {
       .select(`
         *,
         item:items(*),
-        renter:users(*)
+        renter:users!transactions_renter_id_fkey(*)
       `)
       .eq('lender_id', lenderId)
       .order('created_at', { ascending: false })

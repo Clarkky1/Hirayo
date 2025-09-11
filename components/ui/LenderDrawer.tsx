@@ -1,8 +1,11 @@
 import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
+import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   Animated,
   Dimensions,
   StyleSheet,
@@ -16,19 +19,26 @@ interface LenderDrawerProps {
   onClose: () => void;
 }
 
-// Profile data matching the profile page
-const lenderProfile = {
-  firstName: 'Kin Clark',
-  surname: 'Perez',
-  email: 'clarkperez906@gmail.com',
-  memberSince: 'August 2024',
-  totalItems: 8,
-  totalEarnings: '₱15,000',
-};
+interface LenderStats {
+  totalItems: number;
+  totalEarnings: number;
+}
 
 export const LenderDrawer: React.FC<LenderDrawerProps> = ({ isVisible, onClose }) => {
+  const { user } = useSupabaseAuth();
   const slideAnim = useRef(new Animated.Value(Dimensions.get('window').width)).current;
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [stats, setStats] = useState<LenderStats>({ totalItems: 0, totalEarnings: 0 });
+  const [loading, setLoading] = useState(true);
 
+  // Fetch user profile and stats when drawer opens
+  useEffect(() => {
+    if (isVisible && user) {
+      fetchUserData();
+    }
+  }, [isVisible, user]);
+
+  // Animation effect
   useEffect(() => {
     if (isVisible) {
       Animated.timing(slideAnim, {
@@ -45,6 +55,55 @@ export const LenderDrawer: React.FC<LenderDrawerProps> = ({ isVisible, onClose }
     }
   }, [isVisible, slideAnim]);
 
+  const fetchUserData = async () => {
+    if (!user) return;
+    
+    try {
+      setLoading(true);
+      
+      // Fetch user profile
+      const { data: profileData, error: profileError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError) throw profileError;
+      setUserProfile(profileData);
+
+      // Fetch lender stats
+      const [itemsResult, earningsResult] = await Promise.all([
+        // Count total items
+        supabase
+          .from('items')
+          .select('id', { count: 'exact' })
+          .eq('lender_id', user.id),
+        
+        // Calculate total earnings from completed transactions
+        supabase
+          .from('transactions')
+          .select('amount')
+          .eq('lender_id', user.id)
+          .eq('status', 'completed')
+      ]);
+
+      if (itemsResult.error) throw itemsResult.error;
+      if (earningsResult.error) throw earningsResult.error;
+
+      const totalEarnings = earningsResult.data?.reduce((sum, transaction) => sum + transaction.amount, 0) || 0;
+
+      setStats({
+        totalItems: itemsResult.count || 0,
+        totalEarnings: totalEarnings,
+      });
+
+    } catch (error) {
+      console.error('Error fetching drawer data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleLenderProfilePress = () => {
     onClose();
     router.push('/lenders' as any);
@@ -53,6 +112,16 @@ export const LenderDrawer: React.FC<LenderDrawerProps> = ({ isVisible, onClose }
   const handleQuickActionPress = (route: string) => {
     onClose();
     router.push(route as any);
+  };
+
+  const formatMemberSince = (dateString: string) => {
+    if (!dateString) return 'Unknown';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+  };
+
+  const formatEarnings = (amount: number) => {
+    return `₱${amount.toLocaleString()}`;
   };
 
   if (!isVisible) return null;
@@ -83,17 +152,35 @@ export const LenderDrawer: React.FC<LenderDrawerProps> = ({ isVisible, onClose }
 
           {/* Lender Profile Section */}
           <View style={styles.profileSection}>
-            <View style={styles.avatarContainer}>
-              <View style={styles.profileAvatar}>
-                <Text style={styles.profileInitials}>
-                  {lenderProfile.firstName.split(' ').map(n => n[0]).join('')}
-                </Text>
+            {loading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={Colors.primary[500]} />
+                <Text style={styles.loadingText}>Loading profile...</Text>
               </View>
-              <View style={styles.onlineIndicator} />
-            </View>
-            <Text style={styles.profileName}>{lenderProfile.firstName} {lenderProfile.surname}</Text>
-            <Text style={styles.profileEmail}>{lenderProfile.email}</Text>
-            <Text style={styles.profileMemberSince}>Member since {lenderProfile.memberSince}</Text>
+            ) : userProfile ? (
+              <>
+                <View style={styles.avatarContainer}>
+                  <View style={styles.profileAvatar}>
+                    <Text style={styles.profileInitials}>
+                      {userProfile.first_name?.charAt(0) || 'U'}{userProfile.last_name?.charAt(0) || 'S'}
+                    </Text>
+                  </View>
+                  <View style={styles.onlineIndicator} />
+                </View>
+                <Text style={styles.profileName}>
+                  {userProfile.first_name || 'User'} {userProfile.last_name || 'Name'}
+                </Text>
+                <Text style={styles.profileEmail}>{userProfile.email || 'No email'}</Text>
+                <Text style={styles.profileMemberSince}>
+                  Member since {formatMemberSince(userProfile.created_at)}
+                </Text>
+              </>
+            ) : (
+              <View style={styles.errorContainer}>
+                <Ionicons name="alert-circle-outline" size={48} color={Colors.error} />
+                <Text style={styles.errorText}>Failed to load profile</Text>
+              </View>
+            )}
           </View>
 
           {/* Quick Actions Section */}
@@ -164,12 +251,12 @@ export const LenderDrawer: React.FC<LenderDrawerProps> = ({ isVisible, onClose }
           {/* Stats Section */}
           <View style={styles.statsSection}>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{lenderProfile.totalItems}</Text>
+              <Text style={styles.statNumber}>{stats.totalItems}</Text>
               <Text style={styles.statLabel}>Items</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{lenderProfile.totalEarnings}</Text>
+              <Text style={styles.statNumber}>{formatEarnings(stats.totalEarnings)}</Text>
               <Text style={styles.statLabel}>Earnings</Text>
             </View>
           </View>
@@ -318,5 +405,24 @@ const styles = StyleSheet.create({
   statDivider: {
     width: 1,
     backgroundColor: Colors.border.light,
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    paddingVertical: Spacing.xl,
+  },
+  loadingText: {
+    ...TextStyles.body.medium,
+    color: Colors.text.secondary,
+    marginTop: Spacing.md,
+  },
+  errorContainer: {
+    alignItems: 'center',
+    paddingVertical: Spacing.xl,
+  },
+  errorText: {
+    ...TextStyles.body.medium,
+    color: Colors.error,
+    marginTop: Spacing.md,
+    textAlign: 'center',
   },
 });
