@@ -1,4 +1,4 @@
-import { OTPVerificationScreen } from '@/components/login';
+// import { OTPVerificationScreen } from '@/components/login'; // Commented out for email/password signup
 import { TermsConditionsModal } from '@/components/ui';
 import { Shadows, Spacing } from '@/constants/DesignSystem';
 import { useAuthState } from '@/contexts/AuthStateContext';
@@ -26,17 +26,21 @@ import {
 export default function SignupScreen() {
   const router = useRouter();
   const { signup } = useAuth();
-  const { signUp, signInWithPhone } = useSupabaseAuth();
+  const { signUp, signInWithPhone, signUpWithEmail } = useSupabaseAuth();
   const { setAuthenticated } = useAuthState();
   const [firstName, setFirstName] = useState('');
   const [surname, setSurname] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  // Phone number - commented out temporarily
+  // const [phoneNumber, setPhoneNumber] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [showOTP, setShowOTP] = useState(false);
+  // OTP verification - commented out temporarily
+  // const [showOTP, setShowOTP] = useState(false);
   
   // ID Upload states
   const [idType, setIdType] = useState('');
@@ -47,20 +51,30 @@ export default function SignupScreen() {
     router.back();
   };
 
-  const handleBackFromOTP = () => {
-    setShowOTP(false);
-  };
+  // OTP verification - commented out temporarily
+  // const handleBackFromOTP = () => {
+  //   setShowOTP(false);
+  // };
 
-  const handleCompleteSignup = async (otp: string) => {
+  // Email/Password signup
+  const handleEmailSignup = async () => {
+    if (password !== confirmPassword) {
+      Alert.alert('Password Mismatch', 'Passwords do not match. Please try again.');
+      return;
+    }
+
+    if (password.length < 6) {
+      Alert.alert('Weak Password', 'Password must be at least 6 characters long.');
+      return;
+    }
+
     try {
-      // For testing, simulate successful signup
-      console.log('Completing signup with OTP:', otp);
+      console.log('Creating account with email:', email);
       
       // Create user account with Supabase
-      const { error } = await signUp(email, 'tempPassword123!', {
+      const { error } = await signUpWithEmail(email, password, {
         first_name: firstName,
         last_name: surname,
-        phone: phoneNumber,
         date_of_birth: dateOfBirth ? formatDate(dateOfBirth) : '',
         user_type: 'renter',
         id_type: idType,
@@ -73,19 +87,6 @@ export default function SignupScreen() {
         return;
       }
       
-      // Also call the original signup for compatibility
-      const userData = { 
-        firstName, 
-        surname, 
-        phoneNumber,
-        dateOfBirth: dateOfBirth ? formatDate(dateOfBirth) : '', 
-        email,
-        otp
-      };
-      
-      // Use authentication hook to signup
-      await signup(userData);
-      
       // Set authenticated state
       await setAuthenticated(true);
       
@@ -96,6 +97,53 @@ export default function SignupScreen() {
       Alert.alert('Signup Failed', 'Failed to complete signup. Please try again.');
     }
   };
+
+  // OTP signup - commented out temporarily
+  // const handleCompleteSignup = async (otp: string) => {
+  //   try {
+  //     // For testing, simulate successful signup
+  //     console.log('Completing signup with OTP:', otp);
+  //     
+  //     // Create user account with Supabase
+  //     const { error } = await signUp(email, 'tempPassword123!', {
+  //       first_name: firstName,
+  //       last_name: surname,
+  //       phone: phoneNumber,
+  //       date_of_birth: dateOfBirth ? formatDate(dateOfBirth) : '',
+  //       user_type: 'renter',
+  //       id_type: idType,
+  //       id_image_url: idImage || undefined,
+  //     });
+  //     
+  //     if (error) {
+  //       console.error('Signup error:', error);
+  //       Alert.alert('Signup Failed', 'Failed to create account. Please try again.');
+  //       return;
+  //     }
+  //     
+  //     // Also call the original signup for compatibility
+  //     const userData = { 
+  //       firstName, 
+  //       surname, 
+  //       phoneNumber,
+  //       dateOfBirth: dateOfBirth ? formatDate(dateOfBirth) : '', 
+  //       email,
+  //       otp
+  //     };
+  //     
+  //     // Use authentication hook to signup
+  //     await signup(userData);
+  //     
+  //     // Set authenticated state
+  //     await setAuthenticated(true);
+  //     
+  //     // Navigate to main app after successful signup
+  //     router.replace('/(tabs)');
+  //   } catch (error) {
+  //     console.error('Signup error:', error);
+  //     Alert.alert('Signup Failed', 'Failed to complete signup. Please try again.');
+  //   }
+  // };
 
   // ID Type options
   const idTypes = [
@@ -170,24 +218,35 @@ export default function SignupScreen() {
       return;
     }
     
-    // Validate phone number before sending OTP
-    if (!isValidPhoneNumber(phoneNumber)) {
-      Alert.alert('Invalid Phone Number', 'Please enter a valid Philippine phone number (09XXXXXXXXX)');
-      return;
-    }
-    
-    try {
-      console.log('Sending OTP to:', phoneNumber);
-      // For testing, simulate sending OTP
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Show OTP verification screen
-      setShowOTP(true);
-    } catch (error) {
-      console.error('Send OTP error:', error);
-      Alert.alert('Error', 'Failed to send OTP. Please try again.');
-    }
+    // Use email/password signup instead of phone/OTP
+    await handleEmailSignup();
   };
+
+  // Phone/OTP signup - commented out temporarily
+  // const handleAgreeAndContinue = async () => {
+  //   if (!termsAccepted) {
+  //     setShowTermsModal(true);
+  //     return;
+  //   }
+  //   
+  //   // Validate phone number before sending OTP
+  //   if (!isValidPhoneNumber(phoneNumber)) {
+  //     Alert.alert('Invalid Phone Number', 'Please enter a valid Philippine phone number (09XXXXXXXXX)');
+  //     return;
+  //   }
+  //   
+  //   try {
+  //     console.log('Sending OTP to:', phoneNumber);
+  //     // For testing, simulate sending OTP
+  //     await new Promise(resolve => setTimeout(resolve, 1500));
+  //     
+  //     // Show OTP verification screen
+  //     setShowOTP(true);
+  //   } catch (error) {
+  //     console.error('Send OTP error:', error);
+  //     Alert.alert('Error', 'Failed to send OTP. Please try again.');
+  //   }
+  // };
 
   const handleTermsAccept = () => {
     setTermsAccepted(true);
@@ -206,18 +265,22 @@ export default function SignupScreen() {
     return cleanPhone.length === 11 && cleanPhone.startsWith('09');
   };
 
-  const isFormValid = firstName.trim() && surname.trim() && phoneNumber.trim() && dateOfBirth !== null && email.trim() && termsAccepted && idImage;
+  // Form validation - updated for email/password
+  const isFormValid = firstName.trim() && surname.trim() && dateOfBirth !== null && email.trim() && password.trim() && confirmPassword.trim() && termsAccepted && idImage;
 
-  // Show OTP verification screen if OTP step is active
-  if (showOTP) {
-    return (
-      <OTPVerificationScreen 
-        phoneNumber={phoneNumber} 
-        onBack={handleBackFromOTP}
-        onComplete={handleCompleteSignup}
-      />
-    );
-  }
+  // OTP verification - commented out temporarily
+  // const isFormValid = firstName.trim() && surname.trim() && phoneNumber.trim() && dateOfBirth !== null && email.trim() && termsAccepted && idImage;
+
+  // Show OTP verification screen if OTP step is active - commented out
+  // if (showOTP) {
+  //   return (
+  //     <OTPVerificationScreen 
+  //       phoneNumber={phoneNumber} 
+  //       onBack={handleBackFromOTP}
+  //       onComplete={handleCompleteSignup}
+  //     />
+  //   );
+  // }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -341,8 +404,44 @@ export default function SignupScreen() {
                 </Text>
               </View>
 
-              {/* Phone Number Section */}
+              {/* Password Section */}
               <View style={styles.formSection}>
+                <Text style={styles.sectionLabel}>Password</Text>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Password <Text style={styles.requiredAsterisk}>*</Text></Text>
+                  <View style={styles.inputWrapper}>
+                    <Ionicons name="lock-closed-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Enter your password"
+                      value={password}
+                      onChangeText={setPassword}
+                      secureTextEntry={true}
+                      placeholderTextColor="#9CA3AF"
+                    />
+                  </View>
+                </View>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Confirm Password <Text style={styles.requiredAsterisk}>*</Text></Text>
+                  <View style={styles.inputWrapper}>
+                    <Ionicons name="lock-closed-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Confirm your password"
+                      value={confirmPassword}
+                      onChangeText={setConfirmPassword}
+                      secureTextEntry={true}
+                      placeholderTextColor="#9CA3AF"
+                    />
+                  </View>
+                </View>
+                <Text style={styles.helperText}>
+                  Password must be at least 6 characters long
+                </Text>
+              </View>
+
+              {/* Phone Number Section - commented out temporarily */}
+              {/* <View style={styles.formSection}>
                 <Text style={styles.sectionLabel}>Phone Number</Text>
                 <View style={styles.inputGroup}>
                   <Text style={styles.inputLabel}>Phone <Text style={styles.requiredAsterisk}>*</Text></Text>
@@ -361,7 +460,7 @@ export default function SignupScreen() {
                 <Text style={styles.helperText}>
                   We'll use this to send you verification codes and important updates
                 </Text>
-              </View>
+              </View> */}
 
               {/* Date of Birth Section */}
               <View style={styles.formSection}>

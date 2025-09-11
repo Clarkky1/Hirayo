@@ -7,7 +7,9 @@ interface SupabaseAuthContextType {
   session: Session | null;
   loading: boolean;
   signUp: (email: string, password: string, userData: Partial<User>) => Promise<{ error: any }>;
+  signUpWithEmail: (email: string, password: string, userData: Partial<User>) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signInWithEmail: (email: string, password: string) => Promise<{ error: any }>;
   signInWithPhone: (phone: string) => Promise<{ error: any }>;
   verifyOtp: (phone: string, token: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
@@ -111,6 +113,33 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   };
 
+  const signInWithEmail = async (email: string, password: string) => {
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      return { error };
+    } catch (error) {
+      return { error };
+    }
+  };
+
+  const signUpWithEmail = async (email: string, password: string, userData: Partial<User>) => {
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: userData,
+        },
+      });
+      return { error };
+    } catch (error) {
+      return { error };
+    }
+  };
+
   const signInWithPhone = async (phone: string) => {
     try {
       const { error } = await supabase.auth.signInWithOtp({
@@ -163,7 +192,9 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
     session,
     loading,
     signUp,
+    signUpWithEmail,
     signIn,
+    signInWithEmail,
     signInWithPhone,
     verifyOtp,
     signOut,

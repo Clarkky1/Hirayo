@@ -18,42 +18,83 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import OTPVerificationScreen from './OTPVerificationScreen';
+// import OTPVerificationScreen from './OTPVerificationScreen'; // Commented out for email/password login
 
 const { width, height } = Dimensions.get('window');
 
 export default function LoginScreen() {
   const router = useRouter();
   const { login } = useAuth();
-  const { signInWithPhone, verifyOtp } = useSupabaseAuth();
+  const { signInWithPhone, verifyOtp, signInWithEmail } = useSupabaseAuth();
   const { setAuthenticated } = useAuthState();
-  const [phoneNumber, setPhoneNumber] = useState('');
+  // Phone number login - commented out temporarily
+  // const [phoneNumber, setPhoneNumber] = useState('');
+  // const [showOTP, setShowOTP] = useState(false);
+  
+  // Email/Password login
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showOTP, setShowOTP] = useState(false);
 
-  // Phone number validation for Philippine numbers (11 digits starting with 09)
-  const isValidPhoneNumber = (phone: string) => {
-    const cleanPhone = phone.replace(/\D/g, ''); // Remove non-digits
-    // Philippine mobile numbers: 11 digits starting with 09
-    return cleanPhone.length === 11 && cleanPhone.startsWith('09');
+  // Phone number validation for Philippine numbers (11 digits starting with 09) - commented out
+  // const isValidPhoneNumber = (phone: string) => {
+  //   const cleanPhone = phone.replace(/\D/g, ''); // Remove non-digits
+  //   // Philippine mobile numbers: 11 digits starting with 09
+  //   return cleanPhone.length === 11 && cleanPhone.startsWith('09');
+  // };
+
+  // Email validation
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   };
 
 
 
-  const handleContinue = async () => {
-    if (!isValidPhoneNumber(phoneNumber)) return;
+  // Phone number login - commented out temporarily
+  // const handleContinue = async () => {
+  //   if (!isValidPhoneNumber(phoneNumber)) return;
+  //   
+  //   setIsLoading(true);
+  //   try {
+  //     console.log('Sending OTP to:', phoneNumber);
+  //     
+  //     // For now, simulate OTP sending since phone auth needs SMS provider setup
+  //     await new Promise(resolve => setTimeout(resolve, 1500));
+  //     
+  //     // Show OTP verification screen
+  //     setShowOTP(true);
+  //   } catch (error) {
+  //     console.error('Send OTP error:', error);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  // Email/Password login
+  const handleEmailLogin = async () => {
+    if (!isValidEmail(email) || !password.trim()) return;
     
     setIsLoading(true);
     try {
-      console.log('Sending OTP to:', phoneNumber);
+      console.log('Logging in with email:', email);
       
-      // For now, simulate OTP sending since phone auth needs SMS provider setup
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Use Supabase email/password authentication
+      const { error } = await signInWithEmail(email, password);
       
-      // Show OTP verification screen
-      setShowOTP(true);
+      if (error) {
+        console.error('Login error:', error);
+        // Handle error (you can add Alert here if needed)
+        return;
+      }
+      
+      // Set authenticated state
+      await setAuthenticated(true);
+      
+      // Navigate to main app after successful login
+      router.push('/(tabs)');
     } catch (error) {
-      console.error('Send OTP error:', error);
+      console.error('Email login error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -107,19 +148,20 @@ export default function LoginScreen() {
     router.push('/signup');
   };
 
-  const handleBackFromOTP = () => {
-    setShowOTP(false);
-  };
+  // OTP verification - commented out temporarily
+  // const handleBackFromOTP = () => {
+  //   setShowOTP(false);
+  // };
 
-  // Show OTP verification screen if OTP step is active
-  if (showOTP) {
-    return (
-      <OTPVerificationScreen 
-        phoneNumber={phoneNumber} 
-        onBack={handleBackFromOTP} 
-      />
-    );
-  }
+  // Show OTP verification screen if OTP step is active - commented out
+  // if (showOTP) {
+  //   return (
+  //     <OTPVerificationScreen 
+  //       phoneNumber={phoneNumber} 
+  //       onBack={handleBackFromOTP} 
+  //     />
+  //   );
+  // }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -163,7 +205,66 @@ export default function LoginScreen() {
 
               {/* Input Section */}
               <View style={styles.inputSection}>
+                {/* Email Input */}
                 <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Email Address</Text>
+                  <View style={[
+                    styles.inputWrapper,
+                    styles.inputWrapperFocused
+                  ]}>
+                    <Ionicons 
+                      name="mail-outline" 
+                      size={20} 
+                      color="#9CA3AF" 
+                      style={styles.inputIcon}
+                    />
+                    <TextInput
+                      style={styles.inputField}
+                      placeholder="Enter your email"
+                      placeholderTextColor="#9CA3AF"
+                      value={email}
+                      onChangeText={setEmail}
+                      keyboardType="email-address"
+                      autoCorrect={false}
+                      autoCapitalize="none"
+                      returnKeyType="next"
+                      editable={true}
+                      selectTextOnFocus={false}
+                    />
+                  </View>
+                </View>
+
+                {/* Password Input */}
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Password</Text>
+                  <View style={[
+                    styles.inputWrapper,
+                    styles.inputWrapperFocused
+                  ]}>
+                    <Ionicons 
+                      name="lock-closed-outline" 
+                      size={20} 
+                      color="#9CA3AF" 
+                      style={styles.inputIcon}
+                    />
+                    <TextInput
+                      style={styles.inputField}
+                      placeholder="Enter your password"
+                      placeholderTextColor="#9CA3AF"
+                      value={password}
+                      onChangeText={setPassword}
+                      secureTextEntry={true}
+                      autoCorrect={false}
+                      autoCapitalize="none"
+                      returnKeyType="done"
+                      editable={true}
+                      selectTextOnFocus={false}
+                    />
+                  </View>
+                </View>
+
+                {/* Phone number login - commented out temporarily */}
+                {/* <View style={styles.inputGroup}>
                   <Text style={styles.inputLabel}>Phone Number</Text>
                   <View style={[
                     styles.inputWrapper,
@@ -199,16 +300,16 @@ export default function LoginScreen() {
                   <Text style={styles.errorText}>
                     Please enter a valid phone number (09XXXXXXXXX)
                   </Text>
-                )}
+                )} */}
 
                 <TouchableOpacity 
                   style={[
                     styles.primaryButton, 
-                    isValidPhoneNumber(phoneNumber) && styles.primaryButtonActive,
+                    isValidEmail(email) && password.trim() && styles.primaryButtonActive,
                     isLoading && styles.primaryButtonLoading
                   ]}
-                  onPress={handleContinue}
-                  disabled={!isValidPhoneNumber(phoneNumber) || isLoading}
+                  onPress={handleEmailLogin}
+                  disabled={!isValidEmail(email) || !password.trim() || isLoading}
                   activeOpacity={0.8}
                 >
                 {isLoading ? (
