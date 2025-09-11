@@ -24,7 +24,7 @@ export function ThemedText({
 
   const getTextStyle = () => {
     if (variant && size) {
-      return TextStyles[variant][size];
+      return (TextStyles as any)[variant][size];
     }
     
     switch (type) {

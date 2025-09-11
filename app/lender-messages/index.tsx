@@ -1,16 +1,20 @@
+  import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
+import { messagesService } from '@/services/messagesService';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
     Alert,
     FlatList,
     LogBox,
+    RefreshControl,
     SafeAreaView,
     StyleSheet,
     Text,
     TouchableOpacity,
     View
 } from 'react-native';
+import SkeletonLoader from '../../components/common/SkeletonLoader';
 import { BorderRadius, Spacing } from '../../constants/DesignSystem';
 
 LogBox.ignoreAllLogs(true);
@@ -35,79 +39,39 @@ interface RentalRequest {
 }
 
 export default function LenderMessagesScreen() {
+  const { user } = useSupabaseAuth();
   const [activeTab, setActiveTab] = useState<'requests' | 'overview'>('requests');
-  const [activeRequests, setActiveRequests] = useState<RentalRequest[]>([
-    {
-      id: '1',
-      renterName: 'John Doe',
-      renterId: 'renter1',
-      itemId: 'item1',
-      status: 'pending',
-      message: 'Hi! I would like to rent your camera for this weekend.',
-      timestamp: '2 min ago',
-      itemName: 'Canon EOS 90D DSLR Camera',
-      itemPrice: 1200,
-      startDate: 'Aug 24, 2025',
-      endDate: 'Aug 26, 2025',
-      totalDays: 3,
-      totalAmount: 3600,
-      hasReplied: true,
-      lastReplyTime: '1 min ago',
-    },
-    {
-      id: '2',
-      renterName: 'Jane Smith',
-      renterId: 'renter2',
-      itemId: 'item1',
-      status: 'pending',
-      message: 'Is this camera still available? I need it for a wedding.',
-      timestamp: '5 min ago',
-      itemName: 'Canon EOS 90D DSLR Camera',
-      itemPrice: 1200,
-      startDate: 'Aug 25, 2025',
-      endDate: 'Aug 27, 2025',
-      totalDays: 3,
-      totalAmount: 3600,
-      hasReplied: false,
-    },
-    {
-      id: '3',
-      renterName: 'Mike Johnson',
-      renterId: 'renter3',
-      itemId: 'item1',
-      status: 'approved',
-      message: 'Can I rent this for next week?',
-      timestamp: '10 min ago',
-      itemName: 'Canon EOS 90D DSLR Camera',
-      itemPrice: 1200,
-      startDate: 'Aug 28, 2025',
-      endDate: 'Aug 30, 2025',
-      totalDays: 3,
-      totalAmount: 3600,
-      hasReplied: true,
-      lastReplyTime: '8 min ago',
-    },
-    {
-      id: '4',
-      renterName: 'Sarah Wilson',
-      renterId: 'renter4',
-      itemId: 'item2',
-      status: 'declined',
-      message: 'Interested in renting your laptop for a week.',
-      timestamp: '1 hour ago',
-      itemName: 'MacBook Pro 16"',
-      itemPrice: 2500,
-      startDate: 'Aug 20, 2025',
-      endDate: 'Aug 27, 2025',
-      totalDays: 7,
-      totalAmount: 17500,
-      hasReplied: true,
-      lastReplyTime: '45 min ago',
-    },
-  ]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [conversations, setConversations] = useState<any[]>([]);
+  const [activeRequests, setActiveRequests] = useState<RentalRequest[]>([]);
+
+  const loadConversations = useCallback(async () => {
+    if (!user) return;
+    
+    try {
+      setLoading(true);
+      const data = await messagesService.getConversations(user.id);
+      setConversations(data);
+    } catch (error) {
+      console.error('Error loading conversations:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await loadConversations();
+    setRefreshing(false);
+  }, [loadConversations]);
+
+  useEffect(() => {
+    loadConversations();
+  }, [loadConversations]);
 
   const handleApproveRequest = (requestId: string) => {
-    const approvedRequest = activeRequests.find(req => req.id === requestId);
+    const approvedRequest = activeRequests.find((req: RentalRequest) => req.id === requestId);
     
     Alert.alert(
       'Approve Request',
@@ -118,8 +82,8 @@ export default function LenderMessagesScreen() {
           text: 'Yes, Approve',
           style: 'default',
           onPress: () => {
-            setActiveRequests(prev =>
-              prev.filter(req => {
+            setActiveRequests((prev: RentalRequest[]) =>
+              prev.filter((req: RentalRequest) => {
                 // Keep the approved request
                 if (req.id === requestId) {
                   return true;
@@ -130,7 +94,7 @@ export default function LenderMessagesScreen() {
                 }
                 // Keep requests for other items
                 return true;
-              }).map(req => 
+              }).map((req: RentalRequest) => 
                 req.id === requestId 
                   ? { ...req, status: 'approved' as const }
                   : req
@@ -152,8 +116,8 @@ export default function LenderMessagesScreen() {
           text: 'Decline',
           style: 'destructive',
           onPress: () => {
-            setActiveRequests(prev =>
-              prev.map(req =>
+            setActiveRequests((prev: RentalRequest[]) =>
+              prev.map((req: RentalRequest) =>
                 req.id === requestId ? { ...req, status: 'declined' as const } : req
               )
             );
@@ -164,7 +128,7 @@ export default function LenderMessagesScreen() {
   };
 
   const handleViewConversation = (requestId: string) => {
-    const request = activeRequests.find(r => r.id === requestId);
+    const request = activeRequests.find((r: RentalRequest) => r.id === requestId);
     if (request) {
       router.push({
         pathname: '/view-messages',
@@ -255,14 +219,51 @@ export default function LenderMessagesScreen() {
     </View>
   );
 
+  const renderSkeletonLoader = () => (
+    <View style={styles.skeletonContainer}>
+      <View style={styles.skeletonTabContainer}>
+        {Array.from({ length: 2 }).map((_, index) => (
+          <SkeletonLoader key={index} width="45%" height={40} borderRadius={8} />
+        ))}
+      </View>
+
+      <View style={styles.skeletonContent}>
+        {Array.from({ length: 4 }).map((_, index) => (
+          <View key={index} style={styles.skeletonRequestCard}>
+            <View style={styles.skeletonRequestHeader}>
+              <SkeletonLoader width={40} height={40} borderRadius={20} style={{ marginRight: 12 }} />
+              <View style={styles.skeletonRequestInfo}>
+                <SkeletonLoader width="60%" height={16} style={{ marginBottom: 4 }} />
+                <SkeletonLoader width="40%" height={12} />
+              </View>
+            </View>
+            <SkeletonLoader width="90%" height={14} style={{ marginBottom: 8 }} />
+            <SkeletonLoader width="70%" height={12} style={{ marginBottom: 12 }} />
+            <View style={styles.skeletonRequestActions}>
+              <SkeletonLoader width="80%" height={32} borderRadius={6} />
+            </View>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+
   const renderRequests = () => (
     <View style={styles.requestsContainer}>
       <FlatList
-        data={activeRequests}
+        data={conversations}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => renderRequestCard(item)}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.requestsList}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={['#667EEA']}
+            tintColor="#667EEA"
+          />
+        }
       />
     </View>
   );
@@ -277,19 +278,19 @@ export default function LenderMessagesScreen() {
       <View style={styles.statsContainer}>
         <View style={styles.statCard}>
           <Text style={styles.statNumber}>
-            {activeRequests.filter(r => r.status === 'pending').length}
+            {activeRequests.filter((r: RentalRequest) => r.status === 'pending').length}
           </Text>
           <Text style={styles.statLabel}>Pending</Text>
         </View>
         <View style={styles.statCard}>
           <Text style={styles.statNumber}>
-            {activeRequests.filter(r => r.status === 'approved').length}
+            {activeRequests.filter((r: RentalRequest) => r.status === 'approved').length}
           </Text>
           <Text style={styles.statLabel}>Approved</Text>
         </View>
         <View style={styles.statCard}>
           <Text style={styles.statNumber}>
-            {activeRequests.filter(r => r.status === 'declined').length}
+            {activeRequests.filter((r: RentalRequest) => r.status === 'declined').length}
           </Text>
           <Text style={styles.statLabel}>Declined</Text>
         </View>
@@ -330,17 +331,21 @@ export default function LenderMessagesScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      
+      {loading ? (
+        renderSkeletonLoader()
+      ) : (
+        <>
+          <View style={styles.tabContainer}>
+            {renderTabButton('requests', 'Requests', 'list-outline')}
+            {renderTabButton('overview', 'Overview', 'grid-outline')}
+          </View>
 
-      <View style={styles.tabContainer}>
-        {renderTabButton('requests', 'Requests', 'list-outline')}
-        {renderTabButton('overview', 'Overview', 'grid-outline')}
-      </View>
-
-      <View style={styles.content}>
-        {activeTab === 'requests' && renderRequests()}
-        {activeTab === 'overview' && renderOverview()}
-      </View>
+          <View style={styles.content}>
+            {activeTab === 'requests' && renderRequests()}
+            {activeTab === 'overview' && renderOverview()}
+          </View>
+        </>
+      )}
     </SafeAreaView>
   );
 }
@@ -736,6 +741,44 @@ const styles = StyleSheet.create({
   activityTimestamp: {
     fontSize: 12,
     color: '#999999',
+  },
+  // Skeleton loading styles
+  skeletonContainer: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+  },
+  skeletonTabContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: Spacing.sm,
+    backgroundColor: '#F5F5F5',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+    gap: Spacing.md,
+  },
+  skeletonContent: {
+    flex: 1,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
+  },
+  skeletonRequestCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.sm,
+    marginBottom: Spacing.sm,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  skeletonRequestHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Spacing.sm,
+  },
+  skeletonRequestInfo: {
+    flex: 1,
+  },
+  skeletonRequestActions: {
+    marginTop: Spacing.sm,
   },
 });
 

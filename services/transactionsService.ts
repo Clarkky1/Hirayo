@@ -94,10 +94,10 @@ export const transactionsService = {
       completed: data?.filter(t => t.status === 'completed').length || 0,
       pending: data?.filter(t => t.status === 'pending').length || 0,
       cancelled: data?.filter(t => t.status === 'cancelled').length || 0,
-      totalEarnings: data?.filter(t => t.status === 'completed' && t.lender_id === userId)
-        .reduce((sum, t) => sum + t.amount, 0) || 0,
-      totalSpent: data?.filter(t => t.status === 'completed' && t.renter_id === userId)
-        .reduce((sum, t) => sum + t.amount, 0) || 0,
+      totalEarnings: data?.filter(t => t.status === 'completed' && (t as any).lender_id === userId)
+        .reduce((sum, t) => sum + (t as any).amount, 0) || 0,
+      totalSpent: data?.filter(t => t.status === 'completed' && (t as any).renter_id === userId)
+        .reduce((sum, t) => sum + (t as any).amount, 0) || 0,
     };
 
     return { data: stats, error: null };

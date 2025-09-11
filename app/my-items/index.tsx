@@ -1,9 +1,12 @@
   import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
+import { LenderItem, lenderService } from '@/services/lenderService';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
     LogBox,
+    RefreshControl,
     SafeAreaView,
     ScrollView,
     StyleSheet,
@@ -11,96 +14,71 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import SkeletonLoader from '../../components/common/SkeletonLoader';
 import { Card } from '../../components/ui/Card';
 
 LogBox.ignoreAllLogs(true);
 
 
-interface MyItem {
-  id: string;
-  name: string;
-  category: string;
-  price: string;
-  status: 'active' | 'rented' | 'inactive';
-  rating: number;
-  totalRentals: number;
-  image?: string;
-}
-
 export default function MyItemsScreen() {                                                          
+  const { user } = useSupabaseAuth();
   const params = useLocalSearchParams();
   const highlightItemId = params.highlightItemId as string;
   const scrollViewRef = useRef<ScrollView>(null);
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'active' | 'rented' | 'inactive'>('all');
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [myItems, setMyItems] = useState<LenderItem[]>([]);
 
-  const myItems: MyItem[] = [
-    {
-      id: '1',
-      name: 'Canon EOS R5 Camera',
-      category: 'Cameras',
-      price: '₱2,500 for a day',  
-      status: 'active',
-      rating: 4.9,
-      totalRentals: 12
-    },
-    {
-      id: '2',
-      name: 'MacBook Pro M2',
-      category: 'Laptops',
-      price: '₱3,500 for a day',
-      status: 'rented',
-      rating: 4.8,
-      totalRentals: 8
-    },
-    {
-      id: '3',
-      name: 'iPhone 15 Pro Max',
-      category: 'Phones',
-      price: '₱1,800 for a day',
-      status: 'active',
-      rating: 4.7,
-      totalRentals: 15
-    },
-    {
-      id: '4',
-      name: 'DJI Mavic 3 Drone',
-      category: 'Drones',
-      price: '₱4,200 for a day',
-      status: 'inactive',
-      rating: 4.6,
-      totalRentals: 6
+  const loadItems = useCallback(async () => {
+    if (!user) return;
+    
+    try {
+      setLoading(true);
+      const items = await lenderService.getLenderItems(user.id);
+      setMyItems(items);
+    } catch (error) {
+      console.error('Error loading items:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  }, [user]);
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await loadItems();
+    setRefreshing(false);
+  }, [loadItems]);
+
+  useEffect(() => {
+    loadItems();
+  }, [loadItems]);
 
   const filteredItems = selectedFilter === 'all' 
     ? myItems 
-    : myItems.filter(item => item.status === selectedFilter);
+    : myItems.filter(item => {
+      if (selectedFilter === 'active') return item.is_available;
+      if (selectedFilter === 'rented') return !item.is_available && item.total_rentals > 0;
+      if (selectedFilter === 'inactive') return !item.is_available && item.total_rentals === 0;
+      return true;
+    });
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return Colors.success;
-      case 'rented': return Colors.warning;
-      case 'inactive': return Colors.neutral[500];
-      default: return Colors.neutral[500];
-    }
+  const getStatusColor = (item: LenderItem) => {
+    if (item.is_available) return Colors.success;
+    if (item.total_rentals > 0) return Colors.warning;
+    return Colors.neutral[500];
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'active': return 'Available';
-      case 'rented': return 'Currently Rented';
-      case 'inactive': return 'Not Available';
-      default: return status;
-    }
+  const getStatusText = (item: LenderItem) => {
+    if (item.is_available) return 'Available';
+    if (item.total_rentals > 0) return 'Currently Rented';
+    return 'Not Available';
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'active': return 'checkmark-circle';
-      case 'rented': return 'time';
-      case 'inactive': return 'pause-circle';
-      default: return 'help-circle';
-    }
+  const getStatusIcon = (item: LenderItem) => {
+    if (item.is_available) return 'checkmark-circle';
+    if (item.total_rentals > 0) return 'time';
+    return 'pause-circle';
   };
 
   const renderFilterButton = (filter: 'all' | 'active' | 'rented' | 'inactive', label: string, count: number) => (
@@ -132,7 +110,7 @@ export default function MyItemsScreen() {
     </TouchableOpacity>
   );
 
-  const renderItemCard = (item: MyItem) => {
+  const renderItemCard = (item: LenderItem) => {
     const cardStyle = item.id === highlightItemId 
       ? { ...styles.itemCard, ...styles.highlightedItemCard }
       : styles.itemCard;
@@ -159,7 +137,7 @@ export default function MyItemsScreen() {
             <Text style={styles.itemCategory}>{item.category}</Text>
           </View>
           <View style={styles.itemPrice}>
-            <Text style={styles.priceText}>{item.price}</Text>
+            <Text style={styles.priceText}>₱{item.price_per_day}/day</Text>
           </View>
         </View>
 
@@ -167,11 +145,11 @@ export default function MyItemsScreen() {
       <View style={styles.itemStats}>
         <View style={styles.statItem}>
           <Ionicons name="star" size={16} color="#FFD700" />
-          <Text style={styles.statText}>{item.rating}</Text>
+          <Text style={styles.statText}>{item.rating.toFixed(1)}</Text>
         </View>
         <View style={styles.statItem}>
           <Ionicons name="repeat" size={16} color={Colors.primary[500]} />
-          <Text style={styles.statText}>{item.totalRentals} rentals</Text>
+          <Text style={styles.statText}>{item.total_rentals} rentals</Text>
         </View>
       </View>
 
@@ -179,15 +157,15 @@ export default function MyItemsScreen() {
       <View style={styles.itemFooter}>
         <View style={styles.statusContainer}>
           <Ionicons 
-            name={getStatusIcon(item.status) as any} 
+            name={getStatusIcon(item) as any} 
             size={16} 
-            color={getStatusColor(item.status)} 
+            color={getStatusColor(item)} 
           />
           <Text style={[
             styles.statusText,
-            { color: getStatusColor(item.status) }
+            { color: getStatusColor(item) }
           ]}>
-            {getStatusText(item.status)}
+            {getStatusText(item)}
           </Text>
         </View>
         
@@ -223,9 +201,9 @@ export default function MyItemsScreen() {
   const getFilterCounts = () => {
     return {
       all: myItems.length,
-      active: myItems.filter(item => item.status === 'active').length,
-      rented: myItems.filter(item => item.status === 'rented').length,
-      inactive: myItems.filter(item => item.status === 'inactive').length
+      active: myItems.filter(item => item.is_available).length,
+      rented: myItems.filter(item => !item.is_available && item.total_rentals > 0).length,
+      inactive: myItems.filter(item => !item.is_available && item.total_rentals === 0).length
     };
   };
 
@@ -252,114 +230,185 @@ export default function MyItemsScreen() {
     }
   }, [highlightItemId]);
 
+  const renderSkeletonLoader = () => (
+    <View style={styles.skeletonContainer}>
+      <View style={styles.skeletonHeader}>
+        <SkeletonLoader width="50%" height={28} style={{ marginBottom: 8 }} />
+        <SkeletonLoader width="70%" height={16} />
+      </View>
+      
+      <View style={styles.skeletonStatsSection}>
+        {Array.from({ length: 3 }).map((_, index) => (
+          <View key={index} style={styles.skeletonStatCard}>
+            <SkeletonLoader width={24} height={24} style={{ marginBottom: 8 }} />
+            <SkeletonLoader width="60%" height={20} style={{ marginBottom: 4 }} />
+            <SkeletonLoader width="80%" height={12} />
+          </View>
+        ))}
+      </View>
+
+      <View style={styles.skeletonFilterSection}>
+        <SkeletonLoader width="40%" height={20} style={{ marginBottom: 16 }} />
+        <View style={styles.skeletonFilterTabs}>
+          {Array.from({ length: 4 }).map((_, index) => (
+            <SkeletonLoader key={index} width="22%" height={36} borderRadius={8} />
+          ))}
+        </View>
+      </View>
+
+      <View style={styles.skeletonItemsSection}>
+        <View style={styles.skeletonSectionHeader}>
+          <SkeletonLoader width="40%" height={20} />
+          <SkeletonLoader width="20%" height={16} />
+        </View>
+        {Array.from({ length: 3 }).map((_, index) => (
+          <View key={index} style={styles.skeletonItemCard}>
+            <View style={styles.skeletonItemHeader}>
+              <View style={styles.skeletonItemInfo}>
+                <SkeletonLoader width="80%" height={18} style={{ marginBottom: 8 }} />
+                <SkeletonLoader width="60%" height={14} />
+              </View>
+              <SkeletonLoader width="30%" height={16} />
+            </View>
+            <View style={styles.skeletonItemStats}>
+              <SkeletonLoader width="40%" height={16} />
+              <SkeletonLoader width="40%" height={16} />
+            </View>
+            <View style={styles.skeletonItemFooter}>
+              <SkeletonLoader width="50%" height={16} />
+              <View style={styles.skeletonActionButtons}>
+                <SkeletonLoader width="60" height={32} borderRadius={6} />
+                <SkeletonLoader width="60" height={32} borderRadius={6} />
+              </View>
+            </View>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView 
         ref={scrollViewRef}
         style={styles.scrollView} 
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={['#667EEA']}
+            tintColor="#667EEA"
+          />
+        }
       >
-        {/* Header Section */}
-        <View style={styles.headerSection}>
-          <View style={styles.headerContent}>
-            <Text style={styles.headerTitle}>My Items</Text>
-            <Text style={styles.headerSubtitle}>Manage your rental items</Text>
-          </View>
-          <TouchableOpacity 
-            style={styles.addItemButton}
-            onPress={() => router.push('/post-item' as any)}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="add" size={20} color={Colors.text.inverse} />
-            <Text style={styles.addItemText}>Add Item</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Quick Stats */}
-        <View style={styles.statsSection}>
-          <Card variant="filled" padding="large" style={styles.statCard}>
-            <Ionicons name="cube" size={24} color={Colors.primary[500]} />
-            <Text style={styles.statNumber}>{myItems.length}</Text>
-            <Text style={styles.statLabel}>Total Items</Text>
-          </Card>
-          <Card variant="filled" padding="large" style={styles.statCard}>
-            <Ionicons name="checkmark-circle" size={24} color={Colors.success} />
-            <Text style={styles.statNumber}>{counts.active}</Text>
-            <Text style={styles.statLabel}>Available</Text>
-          </Card>
-          <Card variant="filled" padding="large" style={styles.statCard}>
-            <Ionicons name="time" size={24} color={Colors.warning} />
-            <Text style={styles.statNumber}>{counts.rented}</Text>
-            <Text style={styles.statLabel}>Rented</Text>
-          </Card>
-        </View>
-
-        {/* Filter Tabs */}
-        <View style={styles.filterSection}>
-          <Text style={styles.sectionTitle}>Filter Items</Text>
-          <View style={styles.filterTabs}>
-            {renderFilterButton('all', 'All', counts.all)}
-            {renderFilterButton('active', 'Available', counts.active)}
-            {renderFilterButton('rented', 'Rented', counts.rented)}
-            {renderFilterButton('inactive', 'Inactive', counts.inactive)}
-          </View>
-        </View>
-
-        {/* Items List */}
-        <View style={styles.itemsSection}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>
-              {selectedFilter === 'all' ? 'All Items' : 
-               selectedFilter === 'active' ? 'Available Items' :
-               selectedFilter === 'rented' ? 'Currently Rented' : 'Inactive Items'}
-            </Text>
-            <Text style={styles.itemCount}>{filteredItems.length} items</Text>
-          </View>
-
-          {filteredItems.length > 0 ? (
-            <View style={styles.itemsList}>
-              {filteredItems.map(renderItemCard)}
+        {loading ? (
+          renderSkeletonLoader()
+        ) : (
+          <>
+            {/* Header Section */}
+            <View style={styles.headerSection}>
+              <View style={styles.headerContent}>
+                <Text style={styles.headerTitle}>My Items</Text>
+                <Text style={styles.headerSubtitle}>Manage your rental items</Text>
+              </View>
+              <TouchableOpacity 
+                style={styles.addItemButton}
+                onPress={() => router.push('/post-item' as any)}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="add" size={20} color={Colors.text.inverse} />
+                <Text style={styles.addItemText}>Add Item</Text>
+              </TouchableOpacity>
             </View>
-          ) : (
-            <View style={styles.emptyState}>
-              <Ionicons name="cube-outline" size={64} color={Colors.neutral[400]} />
-              <Text style={styles.emptyStateTitle}>No items found</Text>
-              <Text style={styles.emptyStateText}>
-                {selectedFilter === 'all' ? 'You haven\'t added any items yet.' :
-                 selectedFilter === 'active' ? 'No available items at the moment.' :
-                 selectedFilter === 'rented' ? 'No items are currently rented.' : 'No inactive items.'}
-              </Text>
-              {selectedFilter === 'all' && (
-                <TouchableOpacity 
-                  style={styles.emptyStateButton}
-                  onPress={() => router.push('/post-item' as any)}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.emptyStateButtonText}>Add Your First Item</Text>
-                </TouchableOpacity>
+
+            {/* Quick Stats */}
+            <View style={styles.statsSection}>
+              <Card variant="filled" padding="large" style={styles.statCard}>
+                <Ionicons name="cube" size={24} color={Colors.primary[500]} />
+                <Text style={styles.statNumber}>{myItems.length}</Text>
+                <Text style={styles.statLabel}>Total Items</Text>
+              </Card>
+              <Card variant="filled" padding="large" style={styles.statCard}>
+                <Ionicons name="checkmark-circle" size={24} color={Colors.success} />
+                <Text style={styles.statNumber}>{counts.active}</Text>
+                <Text style={styles.statLabel}>Available</Text>
+              </Card>
+              <Card variant="filled" padding="large" style={styles.statCard}>
+                <Ionicons name="time" size={24} color={Colors.warning} />
+                <Text style={styles.statNumber}>{counts.rented}</Text>
+                <Text style={styles.statLabel}>Rented</Text>
+              </Card>
+            </View>
+
+            {/* Filter Tabs */}
+            <View style={styles.filterSection}>
+              <Text style={styles.sectionTitle}>Filter Items</Text>
+              <View style={styles.filterTabs}>
+                {renderFilterButton('all', 'All', counts.all)}
+                {renderFilterButton('active', 'Available', counts.active)}
+                {renderFilterButton('rented', 'Rented', counts.rented)}
+                {renderFilterButton('inactive', 'Inactive', counts.inactive)}
+              </View>
+            </View>
+
+            {/* Items List */}
+            <View style={styles.itemsSection}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>
+                  {selectedFilter === 'all' ? 'All Items' : 
+                   selectedFilter === 'active' ? 'Available Items' :
+                   selectedFilter === 'rented' ? 'Currently Rented' : 'Inactive Items'}
+                </Text>
+                <Text style={styles.itemCount}>{filteredItems.length} items</Text>
+              </View>
+
+              {filteredItems.length > 0 ? (
+                <View style={styles.itemsList}>
+                  {filteredItems.map(renderItemCard)}
+                </View>
+              ) : (
+                <View style={styles.emptyState}>
+                  <Ionicons name="cube-outline" size={64} color={Colors.neutral[400]} />
+                  <Text style={styles.emptyStateTitle}>No items found</Text>
+                  <Text style={styles.emptyStateText}>
+                    {selectedFilter === 'all' ? 'You haven\'t added any items yet.' :
+                     selectedFilter === 'active' ? 'No available items at the moment.' :
+                     selectedFilter === 'rented' ? 'No items are currently rented.' : 'No inactive items.'}
+                  </Text>
+                  {selectedFilter === 'all' && (
+                    <TouchableOpacity 
+                      style={styles.emptyStateButton}
+                      onPress={() => router.push('/post-item' as any)}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.emptyStateButtonText}>Add Your First Item</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
               )}
             </View>
-          )}
-        </View>
 
-        {/* Help Section */}
-        <View style={styles.helpSection}>
-          <Text style={styles.sectionTitle}>Need Help?</Text>
-          <Card variant="filled" padding="large" style={styles.helpCard}>
-            <View style={styles.helpItem}>
-              <Ionicons name="information-circle" size={20} color={Colors.primary[500]} />
-              <Text style={styles.helpText}>Keep your item descriptions clear and accurate</Text>
+            {/* Help Section */}
+            <View style={styles.helpSection}>
+              <Text style={styles.sectionTitle}>Need Help?</Text>
+              <Card variant="filled" padding="large" style={styles.helpCard}>
+                <View style={styles.helpItem}>
+                  <Ionicons name="information-circle" size={20} color={Colors.primary[500]} />
+                  <Text style={styles.helpText}>Keep your item descriptions clear and accurate</Text>
+                </View>
+                <View style={styles.helpItem}>
+                  <Ionicons name="camera" size={20} color={Colors.success} />
+                  <Text style={styles.helpText}>Upload high-quality photos of your items</Text>
+                </View>
+                <View style={styles.helpItem}>
+                  <Ionicons name="settings" size={20} color={Colors.warning} />
+                  <Text style={styles.helpText}>Update availability and pricing regularly</Text>
+                </View>
+              </Card>
             </View>
-            <View style={styles.helpItem}>
-              <Ionicons name="camera" size={20} color={Colors.success} />
-              <Text style={styles.helpText}>Upload high-quality photos of your items</Text>
-            </View>
-            <View style={styles.helpItem}>
-              <Ionicons name="settings" size={20} color={Colors.warning} />
-              <Text style={styles.helpText}>Update availability and pricing regularly</Text>
-            </View>
-          </Card>
-        </View>
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -689,5 +738,70 @@ const styles = StyleSheet.create({
     ...TextStyles.body.small,
     color: Colors.text.secondary,
     flex: 1,
+  },
+  // Skeleton loading styles
+  skeletonContainer: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.md,
+  },
+  skeletonHeader: {
+    marginBottom: Spacing.lg,
+    paddingVertical: Spacing.md,
+  },
+  skeletonStatsSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: Spacing.lg,
+  },
+  skeletonStatCard: {
+    alignItems: 'center',
+    width: '30%',
+    paddingVertical: Spacing.md,
+  },
+  skeletonFilterSection: {
+    marginBottom: Spacing.lg,
+  },
+  skeletonFilterTabs: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: Spacing.xs,
+  },
+  skeletonItemsSection: {
+    marginBottom: Spacing.lg,
+  },
+  skeletonSectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+  },
+  skeletonItemCard: {
+    backgroundColor: Colors.background.secondary,
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.md,
+    marginBottom: Spacing.md,
+  },
+  skeletonItemHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: Spacing.sm,
+  },
+  skeletonItemInfo: {
+    flex: 1,
+  },
+  skeletonItemStats: {
+    flexDirection: 'row',
+    marginBottom: Spacing.md,
+    gap: Spacing.md,
+  },
+  skeletonItemFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  skeletonActionButtons: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
   },
 });

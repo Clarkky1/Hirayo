@@ -1,4 +1,4 @@
-import { Colors } from '@/constants/Colors';
+import { Colors } from '@/constants/DesignSystem';
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 
@@ -39,7 +39,7 @@ const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
 
   const backgroundColor = animatedValue.interpolate({
     inputRange: [0, 1],
-    outputRange: [Colors.light.gray[200], Colors.light.gray[300]],
+    outputRange: [Colors.neutral[200], Colors.neutral[300]],
   });
 
   return (
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   itemCardSkeleton: {
-    backgroundColor: Colors.light.background,
+    backgroundColor: Colors.background.primary,
     borderRadius: 12,
     marginBottom: 16,
     overflow: 'hidden',
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.light.gray[200],
+    borderBottomColor: Colors.neutral[200],
   },
   transactionHeader: {
     flexDirection: 'row',
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.light.gray[200],
+    borderBottomColor: Colors.neutral[200],
   },
   messageHeader: {
     flexDirection: 'row',
