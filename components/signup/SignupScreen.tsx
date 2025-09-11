@@ -56,47 +56,6 @@ export default function SignupScreen() {
   //   setShowOTP(false);
   // };
 
-  // Email/Password signup
-  const handleEmailSignup = async () => {
-    if (password !== confirmPassword) {
-      Alert.alert('Password Mismatch', 'Passwords do not match. Please try again.');
-      return;
-    }
-
-    if (password.length < 6) {
-      Alert.alert('Weak Password', 'Password must be at least 6 characters long.');
-      return;
-    }
-
-    try {
-      console.log('Creating account with email:', email);
-      
-      // Create user account with Supabase
-      const { error } = await signUpWithEmail(email, password, {
-        first_name: firstName,
-        last_name: surname,
-        date_of_birth: dateOfBirth ? formatDate(dateOfBirth) : '',
-        user_type: 'renter',
-        id_type: idType,
-        id_image_url: idImage || undefined,
-      });
-      
-      if (error) {
-        console.error('Signup error:', error);
-        Alert.alert('Signup Failed', 'Failed to create account. Please try again.');
-        return;
-      }
-      
-      // Set authenticated state
-      await setAuthenticated(true);
-      
-      // Navigate to main app after successful signup
-      router.replace('/(tabs)');
-    } catch (error) {
-      console.error('Signup error:', error);
-      Alert.alert('Signup Failed', 'Failed to complete signup. Please try again.');
-    }
-  };
 
   // OTP signup - commented out temporarily
   // const handleCompleteSignup = async (otp: string) => {
@@ -254,7 +213,7 @@ export default function SignupScreen() {
         date_of_birth: dateOfBirth?.toISOString().split('T')[0],
         user_type: 'renter' as const,
         id_type: idType,
-        id_image_url: idImage, // This will be uploaded to Supabase Storage later
+        id_image_url: idImage || undefined, // Convert null to undefined
         is_verified: false,
         is_active: true,
       };
