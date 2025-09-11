@@ -40,7 +40,7 @@ export default function HomeScreen() {
   const [isNavigating, setIsNavigating] = useState(false);
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
-  const { setHasClickedGetStarted } = useLender();
+  const { hasClickedGetStarted, setHasClickedGetStarted } = useLender();
   const { user } = useSupabaseAuth();
 
   // Load items from Supabase
@@ -230,25 +230,27 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Become a Lender Section */}
-        <View style={styles.lenderSectionContainer}>
-          <View style={styles.lenderSection}>
-          <View style={styles.lenderContent}>
-            <Text style={styles.lenderTitle}>Become a Lender</Text>
-            <Text style={styles.lenderSubtitle}>Start earning by renting out your items</Text>
-            <TouchableOpacity 
-              style={styles.lenderButton} 
-              onPress={() => {
-                setHasClickedGetStarted(true);
-                router.push('/lenders' as any);
-              }}
-            >
-              <Text style={styles.lenderButtonText}>Get Started</Text>
-              <Ionicons name="arrow-forward" size={16} color={Colors.text.inverse} />
-            </TouchableOpacity>
+        {/* Become a Lender Section - Only show if user hasn't clicked Get Started */}
+        {!hasClickedGetStarted && (
+          <View style={styles.lenderSectionContainer}>
+            <View style={styles.lenderSection}>
+            <View style={styles.lenderContent}>
+              <Text style={styles.lenderTitle}>Become a Lender</Text>
+              <Text style={styles.lenderSubtitle}>Start earning by renting out your items</Text>
+              <TouchableOpacity 
+                style={styles.lenderButton} 
+                onPress={() => {
+                  setHasClickedGetStarted(true);
+                  router.push('/lenders' as any);
+                }}
+              >
+                <Text style={styles.lenderButtonText}>Get Started</Text>
+                <Ionicons name="arrow-forward" size={16} color={Colors.text.inverse} />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-        </View>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
