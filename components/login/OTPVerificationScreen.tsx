@@ -1,4 +1,5 @@
 import { Shadows, Spacing } from '@/constants/DesignSystem';
+import { useAuthState } from '@/contexts/AuthStateContext';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useAuth } from '@/hooks/useAuth';
 import { Ionicons } from '@expo/vector-icons';
@@ -6,15 +7,15 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef, useState } from 'react';
 import {
-  Alert,
-  Dimensions,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
+    Alert,
+    Dimensions,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
 } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
@@ -29,6 +30,7 @@ export default function OTPVerificationScreen({ phoneNumber, onBack, onComplete 
   const router = useRouter();
   const { login } = useAuth();
   const { verifyOtp, signInWithPhone } = useSupabaseAuth();
+  const { setAuthenticated } = useAuthState();
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(60);
@@ -87,6 +89,8 @@ export default function OTPVerificationScreen({ phoneNumber, onBack, onComplete 
       } else {
         // For login flow - use authentication hook to login
         await login({ phoneNumber });
+        // Set authenticated state
+        await setAuthenticated(true);
         // Navigate to main app after successful verification
         router.push('/(tabs)');
       }

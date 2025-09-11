@@ -1,6 +1,7 @@
 import { OTPVerificationScreen } from '@/components/login';
 import { TermsConditionsModal } from '@/components/ui';
 import { Shadows, Spacing } from '@/constants/DesignSystem';
+import { useAuthState } from '@/contexts/AuthStateContext';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useAuth } from '@/hooks/useAuth';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,22 +11,23 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
-    Alert,
-    Image,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 export default function SignupScreen() {
   const router = useRouter();
   const { signup } = useAuth();
   const { signUp, signInWithPhone } = useSupabaseAuth();
+  const { setAuthenticated } = useAuthState();
   const [firstName, setFirstName] = useState('');
   const [surname, setSurname] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -83,6 +85,9 @@ export default function SignupScreen() {
       
       // Use authentication hook to signup
       await signup(userData);
+      
+      // Set authenticated state
+      await setAuthenticated(true);
       
       // Navigate to main app after successful signup
       router.replace('/(tabs)');

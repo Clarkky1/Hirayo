@@ -1,4 +1,5 @@
 import { BorderRadius, Colors, Spacing } from '@/constants/DesignSystem';
+import { useAuthState } from '@/contexts/AuthStateContext';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -106,6 +107,7 @@ const slides = [
 export default function OnboardingScreen() {
   const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const { setFirstTimeCompleted } = useAuthState();
 
   const handleNext = () => {
     if (currentSlide < slides.length - 1) {
@@ -113,7 +115,8 @@ export default function OnboardingScreen() {
     }
   };
 
-  const handleGetStarted = () => {
+  const handleGetStarted = async () => {
+    await setFirstTimeCompleted();
     router.push('/login');
   };
 

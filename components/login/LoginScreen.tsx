@@ -1,4 +1,5 @@
 import { Shadows, Spacing } from '@/constants/DesignSystem';
+import { useAuthState } from '@/contexts/AuthStateContext';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useAuth } from '@/hooks/useAuth';
 import { Ionicons } from '@expo/vector-icons';
@@ -25,6 +26,7 @@ export default function LoginScreen() {
   const router = useRouter();
   const { login } = useAuth();
   const { signInWithPhone, verifyOtp } = useSupabaseAuth();
+  const { setAuthenticated } = useAuthState();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showOTP, setShowOTP] = useState(false);
@@ -64,6 +66,9 @@ export default function LoginScreen() {
       // Use authentication hook to login
       await login({ provider: 'facebook' });
       
+      // Set authenticated state
+      await setAuthenticated(true);
+      
       // Add a small delay to ensure smooth transition
       await new Promise(resolve => setTimeout(resolve, 300));
       
@@ -82,6 +87,9 @@ export default function LoginScreen() {
       console.log('Google login');
       // Use authentication hook to login
       await login({ provider: 'google' });
+      
+      // Set authenticated state
+      await setAuthenticated(true);
       
       // Add a small delay to ensure smooth transition
       await new Promise(resolve => setTimeout(resolve, 300));

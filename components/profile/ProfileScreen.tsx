@@ -1,4 +1,5 @@
 import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
+import { useAuthState } from '@/contexts/AuthStateContext';
 import { useUser } from '@/contexts/UserContext';
 import { useAuth } from '@/hooks/useAuth';
 import { Ionicons } from '@expo/vector-icons';
@@ -6,14 +7,14 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
-  Alert,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Switch,
-  Text,
-  TouchableOpacity,
-  View,
+    Alert,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Switch,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import { Card } from '../ui/Card';
 import { ProfileEditModal } from './ProfileEditModal';
@@ -25,6 +26,7 @@ import { ProfileEditModal } from './ProfileEditModal';
 export default function ProfileScreen() {
   const { profile, updatePreferences, updateProfile, isLoading } = useUser();
   const { logout } = useAuth();
+  const { setAuthenticated } = useAuthState();
   const [showEditModal, setShowEditModal] = useState(false);
 
   // Show loading state while profile is being loaded
@@ -60,9 +62,6 @@ export default function ProfileScreen() {
     router.push('/notifications' as any);
   };
 
-  const handlePrivacy = () => {
-    router.push('/privacy-security' as any);
-  };
 
   const handleHelp = () => {
     router.push('/help-support' as any);
@@ -81,8 +80,10 @@ export default function ProfileScreen() {
         { 
           text: 'Logout', 
           style: 'destructive', 
-          onPress: () => {
+          onPress: async () => {
             logout();
+            // Set authenticated state to false
+            await setAuthenticated(false);
             // Navigate to login page after logout
             router.replace('/login');
           }
@@ -180,7 +181,6 @@ export default function ProfileScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Settings</Text>
           {renderSettingItem('notifications-outline', 'Notifications', 'Manage your notification preferences', handleNotifications)}
-          {renderSettingItem('shield-outline', 'Privacy & Security', 'Control your data and visibility', handlePrivacy)}
         </View>
 
         {/* Support Section */}
