@@ -1,19 +1,18 @@
-import { BorderRadius, Colors, Spacing } from '@/constants/DesignSystem';
+import { Spacing } from '@/constants/DesignSystem';
 import { useSavedItems } from '@/contexts/SavedItemsContext';
 import { useSelectedItem } from '@/contexts/SelectedItemContext';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { savedItemsService } from '@/services/savedItemsService';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useState } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
 import {
   FlatList,
   SafeAreaView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View
 } from 'react-native';
 import { ItemCardSkeleton } from '../common/SkeletonLoader';
@@ -83,6 +82,14 @@ export default function SavedItemsScreen() {
       setLoading(false);
     }
   }, [user]);
+
+  // Cleanup function to prevent state updates after unmount
+  useEffect(() => {
+    return () => {
+      setLoading(false);
+      setError(null);
+    };
+  }, []);
 
   // Load items on mount and refresh when screen comes into focus
   useFocusEffect(
