@@ -9,7 +9,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   Alert,
   Image,
@@ -46,6 +46,18 @@ export default function SignupScreen() {
   const [idType, setIdType] = useState('');
   const [idImage, setIdImage] = useState<string | null>(null);
   const [showIdTypeModal, setShowIdTypeModal] = useState(false);
+  
+  // ScrollView ref for keyboard handling
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  const handleInputFocus = (inputName: string) => {
+    // Scroll to the focused input after a short delay to ensure keyboard is open
+    setTimeout(() => {
+      if (scrollViewRef.current) {
+        scrollViewRef.current.scrollToEnd({ animated: true });
+      }
+    }, 300);
+  };
 
   const handleBack = () => {
     router.back();
@@ -333,6 +345,7 @@ export default function SignupScreen() {
         </View>
 
         <ScrollView 
+          ref={scrollViewRef}
           style={styles.scrollView} 
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
@@ -413,6 +426,7 @@ export default function SignupScreen() {
                         placeholder="First name"
                   value={firstName}
                   onChangeText={setFirstName}
+                  onFocus={() => handleInputFocus('firstName')}
                   autoCapitalize="words"
                         placeholderTextColor="#9CA3AF"
                 />
@@ -427,6 +441,7 @@ export default function SignupScreen() {
                         placeholder="Surname"
                   value={surname}
                   onChangeText={setSurname}
+                  onFocus={() => handleInputFocus('surname')}
                   autoCapitalize="words"
                         placeholderTextColor="#9CA3AF"
                       />

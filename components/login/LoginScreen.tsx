@@ -40,6 +40,7 @@ export default function LoginScreen() {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [isResetting, setIsResetting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Phone number validation for Philippine numbers (11 digits starting with 09) - commented out
   // const isValidPhoneNumber = (phone: string) => {
@@ -316,13 +317,24 @@ export default function LoginScreen() {
                       placeholderTextColor="#9CA3AF"
                       value={password}
                       onChangeText={setPassword}
-                      secureTextEntry={true}
+                      secureTextEntry={!showPassword}
                       autoCorrect={false}
                       autoCapitalize="none"
                       returnKeyType="done"
                       editable={true}
                       selectTextOnFocus={false}
                     />
+                    <TouchableOpacity
+                      onPress={() => setShowPassword(!showPassword)}
+                      style={styles.eyeIcon}
+                      activeOpacity={0.7}
+                    >
+                      <Ionicons 
+                        name={showPassword ? "eye-off-outline" : "eye-outline"} 
+                        size={20} 
+                        color="#9CA3AF" 
+                      />
+                    </TouchableOpacity>
                   </View>
                 </View>
 
@@ -575,21 +587,21 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing['6xl']*2,
-    paddingBottom: Spacing.lg,
+    paddingTop: Spacing.xl,
+    paddingBottom: Spacing.sm,
   },
 
   // Header
   header: {
     alignItems: 'center',
-    marginBottom: Spacing['2xl'],
+    marginBottom: Spacing.lg,
   },
   logoContainer: {
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
   },
   logo: {
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
   },
   appName: {
     fontSize: 28,
@@ -652,11 +664,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#F9FAFB',
-    borderRadius: 12,
-    borderWidth: 2,
+    borderRadius: 10,
+    borderWidth: 1.5,
     borderColor: '#E5E7EB',
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 8,
+    minHeight: 44,
   },
   inputWrapperFocused: {
     borderColor: '#667EEA',
@@ -666,11 +679,18 @@ const styles = StyleSheet.create({
   inputIcon: {
     marginRight: Spacing.md,
   },
+  eyeIcon: {
+    padding: 4,
+    marginLeft: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   inputField: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 15,
     color: '#1F2937',
     paddingVertical: 0,
+    height: 40,
   },
   termsText: {
     fontSize: 12,

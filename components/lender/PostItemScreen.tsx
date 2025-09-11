@@ -4,7 +4,7 @@ import { itemsService } from '@/services/itemsService';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   Alert,
   Image,
@@ -17,7 +17,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import SkeletonLoader from '../common/SkeletonLoader';
 
 const PostItemScreen = () => {
@@ -31,10 +30,21 @@ const PostItemScreen = () => {
     location: '',
   });
   const [images, setImages] = useState<string[]>([]);
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  const handleInputFocus = (inputName: string) => {
+    // Scroll to the focused input after a short delay to ensure keyboard is open
+    setTimeout(() => {
+      if (scrollViewRef.current) {
+        // Scroll to show the input and some space below it
+        scrollViewRef.current.scrollToEnd({ animated: true });
+      }
+    }, 300);
+  };
 
   const categories = [
     'laptop', 'camera', 'phone', 'drone', 'gaming', 'audio', 
-    'photography', 'tools', 'sports', 'other'
+    'tablet/ipad', 'pc'
   ];
 
   const handleInputChange = (field: string, value: string) => {
@@ -129,24 +139,17 @@ const PostItemScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
-        {/* Modern Header */}
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color={Colors.text.primary} />
-          </TouchableOpacity>
-          <View style={styles.headerContent}>
-            <Text style={styles.headerTitle}>Post New Item</Text>
-            <Text style={styles.headerSubtitle}>Share your item with renters</Text>
-          </View>
-          <View style={styles.placeholder} />
-        </View>
-
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          ref={scrollViewRef}
+          style={styles.content} 
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
           {/* Images Section - Prominent */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
@@ -198,13 +201,14 @@ const PostItemScreen = () => {
 
             {/* Item Name */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Item Name *</Text>
+              <Text style={styles.label}>Item Name <Text style={styles.requiredAsterisk}>*</Text></Text>
               <View style={styles.inputContainer}>
                 <TextInput
                   style={styles.input}
                   placeholder="What are you renting out?"
                   value={formData.name}
                   onChangeText={(value) => handleInputChange('name', value)}
+                  onFocus={() => handleInputFocus('name')}
                   placeholderTextColor={Colors.text.secondary}
                 />
               </View>
@@ -212,13 +216,14 @@ const PostItemScreen = () => {
 
             {/* Description */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Description *</Text>
+              <Text style={styles.label}>Description <Text style={styles.requiredAsterisk}>*</Text></Text>
               <View style={styles.inputContainer}>
                 <TextInput
                   style={[styles.input, styles.textArea]}
                   placeholder="Describe your item, its condition, and what makes it special..."
                   value={formData.description}
                   onChangeText={(value) => handleInputChange('description', value)}
+                  onFocus={() => handleInputFocus('description')}
                   multiline
                   numberOfLines={4}
                   placeholderTextColor={Colors.text.secondary}
@@ -229,7 +234,7 @@ const PostItemScreen = () => {
             {/* Price and Category Row */}
             <View style={styles.row}>
               <View style={[styles.inputGroup, styles.halfWidth]}>
-                <Text style={styles.label}>Daily Rate *</Text>
+                <Text style={styles.label}>Daily Rate <Text style={styles.requiredAsterisk}>*</Text></Text>
                 <View style={styles.inputContainer}>
                   <Text style={styles.currencySymbol}>₱</Text>
                   <TextInput
@@ -237,6 +242,7 @@ const PostItemScreen = () => {
                     placeholder="0.00"
                     value={formData.price}
                     onChangeText={(value) => handleInputChange('price', value)}
+                    onFocus={() => handleInputFocus('price')}
                     keyboardType="numeric"
                     placeholderTextColor={Colors.text.secondary}
                   />
@@ -273,38 +279,39 @@ const PostItemScreen = () => {
                 <Ionicons name="location-outline" size={20} color={Colors.text.secondary} style={styles.inputIcon} />
                 <TextInput
                   style={[styles.input, styles.inputWithIcon]}
-                  placeholder="Where is this item located?"
+                  placeholder="Province/City/Barangay"
                   value={formData.location}
                   onChangeText={(value) => handleInputChange('location', value)}
+                  onFocus={() => handleInputFocus('location')}
                   placeholderTextColor={Colors.text.secondary}
                 />
               </View>
             </View>
+
+            {/* Post Button - Part of scrollable content */}
+            <View style={styles.postButtonContainer}>
+              <TouchableOpacity
+                style={[styles.postButton, loading && styles.postButtonDisabled]}
+                onPress={handlePostItem}
+                disabled={loading}
+              >
+                {loading ? (
+                  <View style={styles.loadingContainer}>
+                    <View style={styles.loadingSpinner} />
+                    <Text style={styles.postButtonText}>Posting...</Text>
+                  </View>
+                ) : (
+                  <>
+                    <Ionicons name="add-circle" size={20} color={Colors.text.inverse} />
+                    <Text style={styles.postButtonText}>Post Item</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </View>
           </View>
         </ScrollView>
-
-        {/* Modern Footer */}
-        <View style={styles.footer}>
-          <TouchableOpacity
-            style={[styles.postButton, loading && styles.postButtonDisabled]}
-            onPress={handlePostItem}
-            disabled={loading}
-          >
-            {loading ? (
-              <View style={styles.loadingContainer}>
-                <View style={styles.loadingSpinner} />
-                <Text style={styles.postButtonText}>Posting...</Text>
-              </View>
-            ) : (
-              <>
-                <Ionicons name="add-circle" size={20} color={Colors.text.inverse} />
-                <Text style={styles.postButtonText}>Post Item</Text>
-              </>
-            )}
-          </TouchableOpacity>
-        </View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -388,6 +395,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.text.primary,
     marginBottom: Spacing.sm,
+  },
+  requiredAsterisk: {
+    color: Colors.error,
   },
   inputContainer: {
     position: 'relative',
@@ -500,13 +510,10 @@ const styles = StyleSheet.create({
     marginTop: Spacing.xs,
     fontWeight: '500',
   },
-  // Footer
-  footer: {
-    padding: Spacing.lg,
-    backgroundColor: Colors.background.primary,
-    borderTopWidth: 1,
-    borderTopColor: '#E2E8F0',
-    ...Shadows.lg,
+  // Post Button Container
+  postButtonContainer: {
+    paddingTop: Spacing.lg,
+    paddingBottom: Spacing.xl,
   },
   postButton: {
     backgroundColor: Colors.primary[500],
