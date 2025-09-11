@@ -1,4 +1,5 @@
 import { Shadows, Spacing } from '@/constants/DesignSystem';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useAuth } from '@/hooks/useAuth';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -23,6 +24,7 @@ const { width, height } = Dimensions.get('window');
 export default function LoginScreen() {
   const router = useRouter();
   const { login } = useAuth();
+  const { signInWithPhone, verifyOtp } = useSupabaseAuth();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showOTP, setShowOTP] = useState(false);
@@ -42,7 +44,8 @@ export default function LoginScreen() {
     setIsLoading(true);
     try {
       console.log('Sending OTP to:', phoneNumber);
-      // Simulate sending OTP
+      
+      // For now, simulate OTP sending since phone auth needs SMS provider setup
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       // Show OTP verification screen

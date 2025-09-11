@@ -1,6 +1,7 @@
 import { OTPVerificationScreen } from '@/components/login';
 import { TermsConditionsModal } from '@/components/ui';
 import { Shadows, Spacing } from '@/constants/DesignSystem';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useAuth } from '@/hooks/useAuth';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -24,6 +25,7 @@ import {
 export default function SignupScreen() {
   const router = useRouter();
   const { signup } = useAuth();
+  const { signUp, signInWithPhone } = useSupabaseAuth();
   const [firstName, setFirstName] = useState('');
   const [surname, setSurname] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -49,7 +51,27 @@ export default function SignupScreen() {
 
   const handleCompleteSignup = async (otp: string) => {
     try {
-      // Handle form submission with OTP verification
+      // For testing, simulate successful signup
+      console.log('Completing signup with OTP:', otp);
+      
+      // Create user account with Supabase
+      const { error } = await signUp(email, 'tempPassword123!', {
+        first_name: firstName,
+        last_name: surname,
+        phone: phoneNumber,
+        date_of_birth: dateOfBirth ? formatDate(dateOfBirth) : '',
+        user_type: 'renter',
+        id_type: idType,
+        id_image_url: idImage || undefined,
+      });
+      
+      if (error) {
+        console.error('Signup error:', error);
+        Alert.alert('Signup Failed', 'Failed to create account. Please try again.');
+        return;
+      }
+      
+      // Also call the original signup for compatibility
       const userData = { 
         firstName, 
         surname, 
@@ -58,7 +80,6 @@ export default function SignupScreen() {
         email,
         otp
       };
-      console.log('Completing signup with OTP:', userData);
       
       // Use authentication hook to signup
       await signup(userData);
@@ -152,7 +173,7 @@ export default function SignupScreen() {
     
     try {
       console.log('Sending OTP to:', phoneNumber);
-      // Simulate sending OTP
+      // For testing, simulate sending OTP
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       // Show OTP verification screen

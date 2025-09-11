@@ -13,7 +13,7 @@ export default function PrivacySecurityLayout() {
           title: 'Privacy & Security',
           headerShown: true,
           headerStyle: {
-            backgroundColor: '#0066CC',
+            backgroundColor: '#667EEA',
           },
           headerTintColor: '#ffffff',
         }}

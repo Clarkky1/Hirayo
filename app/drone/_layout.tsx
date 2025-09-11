@@ -13,7 +13,7 @@ export default function DroneLayout() {
           title: 'Drones & UAVs',
           headerShown: true,
           headerStyle: {
-            backgroundColor: '#0066CC',
+            backgroundColor: '#667EEA',
           },
           headerTintColor: '#ffffff',
         }}

@@ -12,6 +12,7 @@ import { RentalFlowProvider } from '@/contexts/RentalFlowContext';
 import { SavedItemsProvider } from '@/contexts/SavedItemsContext';
 import { SearchProvider } from '@/contexts/SearchContext';
 import { SelectedItemProvider } from '@/contexts/SelectedItemContext';
+import { SupabaseAuthProvider } from '@/contexts/SupabaseAuthContext';
 import { UserProvider } from '@/contexts/UserContext';
 import { AuthProvider } from '@/hooks/useAuth';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -44,13 +45,14 @@ export default function RootLayout() {
   }
 
   return (
-    <AuthProvider>
-      <UserProvider>
-        <SearchProvider>
-          <SavedItemsProvider>
-            <SelectedItemProvider>
-              <LenderProvider>
-                <RentalFlowProvider>
+    <SupabaseAuthProvider>
+      <AuthProvider>
+        <UserProvider>
+          <SearchProvider>
+            <SavedItemsProvider>
+              <SelectedItemProvider>
+                <LenderProvider>
+                  <RentalFlowProvider>
               <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
                 <Stack initialRouteName="onboarding">
                   <Stack.Screen name="onboarding" options={{ headerShown: false }} />
@@ -80,12 +82,13 @@ export default function RootLayout() {
                 <StatusBar style="light" />
       <View style={{ backgroundColor: '#667EEA', height: 0 }} />
               </ThemeProvider>
-                </RentalFlowProvider>
-              </LenderProvider>
-            </SelectedItemProvider>
-          </SavedItemsProvider>
-        </SearchProvider>
-      </UserProvider>
-    </AuthProvider>
+                  </RentalFlowProvider>
+                </LenderProvider>
+              </SelectedItemProvider>
+            </SavedItemsProvider>
+          </SearchProvider>
+        </UserProvider>
+      </AuthProvider>
+    </SupabaseAuthProvider>
   );
 }

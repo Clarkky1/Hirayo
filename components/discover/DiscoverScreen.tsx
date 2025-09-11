@@ -1,20 +1,25 @@
-import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
+import { BorderRadius, Colors, Shadows, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { useSearch } from '@/contexts/SearchContext';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
+import { Item } from '@/lib/supabase';
+import { itemsService } from '@/services/itemsService';
 import { debounce, SearchableItem, searchItems } from '@/utils';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useState } from 'react';
 import {
-  FlatList,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    FlatList,
+    RefreshControl,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
 } from 'react-native';
+import { ItemCardSkeleton } from '../common/SkeletonLoader';
 import { ProductCard } from '../ui/ProductCard';
 
 interface ProductItem extends SearchableItem {
@@ -24,18 +29,9 @@ interface ProductItem extends SearchableItem {
   location: string;
   price: number;
   category: string;
+  images?: string[];
+  description?: string;
 }
-
-const products: ProductItem[] = [
-  { id: '1', name: 'Canon EOS R5 Mirrorless Camera', rating: 4.8, location: 'Talisay, Cebu', price: 2500, category: 'camera' },
-  { id: '2', name: 'MacBook Pro M2 14-inch', rating: 4.9, location: 'Cebu City', price: 3500, category: 'laptop' },
-  { id: '3', name: 'iPhone 15 Pro Max', rating: 4.7, location: 'Mandaue City', price: 1800, category: 'phone' },
-  { id: '4', name: 'iPad Pro 12.9" M2', rating: 4.6, location: 'Lapu-Lapu City', price: 2200, category: 'tablet' },
-  { id: '5', name: 'DJI Mavic 3 Pro Drone', rating: 4.9, location: 'Cebu City', price: 4200, category: 'drone' },
-  { id: '6', name: 'Gaming PC RTX 4080', rating: 4.7, location: 'Mandaue City', price: 3800, category: 'pc' },
-  { id: '7', name: 'PlayStation 5', rating: 4.8, location: 'Lapu-Lapu City', price: 1200, category: 'gaming' },
-  { id: '8', name: 'Sony WH-1000XM5 Headphones', rating: 4.6, location: 'Talisay, Cebu', price: 800, category: 'audio' },
-];
 
   const sortOptions = ['₱500 - ₱1,500', '₱1,500 - ₱2,500', '₱2,500 - ₱3,500', '₱3,500 - ₱4,500', '₱4,500 - ₱5,500', '₱5,500 - ₱6,500', '₱6,500 - ₱7,500', '₱7,500 - ₱8,500', '₱8,500 - ₱9,500', '₱9,500 - ₱10,000'];
 const filterCategories = ['Camera', 'Laptop', 'Phone', 'Tablet/iPad', 'Drone', 'PC', 'Gaming', 'Audio'];
@@ -44,15 +40,72 @@ const filterCategories = ['Camera', 'Laptop', 'Phone', 'Tablet/iPad', 'Drone', '
 export default function DiscoverScreen() {
   const params = useLocalSearchParams();
   const { searchQuery, setSearchQuery, addToHistory } = useSearch();
+  const { user } = useSupabaseAuth();
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showFiltersDropdown, setShowFiltersDropdown] = useState(false);
   const [selectedSort, setSelectedSort] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<ProductItem[]>(products);
+  const [products, setProducts] = useState<ProductItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [filteredProducts, setFilteredProducts] = useState<ProductItem[]>([]);
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+
+  // Load items from Supabase
+  const loadItems = useCallback(async (isRefresh = false) => {
+    try {
+      if (isRefresh) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
+      setError(null);
+      
+      const filters = {
+        category: selectedCategory || undefined,
+        location: selectedLocation || undefined,
+        search: searchQuery || undefined,
+      };
+      
+      const { data, error } = await itemsService.getItems(filters);
+      
+      if (error) {
+        console.error('Error loading items:', error);
+        setError('Failed to load items');
+        return;
+      }
+      
+      // Convert Supabase items to ProductItem format
+      const convertedItems: ProductItem[] = (data || []).map((item: Item) => ({
+        id: item.id,
+        name: item.name,
+        rating: item.rating,
+        location: item.location,
+        price: item.price_per_day,
+        category: item.category,
+        images: item.images,
+        description: item.description,
+      }));
+      
+      setProducts(convertedItems);
+      setFilteredProducts(convertedItems);
+    } catch (err) {
+      console.error('Error loading items:', err);
+      setError('Failed to load items');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [selectedCategory, selectedLocation, searchQuery]);
+
+  // Load items on component mount and when filters change
+  useEffect(() => {
+    loadItems();
+  }, [loadItems]);
 
   // Debounced search function
   const debouncedSearch = useCallback(
@@ -288,6 +341,14 @@ export default function DiscoverScreen() {
 
   const finalFilteredProducts = getPriceFilteredProducts();
 
+  const handleRefresh = () => {
+    loadItems(true);
+  };
+
+  const handlePostItem = () => {
+    router.push('/post-item');
+  };
+
   const renderProductItem = ({ item }: { item: ProductItem }) => (
     <ProductCard
       item={item}
@@ -295,6 +356,33 @@ export default function DiscoverScreen() {
       showFavoriteIcon={true}
       variant="default"
     />
+  );
+
+  const renderEmptyState = () => (
+    <View style={styles.emptyState}>
+      <Ionicons name="search-outline" size={64} color={Colors.text.secondary} />
+      <Text style={styles.emptyStateTitle}>No items found</Text>
+      <Text style={styles.emptyStateText}>
+        Try adjusting your search or filters to find what you're looking for.
+      </Text>
+      {user && (
+        <TouchableOpacity style={styles.postItemButton} onPress={handlePostItem}>
+          <Ionicons name="add" size={20} color={Colors.text.inverse} />
+          <Text style={styles.postItemButtonText}>Post Your First Item</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+
+  const renderLoadingState = () => (
+    <View style={styles.productsList}>
+      {Array.from({ length: 6 }).map((_, index) => (
+        <View key={index} style={styles.productsRow}>
+          <ItemCardSkeleton />
+          <ItemCardSkeleton />
+        </View>
+      ))}
+    </View>
   );
 
 
@@ -322,6 +410,14 @@ export default function DiscoverScreen() {
             <Ionicons name="search" size={16} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
+
+        {/* Post Item Button for Lenders */}
+        {user && (
+          <TouchableOpacity style={styles.postItemHeaderButton} onPress={handlePostItem}>
+            <Ionicons name="add-circle" size={20} color={Colors.primary[500]} />
+            <Text style={styles.postItemHeaderText}>Post Item</Text>
+          </TouchableOpacity>
+        )}
 
         {/* Sort and Filter Controls */}
         <View style={styles.controlsContainer}>
@@ -486,20 +582,37 @@ export default function DiscoverScreen() {
       </View>
 
       {/* Scrollable Products Section */}
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.scrollView} 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={[Colors.primary[500]]}
+            tintColor={Colors.primary[500]}
+          />
+        }
+      >
         {/* Products Grid */}
         <View style={styles.productsSection}>
-          <FlatList
-            data={finalFilteredProducts}
-            renderItem={renderProductItem}
-            keyExtractor={(item) => item.id}
-            numColumns={2}
-            columnWrapperStyle={styles.productsRow}
-            contentContainerStyle={styles.productsList}
-            showsVerticalScrollIndicator={false}
-            scrollEnabled={false}
-            ItemSeparatorComponent={() => <View style={{ height: Spacing.md }} />}
-          />
+          {loading ? (
+            renderLoadingState()
+          ) : finalFilteredProducts.length === 0 ? (
+            renderEmptyState()
+          ) : (
+            <FlatList
+              data={finalFilteredProducts}
+              renderItem={renderProductItem}
+              keyExtractor={(item) => item.id}
+              numColumns={2}
+              columnWrapperStyle={styles.productsRow}
+              contentContainerStyle={styles.productsList}
+              showsVerticalScrollIndicator={false}
+              scrollEnabled={false}
+              ItemSeparatorComponent={() => <View style={{ height: Spacing.md }} />}
+            />
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -858,5 +971,69 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
     borderWidth: 1,
     borderColor: Colors.border.light,
+  },
+  postItemHeaderButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.background.secondary,
+    borderRadius: BorderRadius.lg,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    marginBottom: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.primary[200],
+  },
+  postItemHeaderText: {
+    ...TextStyles.body.medium,
+    color: Colors.primary[500],
+    fontWeight: '600',
+    marginLeft: Spacing.xs,
+  },
+  emptyState: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: Spacing.xl * 2,
+    paddingHorizontal: Spacing.lg,
+  },
+  emptyStateTitle: {
+    ...TextStyles.display.large,
+    color: Colors.text.primary,
+    marginTop: Spacing.lg,
+    marginBottom: Spacing.sm,
+  },
+  emptyStateText: {
+    ...TextStyles.body.medium,
+    color: Colors.text.secondary,
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: Spacing.xl,
+  },
+  postItemButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.primary[500],
+    borderRadius: BorderRadius.lg,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    ...Shadows.sm,
+  },
+  postItemButtonText: {
+    ...TextStyles.button.medium,
+    color: Colors.text.inverse,
+    fontWeight: '600',
+    marginLeft: Spacing.sm,
+  },
+  loadingState: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: Spacing.xl * 2,
+  },
+  loadingText: {
+    ...TextStyles.body.medium,
+    color: Colors.text.secondary,
+    marginTop: Spacing.md,
   },
 });

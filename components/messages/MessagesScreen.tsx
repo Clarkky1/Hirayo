@@ -12,6 +12,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import { MessageSkeleton } from '../common/SkeletonLoader';
 
 interface Message {
   id: string;
@@ -145,8 +146,17 @@ const MessageCard: React.FC<{ item: Message }> = ({ item }) => {
 export default function MessagesScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [hasAutoOpened, setHasAutoOpened] = useState(false);
+  const [loading, setLoading] = useState(true);
   const params = useLocalSearchParams();
   
+  // Simulate loading for skeleton effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Auto-open conversation if parameters are present (only once)
   useEffect(() => {
     if (!hasAutoOpened && params.openConversation === 'true' && params.itemId && params.ownerName) {
@@ -220,22 +230,30 @@ export default function MessagesScreen() {
         </View>
       </View>
 
-      <FlatList
-        data={filteredMessages}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <MessageCard item={item} />}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.listContainer}
-        ListEmptyComponent={
-          <View style={styles.emptyState}>
-            <Ionicons name="chatbubble-outline" size={40} color="#E0E0E0" />
-            <Text style={styles.emptyStateText}>No messages found</Text>
-            <Text style={styles.emptyStateSubtext}>
-              Your conversations will appear here
-            </Text>
-          </View>
-        }
-      />
+      {loading ? (
+        <View style={styles.listContainer}>
+          {Array.from({ length: 5 }).map((_, index) => (
+            <MessageSkeleton key={index} />
+          ))}
+        </View>
+      ) : (
+        <FlatList
+          data={filteredMessages}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <MessageCard item={item} />}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContainer}
+          ListEmptyComponent={
+            <View style={styles.emptyState}>
+              <Ionicons name="chatbubble-outline" size={40} color="#E0E0E0" />
+              <Text style={styles.emptyStateText}>No messages found</Text>
+              <Text style={styles.emptyStateSubtext}>
+                Your conversations will appear here
+              </Text>
+            </View>
+          }
+        />
+      )}
 
     </SafeAreaView>
   );

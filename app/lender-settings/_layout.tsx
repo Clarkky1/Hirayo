@@ -13,7 +13,7 @@ export default function LenderSettingsLayout() {
           title: 'Lender Settings',
           headerShown: true,
           headerStyle: {
-            backgroundColor: '#0066CC',
+            backgroundColor: '#667EEA',
           },
           headerTintColor: '#FFFFFF',
           headerTitleStyle: {

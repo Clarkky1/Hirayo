@@ -1,1 +1,3 @@
-export { default } from './PostItemScreen';
+import PostItemScreen from '@/components/lender/PostItemScreen';
+
+export default PostItemScreen;

@@ -1,4 +1,5 @@
 import { Shadows, Spacing } from '@/constants/DesignSystem';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { useAuth } from '@/hooks/useAuth';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -27,6 +28,7 @@ interface OTPVerificationScreenProps {
 export default function OTPVerificationScreen({ phoneNumber, onBack, onComplete }: OTPVerificationScreenProps) {
   const router = useRouter();
   const { login } = useAuth();
+  const { verifyOtp, signInWithPhone } = useSupabaseAuth();
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(60);
@@ -75,8 +77,9 @@ export default function OTPVerificationScreen({ phoneNumber, onBack, onComplete 
     setIsLoading(true);
     try {
       console.log('Verifying OTP:', otp.join(''));
-      // Simulate OTP verification
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // For testing, accept any 6-digit OTP
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       if (onComplete) {
         // For signup flow - call the onComplete callback
@@ -101,8 +104,13 @@ export default function OTPVerificationScreen({ phoneNumber, onBack, onComplete 
     setIsLoading(true);
     try {
       console.log('Resending OTP to:', phoneNumber);
-      // Simulate resending OTP
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { error } = await signInWithPhone(phoneNumber);
+      
+      if (error) {
+        console.error('Resend OTP error:', error);
+        Alert.alert('Error', 'Failed to resend OTP. Please try again.');
+        return;
+      }
       
       setTimeLeft(60);
       setCanResend(false);

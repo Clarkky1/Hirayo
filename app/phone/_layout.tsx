@@ -13,7 +13,7 @@ export default function PhoneLayout() {
           title: 'Smartphones & Phones',
           headerShown: true,
           headerStyle: {
-            backgroundColor: '#0066CC',
+            backgroundColor: '#667EEA',
           },
           headerTintColor: '#ffffff',
         }}

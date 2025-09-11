@@ -13,7 +13,7 @@ export default function MyItemsLayout() {
           title: 'My Items',
           headerShown: true,
           headerStyle: {
-            backgroundColor: '#0066CC',
+            backgroundColor: '#667EEA',
           },
           headerTintColor: '#ffffff',
         }}
@@ -24,7 +24,7 @@ export default function MyItemsLayout() {
           title: 'View Item',
           headerShown: true,
           headerStyle: {
-            backgroundColor: '#0066CC',
+            backgroundColor: '#667EEA',
           },
           headerTintColor: '#ffffff',
           presentation: 'modal',
@@ -36,7 +36,7 @@ export default function MyItemsLayout() {
           title: 'Edit Item',
           headerShown: true,
           headerStyle: {
-            backgroundColor: '#0066CC',
+            backgroundColor: '#667EEA',
           },
           headerTintColor: '#ffffff',
           presentation: 'modal',

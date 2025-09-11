@@ -13,7 +13,7 @@ export default function LaptopLayout() {
           title: 'Laptops & Computers',
           headerShown: true,
           headerStyle: {
-            backgroundColor: '#0066CC',
+            backgroundColor: '#667EEA',
           },
           headerTintColor: '#ffffff',
         }}

@@ -1,66 +1,30 @@
 import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
+import { transactionsService } from '@/services/transactionsService';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import {
-  FlatList,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+    FlatList,
+    SafeAreaView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
+import { TransactionSkeleton } from '../common/SkeletonLoader';
 
 interface Transaction {
   id: string;
   itemName: string;
   ownerName: string;
   amount: number;
-  status: 'completed' | 'active' | 'cancelled';
+  status: 'completed' | 'active' | 'cancelled' | 'pending' | 'refunded';
   date: string;
   duration: string;
   imageUrl?: string;
 }
-
-const transactions: Transaction[] = [
-  {
-    id: '2',
-    itemName: 'MacBook Pro 16" M2',
-    ownerName: 'Sarah Johnson',
-    amount: 3200,
-    status: 'active',
-    date: 'Aug 20-22, 2025',
-    duration: '3 days',
-  },
-  {
-    id: '3',
-    itemName: 'iPhone 15 Pro Max',
-    ownerName: 'Mike Wilson',
-    amount: 1800,
-    status: 'cancelled',
-    date: 'Aug 10-12, 2025',
-    duration: '3 days',
-  },
-  {
-    id: '4',
-    itemName: 'Sony A7 III Mirrorless',
-    ownerName: 'Emma Davis',
-    amount: 4200,
-    status: 'completed',
-    date: 'Aug 5-8, 2025',
-    duration: '4 days',
-  },
-  {
-    id: '5',
-    itemName: 'iPad Pro 12.9" M2',
-    ownerName: 'David Brown',
-    amount: 2400,
-    status: 'active',
-    date: 'Aug 25-27, 2025',
-    duration: '3 days',
-  },
-];
 
 const TransactionCard: React.FC<{ item: Transaction; onPress: (item: Transaction) => void }> = ({ item, onPress }) => {
   const getStatusColor = (status: string) => {
@@ -132,8 +96,56 @@ const TransactionCard: React.FC<{ item: Transaction; onPress: (item: Transaction
 export default function TransactionsScreen() {
   const [activeFilter, setActiveFilter] = useState<'all' | 'completed' | 'active' | 'cancelled'>('all');
   const [showFiltersDropdown, setShowFiltersDropdown] = useState(false);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { user } = useSupabaseAuth();
   const params = useLocalSearchParams();
   const navigation = useNavigation();
+
+  // Load transactions from Supabase
+  const loadTransactions = async () => {
+    if (!user) return;
+    
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const { data, error } = await transactionsService.getTransactions(user.id, {
+        status: activeFilter === 'all' ? undefined : activeFilter,
+      });
+      
+      if (error) {
+        console.error('Error loading transactions:', error);
+        setError('Failed to load transactions');
+        return;
+      }
+      
+      // Convert Supabase transactions to Transaction format
+      const convertedTransactions: Transaction[] = (data || []).map((tx: any) => ({
+        id: tx.id,
+        itemName: tx.item?.name || 'Unknown Item',
+        ownerName: tx.lender?.first_name ? `${tx.lender.first_name} ${tx.lender.last_name}` : 'Unknown Owner',
+        amount: tx.amount,
+        status: tx.status === 'pending' ? 'active' : tx.status,
+        date: `${tx.start_date} - ${tx.end_date}`,
+        duration: `${tx.duration_days} days`,
+        imageUrl: tx.item?.images?.[0],
+      }));
+      
+      setTransactions(convertedTransactions);
+    } catch (err) {
+      console.error('Error loading transactions:', err);
+      setError('Failed to load transactions');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load transactions when component mounts or filter changes
+  useEffect(() => {
+    loadTransactions();
+  }, [user, activeFilter]);
 
   // Configure header with filter icon
   useEffect(() => {
@@ -304,24 +316,32 @@ export default function TransactionsScreen() {
       )}
 
       {/* Transactions List */}
-      <FlatList
-        data={filteredTransactions}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TransactionCard item={item} onPress={handleTransactionPress} />
-        )}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.listContainer}
-        ListEmptyComponent={
-          <View style={styles.emptyState}>
-            <Ionicons name="receipt-outline" size={60} color="#E0E0E0" />
-            <Text style={styles.emptyStateText}>No transactions found</Text>
-            <Text style={styles.emptyStateSubtext}>
-              Your transaction history will appear here
-            </Text>
-          </View>
-        }
-      />
+      {loading ? (
+        <View style={styles.listContainer}>
+          {Array.from({ length: 5 }).map((_, index) => (
+            <TransactionSkeleton key={index} />
+          ))}
+        </View>
+      ) : (
+        <FlatList
+          data={filteredTransactions}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <TransactionCard item={item} onPress={handleTransactionPress} />
+          )}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContainer}
+          ListEmptyComponent={
+            <View style={styles.emptyState}>
+              <Ionicons name="receipt-outline" size={60} color="#E0E0E0" />
+              <Text style={styles.emptyStateText}>No transactions found</Text>
+              <Text style={styles.emptyStateSubtext}>
+                Your transaction history will appear here
+              </Text>
+            </View>
+          }
+        />
+      )}
     </SafeAreaView>
   );
 }

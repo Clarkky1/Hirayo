@@ -13,7 +13,7 @@ export default function LenderMessagesLayout() {
           title: 'Messages',
           headerShown: true,
           headerStyle: {
-            backgroundColor: '#0066CC',
+            backgroundColor: '#667EEA',
           },
           headerTintColor: '#FFFFFF',
           headerTitleStyle: {
