@@ -587,7 +587,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.xl,
+    paddingTop: Spacing['6xl']*3,
     paddingBottom: Spacing.sm,
   },
 
