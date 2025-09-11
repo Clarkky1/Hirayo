@@ -33,7 +33,7 @@ export const itemsService = {
         console.error('Error listing buckets:', bucketsError);
         console.error('Buckets error details:', JSON.stringify(bucketsError, null, 2));
         console.error('Error message:', bucketsError.message);
-        console.error('Error status:', bucketsError.statusCode);
+        console.error('Error status:', (bucketsError as any).statusCode);
         
         // If listing buckets fails, try to directly access the item-images bucket
         console.log('Bucket listing failed, trying direct access to item-images bucket...');
@@ -90,6 +90,49 @@ export const itemsService = {
     }
   },
 
+  // Test network connectivity
+  async testNetworkConnectivity() {
+    try {
+      console.log('Testing network connectivity...');
+      
+      // Test basic network connectivity
+      const testUrl = 'https://httpbin.org/get';
+      console.log('Testing basic network with:', testUrl);
+      
+      const response = await fetch(testUrl, {
+        method: 'GET'
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Network test failed: ${response.status} ${response.statusText}`);
+      }
+      
+      console.log('Basic network connectivity: OK');
+      
+      // Test Supabase API connectivity
+      const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://wdmdqonqxlqrpeqqseuf.supabase.co';
+      const healthUrl = `${supabaseUrl}/rest/v1/`;
+      console.log('Testing Supabase API connectivity with:', healthUrl);
+      
+      const supabaseResponse = await fetch(healthUrl, {
+        method: 'GET',
+        headers: {
+          'apikey': process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndkbWRxb25xeGxxcnBlcXFzZXVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MDI5ODEsImV4cCI6MjA3MzE3ODk4MX0.qzCs7q9OFKY1Y6vbF806X2qC4EBzZfvY2WcI7iEZRy4'
+        }
+      });
+      
+      if (!supabaseResponse.ok) {
+        throw new Error(`Supabase API test failed: ${supabaseResponse.status} ${supabaseResponse.statusText}`);
+      }
+      
+      console.log('Supabase API connectivity: OK');
+      return { success: true };
+    } catch (error) {
+      console.error('Network connectivity test failed:', error);
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    }
+  },
+
   // Test upload functionality
   async testUpload() {
     try {
@@ -114,7 +157,7 @@ export const itemsService = {
         console.error('Test upload error:', error);
         console.error('Upload error details:', JSON.stringify(error, null, 2));
         console.error('Error message:', error.message);
-        console.error('Error status:', error.statusCode);
+        console.error('Error status:', (error as any).statusCode);
         return { success: false, error };
       }
       
@@ -245,10 +288,13 @@ export const itemsService = {
     return { error };
   },
 
-  // Upload item image to Supabase Storage
-  async uploadItemImage(imageUri: string, userId?: string): Promise<string> {
+  // Upload item image to Supabase Storage with retry
+  async uploadItemImage(imageUri: string, userId?: string, retryCount = 0): Promise<string> {
+    const maxRetries = 3;
+    const retryDelay = 2000; // 2 seconds
+    
     try {
-      console.log('Starting image upload for user:', userId);
+      console.log(`Starting image upload for user: ${userId} (attempt ${retryCount + 1}/${maxRetries + 1})`);
       console.log('Image URI:', imageUri);
       const client = getSupabaseClient();
       
@@ -283,6 +329,13 @@ export const itemsService = {
         console.error('Error details:', JSON.stringify(error, null, 2));
         console.error('Error message:', error.message);
         console.error('Error status:', (error as any).statusCode);
+        
+        // Check if this is a network error and we can retry
+        if (error.message?.includes('Network request failed') && retryCount < maxRetries) {
+          console.log(`Network error detected, retrying in ${retryDelay}ms... (${retryCount + 1}/${maxRetries})`);
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+          return await itemsService.uploadItemImage(imageUri, userId, retryCount + 1);
+        }
         
         // Provide more specific error information
         if (error.message?.includes('permission denied') || error.message?.includes('unauthorized')) {

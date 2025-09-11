@@ -101,6 +101,14 @@ const PostItemScreen = () => {
 
     setLoading(true);
     try {
+      // Test network connectivity first
+      console.log('Testing network connectivity...');
+      const networkTest = await itemsService.testNetworkConnectivity();
+      if (!networkTest.success) {
+        throw new Error(`Network connectivity failed: ${networkTest.error}. Please check your internet connection.`);
+      }
+      console.log('Network connectivity: OK');
+
       // Test upload functionality directly (skip bucket listing)
       console.log('Testing upload functionality...');
       const uploadTest = await itemsService.testUpload();
@@ -115,9 +123,21 @@ const PostItemScreen = () => {
       const uploadedImageUrls: string[] = [];
       for (const imageUri of images) {
         console.log('Uploading image:', imageUri);
-        const url = await itemsService.uploadItemImage(imageUri, user.id);
-        uploadedImageUrls.push(url);
-        console.log('Image uploaded successfully:', url);
+        try {
+          const url = await itemsService.uploadItemImage(imageUri, user.id);
+          uploadedImageUrls.push(url);
+          console.log('Image uploaded successfully:', url);
+        } catch (uploadError) {
+          console.error('Image upload failed:', uploadError);
+          
+          // If upload fails due to network issues, use the local URI as fallback
+          if (uploadError instanceof Error && uploadError.message.includes('Network request failed')) {
+            console.warn('Using local image URI as fallback due to network issues');
+            uploadedImageUrls.push(imageUri);
+          } else {
+            throw uploadError;
+          }
+        }
       }
 
       // Create item
