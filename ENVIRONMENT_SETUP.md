@@ -1,26 +1,41 @@
-# Environment Variables Setup
+# Environment Setup
 
 ## Supabase Configuration
 
-To use environment variables for Supabase configuration, create a `.env.local` file in the root directory with the following content:
+Your Supabase configuration has been updated with the new URL and anon key:
 
-```bash
-# Supabase Configuration
-EXPO_PUBLIC_SUPABASE_URL=https://ovelzhyqfxvruoysolez.supabase.co
-EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92ZWx6aHlxZnh2cnVveXNvbGV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1NzY2MzUsImV4cCI6MjA3MTE1MjYzNX0.3ku4ZparEBzshGw1C2ALvBawMemoDHqDe0Wd9CSKW_k
+### New Supabase URL
+```
+https://tjpfwivbyzaxnlvbxrqc.supabase.co
 ```
 
-## How to Set Up
+### New Anon Key
+```
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqcGZ3aXZieXpheG5sdmJ4cnFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MDA1MDUsImV4cCI6MjA3MzE3NjUwNX0.OrSgdnT_mjcZPR2K2UF5vrXYxKJ62DV-xZ4MR8wF2Vo
+```
 
-1. Create a `.env.local` file in the root directory
-2. Copy the content above into the file
-3. The app will automatically use these environment variables
-4. If the environment variables are not found, it will fall back to the hardcoded values
+## Environment Variables
 
-## Current Configuration
+Create a `.env` file in your project root with the following content:
 
-The Supabase configuration is currently set up in `lib/supabase.ts` with:
-- **URL**: `https://ovelzhyqfxvruoysolez.supabase.co`
-- **Anon Key**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92ZWx6aHlxZnh2cnVveXNvbGV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1NzY2MzUsImV4cCI6MjA3MTE1MjYzNX0.3ku4ZparEBzshGw1C2ALvBawMemoDHqDe0Wd9CSKW_k`
+```env
+EXPO_PUBLIC_SUPABASE_URL=https://tjpfwivbyzaxnlvbxrqc.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqcGZ3aXZieXpheG5sdmJ4cnFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MDA1MDUsImV4cCI6MjA3MzE3NjUwNX0.OrSgdnT_mjcZPR2K2UF5vrXYxKJ62DV-xZ4MR8wF2Vo
+```
 
-The app is already configured to use your Supabase anon key and will work with the current setup.
+## Next Steps
+
+1. **Create the .env file** with the content above
+2. **Run the SQL setup** using `SUPABASE_FIXED_SETUP.sql` in your new Supabase project
+3. **Create storage buckets** as described in the Supabase setup documentation
+4. **Test the connection** by running your app
+
+## Storage Buckets Required
+
+Make sure to create these storage buckets in your Supabase dashboard:
+
+1. **item-images** (public)
+2. **user-avatars** (public) 
+3. **id-documents** (private)
+
+The RLS policies for these buckets are included in the SQL setup file.

@@ -7,6 +7,7 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
+  Alert,
   Dimensions,
   Image,
   KeyboardAvoidingView,
@@ -71,34 +72,6 @@ export default function LoginScreen() {
   //   }
   // };
 
-  // Email/Password login
-  const handleEmailLogin = async () => {
-    if (!isValidEmail(email) || !password.trim()) return;
-    
-    setIsLoading(true);
-    try {
-      console.log('Logging in with email:', email);
-      
-      // Use Supabase email/password authentication
-      const { error } = await signInWithEmail(email, password);
-      
-      if (error) {
-        console.error('Login error:', error);
-        // Handle error (you can add Alert here if needed)
-        return;
-      }
-      
-      // Set authenticated state
-      await setAuthenticated(true);
-      
-      // Navigate to main app after successful login
-      router.push('/(tabs)');
-    } catch (error) {
-      console.error('Email login error:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleFacebookLogin = async () => {
     setIsLoading(true);
@@ -139,6 +112,48 @@ export default function LoginScreen() {
       router.push('/(tabs)');
     } catch (error) {
       console.error('Google login error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleEmailLogin = async () => {
+    try {
+      // Validate email format
+      if (!isValidEmail(email)) {
+        Alert.alert('Error', 'Please enter a valid email address');
+        return;
+      }
+
+      // Validate password
+      if (!password.trim()) {
+        Alert.alert('Error', 'Please enter your password');
+        return;
+      }
+
+      setIsLoading(true);
+
+      // Sign in with Supabase
+      const { error } = await signInWithEmail(email.trim(), password);
+      
+      if (error) {
+        console.error('Login error:', error);
+        Alert.alert('Login Failed', error.message || 'Invalid email or password. Please try again.');
+        return;
+      }
+
+      // Success
+      await setAuthenticated(true);
+      
+      // Add a small delay to ensure smooth transition
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Navigate to main app after successful login
+      router.replace('/(tabs)');
+
+    } catch (error) {
+      console.error('Login error:', error);
+      Alert.alert('Error', 'An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }

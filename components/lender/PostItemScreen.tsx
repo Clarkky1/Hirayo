@@ -94,7 +94,7 @@ const PostItemScreen = () => {
       // Upload images first
       const uploadedImageUrls: string[] = [];
       for (const imageUri of images) {
-        const url = await itemsService.uploadItemImage(imageUri);
+        const url = await itemsService.uploadItemImage(imageUri, user.id);
         uploadedImageUrls.push(url);
       }
 

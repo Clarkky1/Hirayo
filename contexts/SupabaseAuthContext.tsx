@@ -127,14 +127,30 @@ export const SupabaseAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const signUpWithEmail = async (email: string, password: string, userData: Partial<User>) => {
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: userData,
         },
       });
-      return { error };
+
+      if (error) throw error;
+
+      // Create user profile in users table
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from('users')
+          .insert({
+            id: data.user.id,
+            email,
+            ...userData,
+          });
+
+        if (profileError) throw profileError;
+      }
+
+      return { error: null };
     } catch (error) {
       return { error };
     }

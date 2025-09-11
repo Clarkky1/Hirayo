@@ -212,6 +212,83 @@ export default function SignupScreen() {
     });
   };
 
+  const handleEmailSignup = async () => {
+    try {
+      // Validate passwords match
+      if (password !== confirmPassword) {
+        Alert.alert('Error', 'Passwords do not match');
+        return;
+      }
+
+      // Validate password length
+      if (password.length < 6) {
+        Alert.alert('Error', 'Password must be at least 6 characters long');
+        return;
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        Alert.alert('Error', 'Please enter a valid email address');
+        return;
+      }
+
+      // Validate age (must be 18+)
+      if (dateOfBirth) {
+        const today = new Date();
+        const age = today.getFullYear() - dateOfBirth.getFullYear();
+        const monthDiff = today.getMonth() - dateOfBirth.getMonth();
+        const actualAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < dateOfBirth.getDate()) ? age - 1 : age;
+        
+        if (actualAge < 18) {
+          Alert.alert('Error', 'You must be at least 18 years old to sign up');
+          return;
+        }
+      }
+
+      // Prepare user data
+      const userData = {
+        first_name: firstName.trim(),
+        last_name: surname.trim(),
+        email: email.trim(),
+        date_of_birth: dateOfBirth?.toISOString().split('T')[0],
+        user_type: 'renter' as const,
+        id_type: idType,
+        id_image_url: idImage, // This will be uploaded to Supabase Storage later
+        is_verified: false,
+        is_active: true,
+      };
+
+      // Sign up with Supabase
+      const { error } = await signUpWithEmail(email.trim(), password, userData);
+      
+      if (error) {
+        console.error('Signup error:', error);
+        Alert.alert('Signup Failed', error.message || 'Failed to create account. Please try again.');
+        return;
+      }
+
+      // Success
+      Alert.alert(
+        'Account Created!', 
+        'Please check your email to verify your account before logging in.',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              setAuthenticated(true);
+              router.replace('/home' as any);
+            }
+          }
+        ]
+      );
+
+    } catch (error) {
+      console.error('Signup error:', error);
+      Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+    }
+  };
+
   const handleAgreeAndContinue = async () => {
     if (!termsAccepted) {
       setShowTermsModal(true);

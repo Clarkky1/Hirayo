@@ -94,40 +94,107 @@ export const itemsService = {
     return { error };
   },
 
-  // Upload item image
-  async uploadItemImage(imageUri: string): Promise<string> {
+  // Upload item image to Supabase Storage
+  async uploadItemImage(imageUri: string, userId?: string): Promise<string> {
     try {
-      // For now, return the original URI as a placeholder
-      // In production, you would upload to Supabase Storage
-      console.log('Image upload placeholder:', imageUri);
-      return imageUri;
+      // Convert image URI to blob
+      const response = await fetch(imageUri);
+      const blob = await response.blob();
       
-      // TODO: Implement actual Supabase Storage upload
-      // const response = await fetch(imageUri);
-      // const blob = await response.blob();
+      // Generate unique filename
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.jpg`;
+      const filePath = userId ? `${userId}/${fileName}` : fileName;
       
-      // const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.jpg`;
-      // const filePath = `item-images/${fileName}`;
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('item-images')
+        .upload(filePath, blob, {
+          contentType: 'image/jpeg',
+          upsert: false
+        });
       
-      // const { data, error } = await supabase.storage
-      //   .from('item-images')
-      //   .upload(filePath, blob, {
-      //     contentType: 'image/jpeg',
-      //     upsert: false
-      //   });
+      if (error) {
+        throw error;
+      }
       
-      // if (error) {
-      //   throw error;
-      // }
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('item-images')
+        .getPublicUrl(filePath);
       
-      // // Get public URL
-      // const { data: { publicUrl } } = supabase.storage
-      //   .from('item-images')
-      //   .getPublicUrl(filePath);
-      
-      // return publicUrl;
+      return publicUrl;
     } catch (error) {
       console.error('Error uploading image:', error);
+      throw error;
+    }
+  },
+
+  // Upload user avatar to Supabase Storage
+  async uploadUserAvatar(imageUri: string, userId: string): Promise<string> {
+    try {
+      // Convert image URI to blob
+      const response = await fetch(imageUri);
+      const blob = await response.blob();
+      
+      // Generate unique filename
+      const fileName = `avatar-${Date.now()}.jpg`;
+      const filePath = `${userId}/${fileName}`;
+      
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('user-avatars')
+        .upload(filePath, blob, {
+          contentType: 'image/jpeg',
+          upsert: true // Allow overwriting existing avatar
+        });
+      
+      if (error) {
+        throw error;
+      }
+      
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('user-avatars')
+        .getPublicUrl(filePath);
+      
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      throw error;
+    }
+  },
+
+  // Upload ID document to Supabase Storage
+  async uploadIdDocument(imageUri: string, userId: string, idType: string): Promise<string> {
+    try {
+      // Convert image URI to blob
+      const response = await fetch(imageUri);
+      const blob = await response.blob();
+      
+      // Generate filename based on ID type
+      const fileName = `${idType}-${Date.now()}.jpg`;
+      const filePath = `${userId}/${fileName}`;
+      
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('id-documents')
+        .upload(filePath, blob, {
+          contentType: 'image/jpeg',
+          upsert: true // Allow overwriting existing ID document
+        });
+      
+      if (error) {
+        throw error;
+      }
+      
+      // Get public URL (this will be private due to RLS policies)
+      const { data: { publicUrl } } = supabase.storage
+        .from('id-documents')
+        .getPublicUrl(filePath);
+      
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading ID document:', error);
       throw error;
     }
   },
