@@ -1,16 +1,24 @@
 
 import { Item, supabase } from '../lib/supabase';
 
+// Ensure we have a properly configured Supabase client
+const getSupabaseClient = () => {
+  if (!supabase) {
+    throw new Error('Supabase client not initialized');
+  }
+  return supabase;
+};
+
 export const itemsService = {
   // Test storage connection
   async testStorageConnection() {
     try {
       console.log('Testing storage connection...');
-      console.log('Supabase client URL:', process.env.EXPO_PUBLIC_SUPABASE_URL);
-      console.log('Supabase client key exists:', !!process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY);
+      const client = getSupabaseClient();
+      console.log('Supabase client initialized:', !!client);
       
       // Check authentication status
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      const { data: { user }, error: authError } = await client.auth.getUser();
       if (authError) {
         console.error('Auth error:', authError);
       } else {
@@ -19,7 +27,7 @@ export const itemsService = {
       
       // Try to list buckets
       console.log('Attempting to list storage buckets...');
-      const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
+      const { data: buckets, error: bucketsError } = await client.storage.listBuckets();
       
       if (bucketsError) {
         console.error('Error listing buckets:', bucketsError);
@@ -66,13 +74,14 @@ export const itemsService = {
   async testUpload() {
     try {
       console.log('Testing upload functionality...');
+      const client = getSupabaseClient();
       
       // Create a simple test blob
       const testData = new Blob(['test content'], { type: 'text/plain' });
       const testFileName = `test-${Date.now()}.txt`;
       
       console.log('Attempting test upload to item-images bucket...');
-      const { data, error } = await supabase.storage
+      const { data, error } = await client.storage
         .from('item-images')
         .upload(`test/${testFileName}`, testData, {
           contentType: 'text/plain',
@@ -87,7 +96,7 @@ export const itemsService = {
       console.log('Test upload successful:', data);
       
       // Clean up test file
-      await supabase.storage
+      await client.storage
         .from('item-images')
         .remove([`test/${testFileName}`]);
       
@@ -211,6 +220,7 @@ export const itemsService = {
     try {
       console.log('Starting image upload for user:', userId);
       console.log('Image URI:', imageUri);
+      const client = getSupabaseClient();
       
       // Convert image URI to blob
       const response = await fetch(imageUri);
@@ -231,7 +241,7 @@ export const itemsService = {
       console.log('File path:', filePath);
       console.log('Blob size:', blob.size, 'bytes');
       
-      const { data, error } = await supabase.storage
+      const { data, error } = await client.storage
         .from(bucketName)
         .upload(filePath, blob, {
           contentType: 'image/jpeg',
@@ -255,7 +265,7 @@ export const itemsService = {
           const newFilePath = userId ? `${userId}/${newFileName}` : newFileName;
           console.log('Trying with new filename:', newFilePath);
           
-          const retryResult = await supabase.storage
+          const retryResult = await client.storage
             .from(bucketName)
             .upload(newFilePath, blob, {
               contentType: 'image/jpeg',
@@ -266,7 +276,7 @@ export const itemsService = {
             throw retryResult.error;
           }
           
-          const { data: { publicUrl } } = supabase.storage
+          const { data: { publicUrl } } = client.storage
             .from(bucketName)
             .getPublicUrl(newFilePath);
           
@@ -280,7 +290,7 @@ export const itemsService = {
       console.log('Successfully uploaded to item-images bucket');
       
       // Get public URL
-      const { data: { publicUrl } } = supabase.storage
+      const { data: { publicUrl } } = client.storage
         .from(bucketName)
         .getPublicUrl(filePath);
       
@@ -288,8 +298,8 @@ export const itemsService = {
       return publicUrl;
     } catch (error) {
       console.error('Error uploading image:', error);
-      console.error('Error stack:', error.stack);
-      throw error;
+      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+      throw error instanceof Error ? error : new Error('Unknown error occurred');
     }
   },
 
