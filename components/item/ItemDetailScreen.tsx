@@ -2,10 +2,12 @@ import { BorderRadius, Colors, Spacing } from '@/constants/DesignSystem';
 import { useLender } from '@/contexts/LenderContext';
 import { useSelectedItem } from '@/contexts/SelectedItemContext';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
+import { itemsService } from '@/services/itemsService';
+import { Item } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Image,
@@ -23,36 +25,55 @@ export default function ItemDetailScreen() {
   const { selectedItem } = useSelectedItem();
   const { validateAndNavigate } = useNavigationGuard();
   const { isLender } = useLender();
-  const { lenderId, lenderName, lenderAvatar } = useLocalSearchParams();
+  const { itemId } = useLocalSearchParams();
   const [activeTab, setActiveTab] = useState<'description' | 'review'>('description');
   const [showMore, setShowMore] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showCommunicationModal, setShowCommunicationModal] = useState(false);
+  const [item, setItem] = useState<Item | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   // Animation value for swipe gestures
   const pan = useRef(new Animated.ValueXY()).current;
   
-  // Use selected item data if available, otherwise use default data
-  const item = selectedItem || {
-    id: '1',
-    name: 'Canon EOS 90D DSLR Camera',
-    price: 2500,
-    rating: 4.76,
-    location: 'Cebu City',
-    category: 'camera'
-  };
+  // Load item data
+  useEffect(() => {
+    const loadItem = async () => {
+      try {
+        setLoading(true);
+        const itemIdToLoad = itemId as string || selectedItem?.id;
+        
+        if (!itemIdToLoad) {
+          setError('No item ID provided');
+          return;
+        }
+
+        const { data, error: itemError } = await itemsService.getItemById(itemIdToLoad);
+        
+        if (itemError) {
+          throw itemError;
+        }
+
+        setItem(data);
+      } catch (err) {
+        console.error('Error loading item:', err);
+        setError('Failed to load item details');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadItem();
+  }, [itemId, selectedItem?.id]);
   
-  // Mock images for demonstration - in real app this would come from the item data
-  const itemImages = [
-    'https://picsum.photos/400/300?random=1',
-    'https://picsum.photos/400/300?random=2',
-    'https://picsum.photos/400/300?random=3',
-    'https://picsum.photos/400/300?random=4',
-    'https://picsum.photos/400/300?random=5',
-  ];
+  // Use item images from data or fallback
+  const itemImages = item?.images && item.images.length > 0 
+    ? item.images 
+    : ['https://picsum.photos/400/300?random=1'];
   
   // Check if description is long enough to show "Show more" button
-  const descriptionText = "Capture high-resolution photos and 4K video with this versatile DSLR. Perfect for events, travel, or content creation. Rent it for a day or a week — no strings attached.";
+  const descriptionText = item?.description || "No description available";
   const isDescriptionLong = descriptionText.length > 100; // Show button if description is longer than 100 characters
 
   const handleRent = () => {
@@ -145,6 +166,39 @@ export default function ItemDetailScreen() {
       },
     })
   ).current;
+
+  // Loading state
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar style="light" />
+        <View style={{ backgroundColor: '#667EEA', height: 0 }} />
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Loading item details...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Error state
+  if (error || !item) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar style="light" />
+        <View style={{ backgroundColor: '#667EEA', height: 0 }} />
+        <View style={styles.errorContainer}>
+          <Ionicons name="alert-circle-outline" size={48} color={Colors.error} />
+          <Text style={styles.errorText}>{error || 'Item not found'}</Text>
+          <TouchableOpacity 
+            style={styles.retryButton}
+            onPress={() => router.back()}
+          >
+            <Text style={styles.retryButtonText}>Go Back</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>

@@ -11,7 +11,15 @@ export const itemsService = {
   }) {
     let query = supabase
       .from('items')
-      .select('*')
+      .select(`
+        *,
+        lender:users!lender_id(
+          id,
+          first_name,
+          last_name,
+          avatar_url
+        )
+      `)
       .eq('is_available', true)
       .order('created_at', { ascending: false });
 
@@ -43,7 +51,15 @@ export const itemsService = {
   async getItemById(id: string) {
     const { data, error } = await supabase
       .from('items')
-      .select('*')
+      .select(`
+        *,
+        lender:users!lender_id(
+          id,
+          first_name,
+          last_name,
+          avatar_url
+        )
+      `)
       .eq('id', id)
       .single();
 

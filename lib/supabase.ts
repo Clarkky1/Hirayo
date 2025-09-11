@@ -39,6 +39,12 @@ export interface Item {
   is_available: boolean;
   created_at: string;
   updated_at: string;
+  lender?: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    avatar_url?: string;
+  };
 }
 
 export interface Message {

@@ -4,14 +4,15 @@ import { transactionsService } from '@/services/transactionsService';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
-    FlatList,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { TransactionSkeleton } from '../common/SkeletonLoader';
 
@@ -97,8 +98,10 @@ export default function TransactionsScreen() {
   const [activeFilter, setActiveFilter] = useState<'all' | 'completed' | 'active' | 'cancelled'>('all');
   const [showFiltersDropdown, setShowFiltersDropdown] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const { user } = useSupabaseAuth();
   const params = useLocalSearchParams();
   const navigation = useNavigation();
@@ -134,6 +137,7 @@ export default function TransactionsScreen() {
       }));
       
       setTransactions(convertedTransactions);
+      setFilteredTransactions(convertedTransactions);
     } catch (err) {
       console.error('Error loading transactions:', err);
       setError('Failed to load transactions');
@@ -141,6 +145,32 @@ export default function TransactionsScreen() {
       setLoading(false);
     }
   };
+
+  // Filter transactions based on search query and active filter
+  const filterTransactions = useCallback(() => {
+    let filtered = transactions;
+
+    // Apply status filter
+    if (activeFilter !== 'all') {
+      filtered = filtered.filter(tx => tx.status === activeFilter);
+    }
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(tx => 
+        tx.itemName.toLowerCase().includes(query) ||
+        tx.ownerName.toLowerCase().includes(query)
+      );
+    }
+
+    setFilteredTransactions(filtered);
+  }, [transactions, activeFilter, searchQuery]);
+
+  // Update filtered transactions when dependencies change
+  useEffect(() => {
+    filterTransactions();
+  }, [filterTransactions]);
 
   // Load transactions when component mounts or filter changes
   useEffect(() => {
@@ -186,10 +216,6 @@ export default function TransactionsScreen() {
   const returnLocation = Array.isArray(params.returnLocation) ? params.returnLocation[0] : params.returnLocation;
   const paymentMethod = Array.isArray(params.paymentMethod) ? params.paymentMethod[0] : params.paymentMethod;
   const transactionId = Array.isArray(params.transactionId) ? params.transactionId[0] : params.transactionId;
-
-  const filteredTransactions = activeFilter === 'all' 
-    ? transactions 
-    : transactions.filter(t => t.status === activeFilter);
 
   const handleTransactionPress = (transaction: Transaction) => {
     // Check if this is the enhanced receipt transaction (from payment)
@@ -314,6 +340,28 @@ export default function TransactionsScreen() {
           </View>
         </>
       )}
+
+      {/* Search Input */}
+      <View style={styles.searchContainer}>
+        <View style={styles.searchInputContainer}>
+          <Ionicons name="search" size={20} color="#9CA3AF" style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search transactions..."
+            placeholderTextColor="#9CA3AF"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity
+              onPress={() => setSearchQuery('')}
+              style={styles.clearButton}
+            >
+              <Ionicons name="close-circle" size={20} color="#9CA3AF" />
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
 
       {/* Transactions List */}
       {loading ? (
@@ -543,5 +591,33 @@ const styles = StyleSheet.create({
     ...TextStyles.body.small,
     color: '#999999',
     textAlign: 'center',
+  },
+  searchContainer: {
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
+    backgroundColor: '#FFFFFF',
+  },
+  searchInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  searchIcon: {
+    marginRight: Spacing.sm,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: '#333333',
+    paddingVertical: 0,
+  },
+  clearButton: {
+    padding: 4,
+    marginLeft: Spacing.sm,
   },
 });

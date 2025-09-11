@@ -33,11 +33,18 @@ interface ProductItem extends SearchableItem {
   description?: string;
 }
 
-  const sortOptions = ['₱500 - ₱1,500', '₱1,500 - ₱2,500', '₱2,500 - ₱3,500', '₱3,500 - ₱4,500', '₱4,500 - ₱5,500', '₱5,500 - ₱6,500', '₱6,500 - ₱7,500', '₱7,500 - ₱8,500', '₱8,500 - ₱9,500', '₱9,500 - ₱10,000'];
-const filterCategories = ['Camera', 'Laptop', 'Phone', 'Tablet/iPad', 'Drone', 'PC', 'Gaming', 'Audio'];
-
-
 export default function DiscoverScreen() {
+  const sortOptions = [
+    { id: 'price-low', label: 'Price: Low to High' },
+    { id: 'price-high', label: 'Price: High to Low' },
+    { id: 'rating', label: 'Highest Rated' },
+    { id: 'newest', label: 'Newest First' },
+    { id: 'oldest', label: 'Oldest First' }
+  ];
+  
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+  const [availableLocations, setAvailableLocations] = useState<string[]>([]);
+  const [priceRanges, setPriceRanges] = useState<{id: string, label: string, min: number, max: number}[]>([]);
   const params = useLocalSearchParams();
   const { searchQuery, setSearchQuery, addToHistory } = useSearch();
   const { user } = useSupabaseAuth();
@@ -93,6 +100,31 @@ export default function DiscoverScreen() {
       
       setProducts(convertedItems);
       setFilteredProducts(convertedItems);
+      
+      // Extract filter options from the data
+      const categories = [...new Set(convertedItems.map(item => item.category))].sort();
+      const locations = [...new Set(convertedItems.map(item => item.location))].sort();
+      
+      // Calculate price ranges dynamically
+      const prices = convertedItems.map(item => item.price).sort((a, b) => a - b);
+      const minPrice = Math.floor(prices[0] / 500) * 500; // Round down to nearest 500
+      const maxPrice = Math.ceil(prices[prices.length - 1] / 500) * 500; // Round up to nearest 500
+      
+      const ranges = [];
+      for (let i = minPrice; i < maxPrice; i += 500) {
+        const rangeId = `${i}-${i + 500}`;
+        const rangeLabel = `₱${i.toLocaleString()} - ₱${(i + 500).toLocaleString()}`;
+        ranges.push({
+          id: rangeId,
+          label: rangeLabel,
+          min: i,
+          max: i + 500
+        });
+      }
+      
+      setAvailableCategories(categories);
+      setAvailableLocations(locations);
+      setPriceRanges(ranges);
     } catch (err) {
       console.error('Error loading items:', err);
       setError('Failed to load items');
@@ -137,16 +169,20 @@ export default function DiscoverScreen() {
     }
   };
 
-  const categories = [
-    { id: 'camera', name: 'Camera', icon: 'camera' },
-    { id: 'laptop', name: 'Laptop', icon: 'laptop' },
-    { id: 'phone', name: 'Phone', icon: 'phone-portrait' },
-    { id: 'pc', name: 'PC', icon: 'desktop' },
-    { id: 'tablet', name: 'Tablet', icon: 'tablet-portrait' },
-    { id: 'gaming', name: 'Gaming', icon: 'game-controller' },
-    { id: 'audio', name: 'Audio', icon: 'headset' },
-    { id: 'drone', name: 'Drone', icon: 'airplane' },
-  ];
+  // Map category names to icons
+  const getCategoryIcon = (category: string) => {
+    const iconMap: { [key: string]: string } = {
+      'camera': 'camera',
+      'laptop': 'laptop',
+      'phone': 'phone-portrait',
+      'pc': 'desktop',
+      'tablet/ipad': 'tablet-portrait',
+      'gaming': 'game-controller',
+      'audio': 'headset',
+      'drone': 'airplane',
+    };
+    return iconMap[category.toLowerCase()] || 'cube';
+  };
 
   const locations = [
     { id: 'nearby', name: 'Nearby (0-5 km)', icon: 'location' },
@@ -182,13 +218,13 @@ export default function DiscoverScreen() {
   };
 
   const getFilteredCategories = () => {
-    let filtered = categories;
+    let filtered = availableCategories;
     
     if (selectedLocation) {
       // Filter categories based on location availability
       // This would typically come from your backend
       filtered = filtered.filter(cat => 
-        ['camera', 'laptop', 'phone', 'pc'].includes(cat.id)
+        ['camera', 'laptop', 'phone', 'pc'].includes(cat.toLowerCase())
       );
     }
     
@@ -249,8 +285,8 @@ export default function DiscoverScreen() {
     setShowSortDropdown(false);
   };
 
-  const handleSortOptionSelect = (option: string) => {
-    setSelectedSort(option);
+  const handleSortOptionSelect = (option: { id: string; label: string }) => {
+    setSelectedSort(option.id);
     setShowSortDropdown(false);
   };
 
@@ -454,18 +490,18 @@ export default function DiscoverScreen() {
                 key={index}
                 style={[
                   styles.dropdownItem,
-                  selectedSort === option && styles.selectedDropdownItem
+                  selectedSort === option.id && styles.selectedDropdownItem
                 ]}
                 onPress={() => handleSortOptionSelect(option)}
                 activeOpacity={0.7}
               >
                 <Text style={[
                   styles.dropdownItemText,
-                  selectedSort === option && styles.selectedDropdownItemText
+                  selectedSort === option.id && styles.selectedDropdownItemText
                 ]}>
-                  {option}
+                  {option.label}
                 </Text>
-                {selectedSort === option && (
+                {selectedSort === option.id && (
                   <Ionicons name="checkmark" size={14} color={Colors.primary[500]} />
                 )}
               </TouchableOpacity>
@@ -480,22 +516,22 @@ export default function DiscoverScreen() {
             <View style={styles.filterSection}>
               <Text style={styles.filterSectionTitle}>Categories</Text>
               <View style={styles.categoriesGrid}>
-                {categories.map((category) => (
+                {availableCategories.map((category) => (
                   <TouchableOpacity
-                    key={category.id}
+                    key={category}
                     style={[
                       styles.categoryChip,
-                      selectedCategory === category.id && styles.selectedCategoryChip
+                      selectedCategories.includes(category) && styles.selectedCategoryChip
                     ]}
-                    onPress={() => handleCategoryPress(category.id)}
+                    onPress={() => handleCategoryToggle(category)}
                     activeOpacity={0.7}
                   >
-                    <Ionicons name={category.icon as any} size={16} color={Colors.text.primary} />
+                    <Ionicons name={getCategoryIcon(category) as any} size={16} color={Colors.text.primary} />
                     <Text style={[
                       styles.categoryChipText,
-                      selectedCategory === category.id && styles.selectedCategoryChipText
+                      selectedCategories.includes(category) && styles.selectedCategoryChipText
                     ]}>
-                      {category.name}
+                      {category.charAt(0).toUpperCase() + category.slice(1)}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -506,22 +542,22 @@ export default function DiscoverScreen() {
             <View style={styles.filterSection}>
               <Text style={styles.filterSectionTitle}>Location</Text>
               <View style={styles.locationsGrid}>
-                {locations.map((location) => (
+                {availableLocations.map((location) => (
                   <TouchableOpacity
-                    key={location.id}
+                    key={location}
                     style={[
                       styles.locationChip,
-                      selectedLocation === location.id && styles.selectedLocationChip
+                      selectedLocation === location && styles.selectedLocationChip
                     ]}
-                    onPress={() => handleLocationPress(location.id)}
+                    onPress={() => setSelectedLocation(selectedLocation === location ? null : location)}
                     activeOpacity={0.7}
                   >
-                    <Ionicons name={location.icon as any} size={16} color={Colors.text.primary} />
+                    <Ionicons name="location" size={16} color={Colors.text.primary} />
                     <Text style={[
                       styles.locationChipText,
-                      selectedLocation === location.id && styles.selectedLocationChipText
+                      selectedLocation === location && styles.selectedLocationChipText
                     ]}>
-                      {location.name}
+                      {location}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -532,23 +568,23 @@ export default function DiscoverScreen() {
             <View style={styles.filterSection}>
               <Text style={styles.filterSectionTitle}>Price Range</Text>
               <View style={styles.priceRangeGrid}>
-                {sortOptions.map((option, index) => (
+                {priceRanges.map((range, index) => (
                   <TouchableOpacity
                     key={index}
                     style={[
                       styles.priceRangeChip,
-                      selectedSort === option && styles.selectedPriceRangeChip
+                      selectedSort === range.id && styles.selectedPriceRangeChip
                     ]}
-                    onPress={() => handleSortOptionSelect(option)}
+                    onPress={() => handleSortOptionSelect({ id: range.id, label: range.label })}
                     activeOpacity={0.7}
                   >
                     <Text style={[
                       styles.priceRangeChipText,
-                      selectedSort === option && styles.selectedPriceRangeChipText
+                      selectedSort === range.id && styles.selectedPriceRangeChipText
                     ]}>
-                      {option}
+                      {range.label}
                     </Text>
-                    {selectedSort === option && (
+                    {selectedSort === range.id && (
                       <Ionicons name="checkmark" size={14} color={Colors.primary[500]} />
                     )}
                   </TouchableOpacity>
