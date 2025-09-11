@@ -393,14 +393,14 @@ export default function SignupScreen() {
                     <Ionicons name="cloud-upload-outline" size={32} color="#9CA3AF" />
                     <Text style={styles.idUploadText}>Upload ID Photo</Text>
                     <Text style={styles.idUploadSubtext}>Tap to select ID type and upload</Text>
-                  </TouchableOpacity>
+              </TouchableOpacity>
                 )}
-              </View>
+            </View>
 
               {/* Legal Name Section */}
               <View style={styles.formSection}>
                 <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionLabel}>Legal Name</Text>
+              <Text style={styles.sectionLabel}>Legal Name</Text>
                   <Text style={styles.idMatchMessage}>Name and birthdate must match your ID</Text>
                 </View>
                 <View style={styles.inputRow}>
@@ -408,26 +408,26 @@ export default function SignupScreen() {
                     <Text style={styles.inputLabel}>First Name <Text style={styles.requiredAsterisk}>*</Text></Text>
                     <View style={styles.inputWrapper}>
                       <Ionicons name="person-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
-                      <TextInput
-                        style={styles.input}
+                <TextInput
+                  style={styles.input}
                         placeholder="First name"
-                        value={firstName}
-                        onChangeText={setFirstName}
-                        autoCapitalize="words"
+                  value={firstName}
+                  onChangeText={setFirstName}
+                  autoCapitalize="words"
                         placeholderTextColor="#9CA3AF"
-                      />
-                    </View>
+                />
+              </View>
                   </View>
                   <View style={styles.inputGroup}>
                     <Text style={styles.inputLabel}>Surname <Text style={styles.requiredAsterisk}>*</Text></Text>
                     <View style={styles.inputWrapper}>
                       <Ionicons name="person-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
-                      <TextInput
-                        style={styles.input}
+                <TextInput
+                  style={styles.input}
                         placeholder="Surname"
-                        value={surname}
-                        onChangeText={setSurname}
-                        autoCapitalize="words"
+                  value={surname}
+                  onChangeText={setSurname}
+                  autoCapitalize="words"
                         placeholderTextColor="#9CA3AF"
                       />
                     </View>
@@ -462,10 +462,10 @@ export default function SignupScreen() {
                       onChangeText={setConfirmPassword}
                       secureTextEntry={true}
                       placeholderTextColor="#9CA3AF"
-                    />
-                  </View>
-                </View>
+                />
               </View>
+                </View>
+            </View>
 
               {/* Phone Number Section - commented out temporarily */}
               {/* <View style={styles.formSection}>
@@ -474,8 +474,8 @@ export default function SignupScreen() {
                   <Text style={styles.inputLabel}>Phone <Text style={styles.requiredAsterisk}>*</Text></Text>
                   <View style={styles.inputWrapper}>
                     <Ionicons name="call-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
-                    <TextInput
-                      style={styles.input}
+                <TextInput
+                  style={styles.input}
                       placeholder="09XXXXXXXXX"
                       value={phoneNumber}
                       onChangeText={setPhoneNumber}
@@ -483,8 +483,8 @@ export default function SignupScreen() {
                       placeholderTextColor="#9CA3AF"
                     />
                   </View>
-                </View>
-                <Text style={styles.helperText}>
+              </View>
+              <Text style={styles.helperText}>
                   We'll use this to send you verification codes and important updates
                 </Text>
               </View> */}
@@ -501,11 +501,11 @@ export default function SignupScreen() {
                     <Ionicons name="calendar-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
                     <Text style={[styles.input, styles.dateInputText]}>
                       {formatDate(dateOfBirth)}
-                    </Text>
+              </Text>
                     <Ionicons name="chevron-down" size={16} color="#9CA3AF" />
                   </TouchableOpacity>
                 </View>
-              </View>
+            </View>
 
               {/* Email Section */}
               <View style={styles.formSection}>
@@ -513,24 +513,24 @@ export default function SignupScreen() {
                   <Text style={styles.inputLabel}>Email Address <Text style={styles.requiredAsterisk}>*</Text></Text>
                   <View style={styles.inputWrapper}>
                     <Ionicons name="mail-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
-                    <TextInput
-                      style={styles.input}
+                <TextInput
+                  style={styles.input}
                       placeholder="your@email.com"
-                      value={email}
-                      onChangeText={setEmail}
-                      keyboardType="email-address"
-                      autoCapitalize="none"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
                       placeholderTextColor="#9CA3AF"
-                    />
+                />
                   </View>
-                </View>
-                <Text style={styles.helperText}>
-                  We'll email you a reservation confirmation
-                </Text>
               </View>
+              <Text style={styles.helperText}>
+                  We'll email you a reservation confirmation
+              </Text>
+            </View>
 
               {/* Terms Agreement with Checkbox */}
-              <View style={styles.agreementContainer}>
+            <View style={styles.agreementContainer}>
                 <TouchableOpacity 
                   style={styles.checkboxContainer}
                   onPress={() => setShowTermsModal(true)}
@@ -543,37 +543,37 @@ export default function SignupScreen() {
                   </View>
                   <Text style={styles.checkboxLabel}>
                     I agree to Hirayo's{' '}
-                    <Text style={styles.linkText}>Terms of Service</Text>
-                    ,{' '}
+                <Text style={styles.linkText}>Terms of Service</Text>
+                ,{' '}
                     <Text style={styles.linkText}>Payment Terms</Text>
-                    {' '}and{' '}
-                    <Text style={styles.linkText}>Anti-Discrimination Policy</Text>
-                    , and acknowledge the{' '}
-                    <Text style={styles.linkText}>Privacy Policy</Text>
-                  </Text>
+                {' '}and{' '}
+                <Text style={styles.linkText}>Anti-Discrimination Policy</Text>
+                , and acknowledge the{' '}
+                <Text style={styles.linkText}>Privacy Policy</Text>
+              </Text>
                 </TouchableOpacity>
-              </View>
+            </View>
 
               {/* Continue Button */}
-              <TouchableOpacity 
+            <TouchableOpacity 
                 style={[
                   styles.primaryButton, 
                   isFormValid && styles.primaryButtonActive
                 ]}
-                onPress={handleAgreeAndContinue}
-                disabled={!isFormValid}
+              onPress={handleAgreeAndContinue}
+              disabled={!isFormValid}
                 activeOpacity={0.8}
-              >
+            >
                 <Text style={styles.primaryButtonText}>Signup</Text>
                 <Ionicons name="arrow-forward" size={20} color="#FFFFFF" style={styles.buttonIcon} />
-              </TouchableOpacity>
+            </TouchableOpacity>
 
               {/* Login Link */}
-              <View style={styles.loginContainer}>
-                <Text style={styles.loginText}>Already have an account? </Text>
-                <TouchableOpacity onPress={handleBack} activeOpacity={0.7}>
-                  <Text style={styles.loginLink}>Log in</Text>
-                </TouchableOpacity>
+            <View style={styles.loginContainer}>
+              <Text style={styles.loginText}>Already have an account? </Text>
+              <TouchableOpacity onPress={handleBack} activeOpacity={0.7}>
+                <Text style={styles.loginLink}>Log in</Text>
+              </TouchableOpacity>
               </View>
             </View>
           </View>

@@ -1,4 +1,4 @@
-import { BorderRadius, Colors, Shadows, Spacing, TextStyles } from '@/constants/DesignSystem';
+import { Colors, Shadows, Spacing } from '@/constants/DesignSystem';
 import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { itemsService } from '@/services/itemsService';
 import { Ionicons } from '@expo/vector-icons';
@@ -134,112 +134,41 @@ const PostItemScreen = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
-        {/* Header */}
+        {/* Modern Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
             <Ionicons name="arrow-back" size={24} color={Colors.text.primary} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Post New Item</Text>
+          <View style={styles.headerContent}>
+            <Text style={styles.headerTitle}>Post New Item</Text>
+            <Text style={styles.headerSubtitle}>Share your item with renters</Text>
+          </View>
           <View style={styles.placeholder} />
         </View>
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          {/* Item Name */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Item Name *</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter item name"
-              value={formData.name}
-              onChangeText={(value) => handleInputChange('name', value)}
-              placeholderTextColor={Colors.text.secondary}
-            />
-          </View>
-
-          {/* Description */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Description *</Text>
-            <TextInput
-              style={[styles.input, styles.textArea]}
-              placeholder="Describe your item..."
-              value={formData.description}
-              onChangeText={(value) => handleInputChange('description', value)}
-              multiline
-              numberOfLines={4}
-              placeholderTextColor={Colors.text.secondary}
-            />
-          </View>
-
-          {/* Price and Category Row */}
-          <View style={styles.row}>
-            <View style={[styles.inputGroup, styles.halfWidth]}>
-              <Text style={styles.label}>Price per Day (₱) *</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="0.00"
-                value={formData.price}
-                onChangeText={(value) => handleInputChange('price', value)}
-                keyboardType="numeric"
-                placeholderTextColor={Colors.text.secondary}
-              />
+          {/* Images Section - Prominent */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Photos</Text>
+              <Text style={styles.sectionSubtitle}>Add up to 5 photos</Text>
             </View>
-            <View style={[styles.inputGroup, styles.halfWidth]}>
-              <Text style={styles.label}>Category *</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
-                {categories.map((category) => (
-                  <TouchableOpacity
-                    key={category}
-                    style={[
-                      styles.categoryChip,
-                      formData.category === category && styles.categoryChipSelected
-                    ]}
-                    onPress={() => handleInputChange('category', category)}
-                  >
-                    <Text style={[
-                      styles.categoryText,
-                      formData.category === category && styles.categoryTextSelected
-                    ]}>
-                      {category.charAt(0).toUpperCase() + category.slice(1)}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-          </View>
-
-          {/* Location */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Location *</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter location"
-              value={formData.location}
-              onChangeText={(value) => handleInputChange('location', value)}
-              placeholderTextColor={Colors.text.secondary}
-            />
-          </View>
-
-          {/* Images */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Images *</Text>
-            <Text style={styles.subLabel}>Add at least one image of your item</Text>
             
-            <View style={styles.imageContainer}>
+            <View style={styles.imageGrid}>
               {loading ? (
-                // Show skeleton loading for images
                 Array.from({ length: 2 }).map((_, index) => (
                   <SkeletonLoader
                     key={index}
-                    width={80}
-                    height={80}
-                    borderRadius={8}
+                    width={100}
+                    height={100}
+                    borderRadius={12}
                     style={styles.imageSkeleton}
                   />
                 ))
               ) : (
                 <>
                   {images.map((image, index) => (
-                    <View key={index} style={styles.imageWrapper}>
+                    <View key={index} style={styles.imageCard}>
                       <Image source={{ uri: image }} style={styles.image} />
                       <TouchableOpacity
                         style={styles.removeImageButton}
@@ -251,27 +180,127 @@ const PostItemScreen = () => {
                   ))}
                   
                   {images.length < 5 && (
-                    <TouchableOpacity style={styles.addImageButton} onPress={pickImage}>
-                      <Ionicons name="camera" size={24} color={Colors.text.secondary} />
-                      <Text style={styles.addImageText}>Add Image</Text>
+                    <TouchableOpacity style={styles.addImageCard} onPress={pickImage}>
+                      <Ionicons name="camera" size={28} color={Colors.primary[500]} />
+                      <Text style={styles.addImageText}>Add Photo</Text>
                     </TouchableOpacity>
                   )}
                 </>
               )}
             </View>
           </View>
+
+          {/* Item Details */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Item Details</Text>
+            </View>
+
+            {/* Item Name */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Item Name *</Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="What are you renting out?"
+                  value={formData.name}
+                  onChangeText={(value) => handleInputChange('name', value)}
+                  placeholderTextColor={Colors.text.secondary}
+                />
+              </View>
+            </View>
+
+            {/* Description */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Description *</Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  placeholder="Describe your item, its condition, and what makes it special..."
+                  value={formData.description}
+                  onChangeText={(value) => handleInputChange('description', value)}
+                  multiline
+                  numberOfLines={4}
+                  placeholderTextColor={Colors.text.secondary}
+                />
+              </View>
+            </View>
+
+            {/* Price and Category Row */}
+            <View style={styles.row}>
+              <View style={[styles.inputGroup, styles.halfWidth]}>
+                <Text style={styles.label}>Daily Rate *</Text>
+                <View style={styles.inputContainer}>
+                  <Text style={styles.currencySymbol}>₱</Text>
+                  <TextInput
+                    style={[styles.input, styles.priceInput]}
+                    placeholder="0.00"
+                    value={formData.price}
+                    onChangeText={(value) => handleInputChange('price', value)}
+                    keyboardType="numeric"
+                    placeholderTextColor={Colors.text.secondary}
+                  />
+                </View>
+              </View>
+              <View style={[styles.inputGroup, styles.halfWidth]}>
+                <Text style={styles.label}>Category *</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
+                  {categories.map((category) => (
+                    <TouchableOpacity
+                      key={category}
+                      style={[
+                        styles.categoryChip,
+                        formData.category === category && styles.categoryChipSelected
+                      ]}
+                      onPress={() => handleInputChange('category', category)}
+                    >
+                      <Text style={[
+                        styles.categoryText,
+                        formData.category === category && styles.categoryTextSelected
+                      ]}>
+                        {category.charAt(0).toUpperCase() + category.slice(1)}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            </View>
+
+            {/* Location */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Location *</Text>
+              <View style={styles.inputContainer}>
+                <Ionicons name="location-outline" size={20} color={Colors.text.secondary} style={styles.inputIcon} />
+                <TextInput
+                  style={[styles.input, styles.inputWithIcon]}
+                  placeholder="Where is this item located?"
+                  value={formData.location}
+                  onChangeText={(value) => handleInputChange('location', value)}
+                  placeholderTextColor={Colors.text.secondary}
+                />
+              </View>
+            </View>
+          </View>
         </ScrollView>
 
-        {/* Post Button */}
+        {/* Modern Footer */}
         <View style={styles.footer}>
           <TouchableOpacity
             style={[styles.postButton, loading && styles.postButtonDisabled]}
             onPress={handlePostItem}
             disabled={loading}
           >
-            <Text style={styles.postButtonText}>
-              {loading ? 'Posting...' : 'Post Item'}
-            </Text>
+            {loading ? (
+              <View style={styles.loadingContainer}>
+                <View style={styles.loadingSpinner} />
+                <Text style={styles.postButtonText}>Posting...</Text>
+              </View>
+            ) : (
+              <>
+                <Ionicons name="add-circle" size={20} color={Colors.text.inverse} />
+                <Text style={styles.postButtonText}>Post Item</Text>
+              </>
+            )}
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -282,27 +311,38 @@ const PostItemScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background.primary,
+    backgroundColor: '#F8FAFC',
   },
   keyboardView: {
     flex: 1,
   },
+  // Modern Header
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.md,
     backgroundColor: Colors.background.primary,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.border.light,
+    borderBottomColor: '#E2E8F0',
+    ...Shadows.sm,
   },
   backButton: {
     padding: Spacing.sm,
+    marginRight: Spacing.sm,
+  },
+  headerContent: {
+    flex: 1,
   },
   headerTitle: {
-    ...TextStyles.display.large,
+    fontSize: 20,
+    fontWeight: '700',
     color: Colors.text.primary,
+    marginBottom: 2,
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: Colors.text.secondary,
   },
   placeholder: {
     width: 40,
@@ -311,6 +351,28 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: Spacing.lg,
   },
+  // Section Styling
+  section: {
+    backgroundColor: Colors.background.primary,
+    borderRadius: 16,
+    padding: Spacing.lg,
+    marginVertical: Spacing.sm,
+    ...Shadows.sm,
+  },
+  sectionHeader: {
+    marginBottom: Spacing.lg,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: Colors.text.primary,
+    marginBottom: 4,
+  },
+  sectionSubtitle: {
+    fontSize: 14,
+    color: Colors.text.secondary,
+  },
+  // Form Styling
   inputGroup: {
     marginBottom: Spacing.lg,
   },
@@ -322,40 +384,61 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   label: {
-    ...TextStyles.body,
+    fontSize: 14,
     fontWeight: '600',
     color: Colors.text.primary,
     marginBottom: Spacing.sm,
   },
-  subLabel: {
-    ...TextStyles.caption,
-    color: Colors.text.secondary,
-    marginBottom: Spacing.sm,
+  inputContainer: {
+    position: 'relative',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   input: {
-    borderWidth: 1,
-    borderColor: Colors.border.medium,
-    borderRadius: BorderRadius.md,
+    flex: 1,
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
+    borderRadius: 12,
     paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
+    paddingVertical: Spacing.md,
     fontSize: 16,
     color: Colors.text.primary,
-    backgroundColor: Colors.background.secondary,
+    backgroundColor: '#FAFAFA',
+  },
+  inputWithIcon: {
+    paddingLeft: 40,
+  },
+  inputIcon: {
+    position: 'absolute',
+    left: 12,
+    zIndex: 1,
+  },
+  currencySymbol: {
+    position: 'absolute',
+    left: 12,
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text.primary,
+    zIndex: 1,
+  },
+  priceInput: {
+    paddingLeft: 30,
   },
   textArea: {
     height: 100,
     textAlignVertical: 'top',
   },
+  // Category Chips
   categoryScroll: {
     marginTop: Spacing.sm,
   },
   categoryChip: {
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
-    borderRadius: BorderRadius.full,
-    backgroundColor: Colors.background.secondary,
+    borderRadius: 20,
+    backgroundColor: '#F1F5F9',
     borderWidth: 1,
-    borderColor: Colors.border.medium,
+    borderColor: '#E2E8F0',
     marginRight: Spacing.sm,
   },
   categoryChipSelected: {
@@ -363,81 +446,98 @@ const styles = StyleSheet.create({
     borderColor: Colors.primary[500],
   },
   categoryText: {
-    ...TextStyles.caption,
+    fontSize: 14,
     color: Colors.text.secondary,
+    fontWeight: '500',
   },
   categoryTextSelected: {
     color: Colors.text.inverse,
     fontWeight: '600',
   },
-  imageContainer: {
+  // Image Grid
+  imageGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
-    marginHorizontal: -Spacing.xs,
-    paddingHorizontal: Spacing.xs,
-    width: '100%',
-    minHeight: 100,
-    maxHeight: 300,
-    overflow: 'hidden',
-    position: 'relative',
-    zIndex: 1,
+    gap: Spacing.sm,
   },
   imageSkeleton: {
     marginRight: Spacing.sm,
+    marginBottom: Spacing.sm,
   },
-  imageWrapper: {
+  imageCard: {
     position: 'relative',
+    width: 100,
+    height: 100,
   },
   image: {
-    width: 80,
-    height: 80,
-    borderRadius: BorderRadius.md,
+    width: 100,
+    height: 100,
+    borderRadius: 12,
   },
   removeImageButton: {
     position: 'absolute',
-    top: -8,
-    right: -8,
+    top: -6,
+    right: -6,
     backgroundColor: Colors.background.primary,
-    borderRadius: 10,
+    borderRadius: 12,
+    padding: 2,
+    ...Shadows.sm,
   },
-  addImageButton: {
-    width: 80,
-    height: 80,
-    borderRadius: BorderRadius.md,
+  addImageCard: {
+    width: 100,
+    height: 100,
+    borderRadius: 12,
     borderWidth: 2,
-    borderColor: Colors.border.medium,
+    borderColor: Colors.primary[500],
     borderStyle: 'dashed',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: Colors.background.secondary,
+    backgroundColor: '#F8FAFF',
   },
   addImageText: {
-    ...TextStyles.caption,
-    color: Colors.text.secondary,
+    fontSize: 12,
+    color: Colors.primary[500],
     marginTop: Spacing.xs,
+    fontWeight: '500',
   },
+  // Footer
   footer: {
     padding: Spacing.lg,
     backgroundColor: Colors.background.primary,
     borderTopWidth: 1,
-    borderTopColor: Colors.border.light,
+    borderTopColor: '#E2E8F0',
+    ...Shadows.lg,
   },
   postButton: {
     backgroundColor: Colors.primary[500],
-    borderRadius: BorderRadius.lg,
-    paddingVertical: Spacing.md,
+    borderRadius: 16,
+    paddingVertical: Spacing.lg,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.sm,
     ...Shadows.sm,
   },
   postButtonDisabled: {
-    backgroundColor: Colors.text.disabled,
+    backgroundColor: '#94A3B8',
   },
   postButtonText: {
-    ...TextStyles.button,
+    fontSize: 16,
     color: Colors.text.inverse,
     fontWeight: '600',
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  loadingSpinner: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: Colors.text.inverse,
+    borderTopColor: 'transparent',
   },
 });
 

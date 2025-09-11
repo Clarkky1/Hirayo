@@ -369,7 +369,7 @@ export default function MyItemsScreen() {
               </View>
               <TouchableOpacity 
                 style={styles.addItemButton}
-                onPress={() => router.push('/post-item' as any)}
+                onPress={handleCreateItem}
                 activeOpacity={0.7}
               >
                 <Ionicons name="add" size={20} color={Colors.text.inverse} />
@@ -858,5 +858,34 @@ const styles = StyleSheet.create({
   skeletonActionButtons: {
     flexDirection: 'row',
     gap: Spacing.sm,
+  },
+  // Action Button Styles
+  toggleButton: {
+    backgroundColor: Colors.warning,
+    borderRadius: BorderRadius.md,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
+  toggleButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.text.inverse,
+  },
+  deleteButton: {
+    backgroundColor: Colors.error,
+    borderRadius: BorderRadius.md,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
+  deleteButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.text.inverse,
   },
 });
