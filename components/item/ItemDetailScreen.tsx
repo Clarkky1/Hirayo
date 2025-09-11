@@ -2,8 +2,8 @@ import { BorderRadius, Colors, Spacing } from '@/constants/DesignSystem';
 import { useLender } from '@/contexts/LenderContext';
 import { useSelectedItem } from '@/contexts/SelectedItemContext';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
-import { itemsService } from '@/services/itemsService';
 import { Item } from '@/lib/supabase';
+import { itemsService } from '@/services/itemsService';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -25,7 +25,7 @@ export default function ItemDetailScreen() {
   const { selectedItem } = useSelectedItem();
   const { validateAndNavigate } = useNavigationGuard();
   const { isLender } = useLender();
-  const { itemId } = useLocalSearchParams();
+  const { itemId, lenderName, lenderId, lenderAvatar } = useLocalSearchParams();
   const [activeTab, setActiveTab] = useState<'description' | 'review'>('description');
   const [showMore, setShowMore] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -98,9 +98,9 @@ export default function ItemDetailScreen() {
         params: { 
           itemId: selectedItem?.id,
           itemName: selectedItem?.name,
-          lenderId: lenderId as string || selectedItem?.lenderId || 'lender-123',
-          lenderName: lenderName as string || selectedItem?.lenderName || 'Item Owner',
-          lenderAvatar: lenderAvatar as string || selectedItem?.lenderAvatar || ''
+          lenderId: item?.lender_id || 'lender-123',
+          lenderName: item?.lender ? `${item.lender.first_name} ${item.lender.last_name}` : 'Item Owner',
+          lenderAvatar: item?.lender?.avatar_url || ''
         }
       });
     } else {
@@ -109,7 +109,7 @@ export default function ItemDetailScreen() {
         pathname: '/view-messages',
         params: { 
           messageId: selectedItem?.id || 'new-conversation',
-          senderName: lenderName as string || selectedItem?.lenderName || 'Item Owner',
+          senderName: item?.lender ? `${item.lender.first_name} ${item.lender.last_name}` : 'Item Owner',
           itemName: selectedItem?.name || 'Item',
           itemId: selectedItem?.id || 'item1',
           isLenderView: 'false',
@@ -209,7 +209,7 @@ export default function ItemDetailScreen() {
         <View style={styles.productHeader}>
           <Text style={styles.productName}>{item.name}</Text>
           <View style={styles.priceContainer}>
-            <Text style={styles.price}>₱{item.price}</Text>
+            <Text style={styles.price}>₱{item.price_per_day}</Text>
             <Text style={styles.rentalPeriod}>for a day</Text>
           </View>
         </View>
@@ -420,16 +420,24 @@ export default function ItemDetailScreen() {
           <View style={styles.ownerSection}>
             <Text style={styles.ownerLabel}>Owner</Text>
             <View style={styles.ownerInfo}>
-              <View style={styles.ownerAvatar} />
-              <Text style={styles.ownerName}>Lorenz Aguirre</Text>
+              <View style={styles.ownerAvatar}>
+                {item?.lender?.avatar_url ? (
+                  <Image source={{ uri: item.lender.avatar_url }} style={styles.ownerAvatarImage} />
+                ) : (
+                  <Ionicons name="person" size={20} color={Colors.text.secondary} />
+                )}
+              </View>
+              <Text style={styles.ownerName}>
+                {item?.lender ? `${item.lender.first_name} ${item.lender.last_name}` : 'Item Owner'}
+              </Text>
               <TouchableOpacity style={styles.ownerChatIcon} onPress={() => router.push({
                 pathname: '/(tabs)/messages',
                 params: {
                   openConversation: 'true',
-                  itemId: '1',
-                  itemName: 'Canon EOS 90D DSLR Camera',
-                  ownerName: 'Lorenz Aguirre',
-                  ownerLocation: 'Cebu City'
+                  itemId: item?.id || '1',
+                  itemName: item?.name || 'Item',
+                  ownerName: item?.lender ? `${item.lender.first_name} ${item.lender.last_name}` : 'Item Owner',
+                  ownerLocation: item?.location || 'Unknown Location'
                 }
               })} activeOpacity={0.7}>
                 <Ionicons name="chatbubble-outline" size={20} color={Colors.primary[500]} />
@@ -445,7 +453,7 @@ export default function ItemDetailScreen() {
       {/* Bottom Action Bar */}
       <View style={styles.actionBar}>
         <View style={styles.priceDisplay}>
-          <Text style={styles.actionBarPrice}>P1,253</Text>
+          <Text style={styles.actionBarPrice}>₱{item?.price_per_day?.toLocaleString() || '0'}</Text>
           <Text style={styles.actionBarPeriod}>for a day</Text>
         </View>
         <TouchableOpacity style={styles.rentButton} onPress={handleRent} activeOpacity={0.7}>
@@ -628,6 +636,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: '#E0E0E0',
     marginRight: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  ownerAvatarImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
   },
   ownerName: {
     fontSize: 16,
@@ -893,5 +908,40 @@ const styles = StyleSheet.create({
     color: '#000000',
     marginLeft: 10,
     fontWeight: '500',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: Colors.text.secondary,
+    marginTop: 10,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 16,
+    color: Colors.error,
+    marginTop: 10,
+    textAlign: 'center',
+  },
+  retryButton: {
+    backgroundColor: Colors.primary[500],
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginTop: 20,
+  },
+  retryButtonText: {
+    color: Colors.text.inverse,
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
