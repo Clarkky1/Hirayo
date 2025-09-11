@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Get Supabase configuration from environment variables with fallbacks
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://tjpfwivbyzaxnlvbxrqc.supabase.co';
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRqcGZ3aXZieXpheG5sdmJ4cnFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MDA1MDUsImV4cCI6MjA3MzE3NjUwNX0.OrSgdnT_mjcZPR2K2UF5vrXYxKJ62DV-xZ4MR8wF2Vo';
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://wdmdqonqxlqrpeqqseuf.supabase.co';
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndkbWRxb25xeGxxcnBlcXFzZXVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MDI5ODEsImV4cCI6MjA3MzE3ODk4MX0.qzCs7q9OFKY1Y6vbF806X2qC4EBzZfvY2WcI7iEZRy4';
 
 // Debug logging
 console.log('Supabase URL:', supabaseUrl);

@@ -1,36 +1,66 @@
 import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { useAuthState } from '@/contexts/AuthStateContext';
-import { useUser } from '@/contexts/UserContext';
-import { useAuth } from '@/hooks/useAuth';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
+import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
-    Alert,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Switch,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { Card } from '../ui/Card';
-import { ProfileEditModal } from './ProfileEditModal';
 
 
 
 
 
 export default function ProfileScreen() {
-  const { profile, updatePreferences, updateProfile, isLoading } = useUser();
-  const { logout } = useAuth();
+  const { signOut, user: supabaseUser } = useSupabaseAuth();
   const { setAuthenticated } = useAuthState();
-  const [showEditModal, setShowEditModal] = useState(false);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+
+  // Fetch user profile from Supabase
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!supabaseUser) {
+        setProfileLoading(false);
+        return;
+      }
+
+      try {
+        setProfileLoading(true);
+        const { data, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', supabaseUser.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching user profile:', error);
+        } else {
+          setUserProfile(data);
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+      } finally {
+        setProfileLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [supabaseUser]);
 
   // Show loading state while profile is being loaded
-  if (isLoading || !profile) {
+  if (profileLoading || !userProfile) {
     return (
       <SafeAreaView style={styles.container}>
         <StatusBar style="light" />
@@ -42,9 +72,6 @@ export default function ProfileScreen() {
     );
   }
 
-  const handleEditProfile = () => {
-    setShowEditModal(true);
-  };
 
   const handleProfileImagePress = () => {
     Alert.alert(
@@ -52,6 +79,15 @@ export default function ProfileScreen() {
       'Profile photo functionality will be available soon!',
       [{ text: 'OK', style: 'default' }]
     );
+  };
+
+  const formatMemberSince = (dateString: string) => {
+    if (!dateString) return 'Unknown';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long' 
+    });
   };
 
   const handlePaymentMethods = () => {
@@ -71,7 +107,7 @@ export default function ProfileScreen() {
     router.push('/about' as any);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     Alert.alert(
       'Logout',
       'Are you sure you want to logout?',
@@ -81,11 +117,21 @@ export default function ProfileScreen() {
           text: 'Logout', 
           style: 'destructive', 
           onPress: async () => {
-            logout();
-            // Set authenticated state to false
-            await setAuthenticated(false);
-            // Navigate to login page after logout
-            router.replace('/login');
+            try {
+              // Sign out from Supabase
+              await signOut();
+              
+              // Set authenticated state to false
+              await setAuthenticated(false);
+              
+              // Navigate to login page after logout
+              router.replace('/login');
+            } catch (error) {
+              console.error('Logout error:', error);
+              // Even if there's an error, clear local state
+              await setAuthenticated(false);
+              router.replace('/login');
+            }
           }
         }
       ]
@@ -148,23 +194,27 @@ export default function ProfileScreen() {
             activeOpacity={0.7}
           >
             <View style={styles.avatar}>
-              {profile.profileImage ? (
+              {userProfile?.avatar_url ? (
                 <View style={styles.profileImageContainer}>
                   <Text style={styles.profileImageText}>IMG</Text>
                 </View>
               ) : (
                 <Text style={styles.avatarText}>
-                  {profile.firstName.split(' ').map(n => n[0]).join('')}
+                  {userProfile?.first_name?.charAt(0) || 'U'}{userProfile?.last_name?.charAt(0) || 'S'}
                 </Text>
               )}
             </View>
           </TouchableOpacity>
           
           <View style={styles.profileInfo}>
-            <Text style={styles.userName}>{profile.firstName} {profile.surname}</Text>
-            <Text style={styles.userEmail}>{profile.email}</Text>
-            <Text style={styles.memberSince}>Member since {profile.memberSince}</Text>
-            {profile.bio && <Text style={styles.userBio}>{profile.bio}</Text>}
+            <Text style={styles.userName}>
+              {userProfile?.first_name || 'User'} {userProfile?.last_name || 'Name'}
+            </Text>
+            <Text style={styles.userEmail}>{userProfile?.email || 'No email'}</Text>
+            <Text style={styles.memberSince}>
+              Member since {formatMemberSince(userProfile?.created_at)}
+            </Text>
+            {userProfile?.bio && <Text style={styles.userBio}>{userProfile.bio}</Text>}
           </View>
         </View>
 
@@ -173,7 +223,6 @@ export default function ProfileScreen() {
         {/* Profile Settings Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Profile</Text>
-          {renderSettingItem('person-outline', 'Personal Information', 'Update your personal information', handleEditProfile)}
           {renderSettingItem('card-outline', 'Payment Methods', 'Manage your payment options', handlePaymentMethods)}
         </View>
 
@@ -206,11 +255,7 @@ export default function ProfileScreen() {
         </View>
       </ScrollView>
 
-      {/* Profile Edit Modal */}
-      <ProfileEditModal
-        visible={showEditModal}
-        onClose={() => setShowEditModal(false)}
-      />
+      {/* Profile Edit Modal - TODO: Implement ProfileEditModal component */}
     </SafeAreaView>
   );
 }
