@@ -119,7 +119,7 @@ export default function SignupScreen() {
 
       // Launch image picker
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: 'images',
         allowsEditing: true,
         aspect: [16, 10], // ID card aspect ratio
         quality: 0.8,

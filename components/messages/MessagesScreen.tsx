@@ -1,11 +1,14 @@
 import { BorderRadius, Colors, Spacing } from '@/constants/DesignSystem';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
+import { messagesService } from '@/services/messagesService';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { StatusBar } from 'expo-status-bar';
+import { useCallback, useEffect, useState } from 'react';
 import {
     FlatList,
+    RefreshControl,
     SafeAreaView,
-    StatusBar,
     StyleSheet,
     Text,
     TextInput,
@@ -14,7 +17,7 @@ import {
 } from 'react-native';
 import { MessageSkeleton } from '../common/SkeletonLoader';
 
-interface Message {
+interface Conversation {
   id: string;
   senderName: string;
   lastMessage: string;
@@ -23,75 +26,10 @@ interface Message {
   isOnline: boolean;
   avatarUrl?: string;
   itemName?: string;
+  itemId?: string;
 }
 
-const messages: Message[] = [
-  {
-    id: '1',
-    senderName: 'John Smith',
-    lastMessage: 'Hi! Is the camera still available for rent?',
-    timestamp: '2m ago',
-    unreadCount: 2,
-    isOnline: true,
-    itemName: 'Canon EOS 90D DSLR Camera',
-  },
-  {
-    id: '2',
-    senderName: 'Sarah Johnson',
-    lastMessage: 'Thanks for the quick response!',
-    timestamp: '1h ago',
-    unreadCount: 0,
-    isOnline: false,
-    itemName: 'MacBook Pro 16" M2',
-  },
-  {
-    id: '3',
-    senderName: 'Mike Wilson',
-    lastMessage: 'Can you deliver it to my location?',
-    timestamp: '3h ago',
-    unreadCount: 1,
-    isOnline: true,
-    itemName: 'iPhone 15 Pro Max',
-  },
-  {
-    id: '4',
-    senderName: 'Emma Davis',
-    lastMessage: 'Perfect! I\'ll pick it up tomorrow.',
-    timestamp: '1d ago',
-    unreadCount: 0,
-    isOnline: false,
-    itemName: 'Sony A7 III Mirrorless',
-  },
-  {
-    id: '5',
-    senderName: 'David Brown',
-    lastMessage: 'What time works best for you?',
-    timestamp: '2d ago',
-    unreadCount: 0,
-    isOnline: true,
-    itemName: 'iPad Pro 12.9" M2',
-  },
-  {
-    id: '6',
-    senderName: 'Lisa Chen',
-    lastMessage: 'The item is in perfect condition!',
-    timestamp: '3d ago',
-    unreadCount: 0,
-    isOnline: false,
-    itemName: 'DJI Mavic Air 2',
-  },
-  {
-    id: '7',
-    senderName: 'Alex Rodriguez',
-    lastMessage: 'Do you have any other cameras available?',
-    timestamp: '1w ago',
-    unreadCount: 0,
-    isOnline: false,
-    itemName: 'GoPro Hero 10',
-  },
-];
-
-const MessageCard: React.FC<{ item: Message }> = ({ item }) => {
+const MessageCard: React.FC<{ item: Conversation }> = ({ item }) => {
   const handleMessagePress = () => {
     router.push({
       pathname: '/view-messages',
@@ -99,7 +37,7 @@ const MessageCard: React.FC<{ item: Message }> = ({ item }) => {
         messageId: item.id,
         senderName: item.senderName,
         itemName: item.itemName || '',
-        itemId: item.id || 'item1' // Include item ID for navigation
+        itemId: item.itemId || item.id // Include item ID for navigation
       }
     });
   };
@@ -144,18 +82,37 @@ const MessageCard: React.FC<{ item: Message }> = ({ item }) => {
 };
 
 export default function MessagesScreen() {
+  const { user } = useSupabaseAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [hasAutoOpened, setHasAutoOpened] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
   const params = useLocalSearchParams();
-  
-  // Simulate loading for skeleton effect
-  useEffect(() => {
-    const timer = setTimeout(() => {
+
+  const loadConversations = useCallback(async () => {
+    if (!user) return;
+    
+    try {
+      setLoading(true);
+      const data = await messagesService.getConversations(user.id);
+      setConversations(data);
+    } catch (error) {
+      console.error('Error loading conversations:', error);
+    } finally {
       setLoading(false);
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, []);
+    }
+  }, [user]);
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await loadConversations();
+    setRefreshing(false);
+  }, [loadConversations]);
+
+  useEffect(() => {
+    loadConversations();
+  }, [loadConversations]);
 
   // Auto-open conversation if parameters are present (only once)
   useEffect(() => {
@@ -163,7 +120,7 @@ export default function MessagesScreen() {
       setHasAutoOpened(true);
       
       // Check if conversation already exists
-      const existingConversation = messages.find(msg => 
+      const existingConversation = conversations.find(msg => 
         msg.senderName === params.ownerName && 
         msg.itemName === params.itemName
       );
@@ -176,7 +133,7 @@ export default function MessagesScreen() {
             messageId: existingConversation.id,
             senderName: existingConversation.senderName,
             itemName: existingConversation.itemName || '',
-            itemId: existingConversation.id || 'item1',
+            itemId: existingConversation.itemId || existingConversation.id,
             isLenderView: 'false'
           }
         });
@@ -196,16 +153,16 @@ export default function MessagesScreen() {
         });
       }
     }
-  }, [params, hasAutoOpened]);
+  }, [params, hasAutoOpened, conversations]);
 
 
 
   const filteredMessages = searchQuery
-    ? messages.filter(msg => 
+    ? conversations.filter(msg => 
         msg.senderName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         msg.itemName?.toLowerCase().includes(searchQuery.toLowerCase())
       )
-    : messages;
+    : conversations;
 
     return (
     <SafeAreaView style={styles.container}>
@@ -243,6 +200,14 @@ export default function MessagesScreen() {
           renderItem={({ item }) => <MessageCard item={item} />}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContainer}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              colors={['#667EEA']}
+              tintColor="#667EEA"
+            />
+          }
           ListEmptyComponent={
             <View style={styles.emptyState}>
               <Ionicons name="chatbubble-outline" size={40} color="#E0E0E0" />

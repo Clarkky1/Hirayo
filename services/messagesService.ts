@@ -9,12 +9,43 @@ export const messagesService = {
         *,
         item:items(*),
         renter:users!conversations_renter_id_fkey(*),
-        lender:users!conversations_lender_id_fkey(*)
+        lender:users!conversations_lender_id_fkey(*),
+        last_message:messages(
+          content,
+          created_at,
+          sender_id
+        )
       `)
       .or(`renter_id.eq.${userId},lender_id.eq.${userId}`)
       .order('updated_at', { ascending: false });
 
-    return { data, error };
+    if (error) {
+      throw error;
+    }
+
+    // Transform data to match the expected format
+    const conversations = data?.map(conv => {
+      const isRenter = conv.renter_id === userId;
+      const otherUser = isRenter ? conv.lender : conv.renter;
+      const lastMessage = conv.last_message?.[0];
+      
+      return {
+        id: conv.id,
+        senderName: otherUser?.first_name && otherUser?.last_name 
+          ? `${otherUser.first_name} ${otherUser.last_name}`
+          : otherUser?.email || 'Unknown User',
+        lastMessage: lastMessage?.content || 'No messages yet',
+        timestamp: lastMessage?.created_at 
+          ? new Date(lastMessage.created_at).toLocaleDateString()
+          : new Date(conv.created_at).toLocaleDateString(),
+        unreadCount: 0, // TODO: Implement unread count
+        isOnline: false, // TODO: Implement online status
+        itemName: conv.item?.name || 'Unknown Item',
+        itemId: conv.item_id,
+      };
+    }) || [];
+
+    return conversations;
   },
 
   // Get messages for a conversation

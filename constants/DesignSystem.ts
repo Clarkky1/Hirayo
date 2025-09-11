@@ -56,24 +56,24 @@ export const Colors = {
 export const Typography = {
   fontFamily: {
     regular: Platform.select({
-      ios: 'SF Pro Display',
-      android: 'Roboto',
-      default: 'System',
+      ios: 'Nunito-Regular',
+      android: 'Nunito-Regular',
+      default: 'Nunito-Regular',
     }),
     medium: Platform.select({
-      ios: 'SF Pro Display',
-      android: 'Roboto',
-      default: 'System',
+      ios: 'Nunito-Medium',
+      android: 'Nunito-Medium',
+      default: 'Nunito-Medium',
     }),
     semibold: Platform.select({
-      ios: 'SF Pro Display',
-      android: 'Roboto',
-      default: 'System',
+      ios: 'Nunito-SemiBold',
+      android: 'Nunito-SemiBold',
+      default: 'Nunito-SemiBold',
     }),
     bold: Platform.select({
-      ios: 'SF Pro Display',
-      android: 'Roboto',
-      default: 'System',
+      ios: 'Nunito-Bold',
+      android: 'Nunito-Bold',
+      default: 'Nunito-Bold',
     }),
   },
   

@@ -108,6 +108,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 16,
     overflow: 'hidden',
+    flex: 1,
+    marginHorizontal: 4,
   },
   itemCardContent: {
     padding: 12,

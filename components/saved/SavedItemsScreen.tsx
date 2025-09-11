@@ -98,11 +98,19 @@ export default function SavedItemsScreen() {
 
       {/* Conditional Rendering based on saved items */}
       {loading ? (
-        /* Loading State */
+        /* Loading State - Grid Layout like Discover */
         <View style={styles.savedItemsContainer}>
-          {Array.from({ length: 4 }).map((_, index) => (
-            <ItemCardSkeleton key={index} />
-          ))}
+          <FlatList
+            data={Array.from({ length: 8 }, (_, index) => ({ id: `skeleton-${index}` }))}
+            renderItem={() => <ItemCardSkeleton />}
+            keyExtractor={(item) => item.id}
+            numColumns={2}
+            columnWrapperStyle={styles.productsRow}
+            contentContainerStyle={styles.productsList}
+            showsVerticalScrollIndicator={false}
+            scrollEnabled={false}
+            ItemSeparatorComponent={() => <View style={{ height: Spacing.md }} />}
+          />
         </View>
       ) : !hasSavedItems ? (
         /* Empty State - No Saved Items */
@@ -223,6 +231,13 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: Spacing.lg,
     paddingTop: 0,
+  },
+  productsRow: {
+    justifyContent: 'space-between',
+    marginBottom: Spacing.md,
+  },
+  productsList: {
+    paddingBottom: 20,
   },
 
   savedItemInfo: {

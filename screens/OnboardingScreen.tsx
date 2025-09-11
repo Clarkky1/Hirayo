@@ -1,4 +1,4 @@
-import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
+import { BorderRadius, Colors, Spacing } from '@/constants/DesignSystem';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -23,40 +23,44 @@ const styles = StyleSheet.create({
     image: {
       width: width * 0.8,
       height: height * 0.35,
-      marginTop: Spacing['2xl'] * 3,
+      marginTop: Spacing['2xl'] * 2,
       marginBottom: Spacing.xl,
     },
     textContainer: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      paddingHorizontal: Spacing.lg,
-      marginBottom: Spacing.xl * 6,
+      paddingHorizontal: Spacing.xl,
+      marginBottom: Spacing.xl * 8,
     },
     text: {
-      ...TextStyles.body.large,
-      color: Colors.text.primary,
+      fontFamily: 'Nunito-SemiBold',
+      fontSize: 22,
+      color: '#7D7B7B',
       textAlign: 'center',
-      lineHeight: 22,
-      marginTop: Spacing.sm,
-      marginBottom: Spacing.sm,
+      lineHeight: 28,
+      marginTop: Spacing.lg,
+      marginBottom: Spacing.lg,
     },
     highlight: {
+      fontFamily: 'Nunito-SemiBold',
+      fontSize: 22,
       color: Colors.primary[500],
       fontWeight: '600',
     },
     button: {
       backgroundColor: Colors.primary[500],
-      paddingVertical: Spacing.xl,
+      paddingVertical: Spacing.lg,
       borderRadius: BorderRadius.md,
       position: 'absolute',
-      bottom: 30,
+      bottom: 40,
       width: width * 0.9,
       alignItems: 'center',
     },
     buttonText: {
+      fontFamily: 'Nunito-SemiBold',
       color: Colors.text.inverse,
-      fontSize: 16,
+      fontSize: 18,
       fontWeight: '600',
     },
   });
@@ -158,7 +162,7 @@ export default function OnboardingScreen() {
         </TouchableOpacity>
       ) : (
         <TouchableOpacity style={styles.button} onPress={handleGetStarted}>
-          <Text style={styles.buttonText}>Get Started</Text>
+          <Text style={styles.buttonText}>Let's Go</Text>
         </TouchableOpacity>
       )}
     </View>

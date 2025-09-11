@@ -374,16 +374,24 @@ export default function DiscoverScreen() {
     </View>
   );
 
-  const renderLoadingState = () => (
-    <View style={styles.productsList}>
-      {Array.from({ length: 6 }).map((_, index) => (
-        <View key={index} style={styles.productsRow}>
-          <ItemCardSkeleton />
-          <ItemCardSkeleton />
-        </View>
-      ))}
-    </View>
-  );
+  const renderLoadingState = () => {
+    // Create skeleton data that matches the grid layout
+    const skeletonData = Array.from({ length: 8 }, (_, index) => ({ id: `skeleton-${index}` }));
+    
+    return (
+      <FlatList
+        data={skeletonData}
+        renderItem={() => <ItemCardSkeleton />}
+        keyExtractor={(item) => item.id}
+        numColumns={2}
+        columnWrapperStyle={styles.productsRow}
+        contentContainerStyle={styles.productsList}
+        showsVerticalScrollIndicator={false}
+        scrollEnabled={false}
+        ItemSeparatorComponent={() => <View style={{ height: Spacing.md }} />}
+      />
+    );
+  };
 
 
 
