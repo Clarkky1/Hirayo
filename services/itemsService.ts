@@ -1,5 +1,5 @@
 
-\import { Item, supabase } from '../lib/supabase';
+import { Item, supabase } from '../lib/supabase';
 
 export const itemsService = {
   // Test storage connection
