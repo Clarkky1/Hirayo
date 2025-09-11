@@ -9,15 +9,15 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useState } from 'react';
 import {
-    FlatList,
-    RefreshControl,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  FlatList,
+  RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { ItemCardSkeleton } from '../common/SkeletonLoader';
 import { ProductCard } from '../ui/ProductCard';
@@ -360,7 +360,7 @@ export default function DiscoverScreen() {
 
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
-      <Ionicons name="search-outline" size={64} color={Colors.text.secondary} />
+      <Ionicons name="search-outline" size={48} color={Colors.text.secondary} />
       <Text style={styles.emptyStateTitle}>No items found</Text>
       <Text style={styles.emptyStateText}>
         Try adjusting your search or filters to find what you're looking for.
@@ -994,21 +994,21 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: Spacing.xl * 2,
+    paddingVertical: Spacing.xl,
     paddingHorizontal: Spacing.lg,
   },
   emptyStateTitle: {
-    ...TextStyles.display.large,
+    ...TextStyles.heading.h3,
     color: Colors.text.primary,
-    marginTop: Spacing.lg,
-    marginBottom: Spacing.sm,
+    marginTop: Spacing.md,
+    marginBottom: Spacing.xs,
   },
   emptyStateText: {
-    ...TextStyles.body.medium,
+    ...TextStyles.body.small,
     color: Colors.text.secondary,
     textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: Spacing.xl,
+    lineHeight: 20,
+    marginBottom: Spacing.lg,
   },
   postItemButton: {
     flexDirection: 'row',

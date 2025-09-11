@@ -10,16 +10,16 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
-  Alert,
-  Image,
-  Platform,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    Image,
+    Platform,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 
 export default function SignupScreen() {
@@ -567,16 +567,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    paddingHorizontal: Spacing.lg,
-    paddingTop: 60,
-    paddingBottom: Spacing['2xl'],
+    paddingHorizontal: Spacing.md,
+    paddingTop: 40,
+    paddingBottom: Spacing.lg,
   },
 
   // Modern Header
   header: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: Spacing['2xl'],
+    marginBottom: Spacing.lg,
   },
   backButton: {
     marginRight: Spacing.md,
@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '700',
     color: '#FFFFFF',
     marginBottom: Spacing.xs,
@@ -612,8 +612,8 @@ const styles = StyleSheet.create({
   // Modern Form Card
   formCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    padding: Spacing['2xl'],
+    borderRadius: 20,
+    padding: Spacing.lg,
     ...Shadows.softLg,
     borderWidth: 1,
     borderColor: 'rgba(0, 0, 0, 0.05)',
@@ -621,10 +621,10 @@ const styles = StyleSheet.create({
 
   // Form Sections
   formSection: {
-    marginBottom: Spacing['2xl'],
+    marginBottom: Spacing.lg,
   },
   sectionLabel: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '700',
     color: '#1F2937',
     marginBottom: Spacing.sm,
@@ -653,11 +653,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#F9FAFB',
-    borderRadius: 16,
+    borderRadius: 12,
     borderWidth: 2,
     borderColor: '#E5E7EB',
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.lg,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.md,
   },
   inputIcon: {
     marginRight: Spacing.md,
@@ -681,14 +681,14 @@ const styles = StyleSheet.create({
 
   // Terms Agreement
   agreementContainer: {
-    marginBottom: Spacing['2xl'],
+    marginBottom: Spacing.lg,
   },
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    padding: Spacing.lg,
+    padding: Spacing.md,
     backgroundColor: '#F9FAFB',
-    borderRadius: 16,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: '#E5E7EB',
   },
@@ -722,13 +722,13 @@ const styles = StyleSheet.create({
   // Modern Primary Button
   primaryButton: {
     backgroundColor: '#E5E7EB',
-    borderRadius: 16,
-    paddingVertical: Spacing.lg,
+    borderRadius: 12,
+    paddingVertical: Spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     ...Shadows.softButton,
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.md,
   },
   primaryButtonActive: {
     backgroundColor: '#667EEA',
@@ -765,8 +765,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#E5E7EB',
     borderStyle: 'dashed',
-    borderRadius: 16,
-    padding: Spacing['2xl'],
+    borderRadius: 12,
+    padding: Spacing.lg,
     alignItems: 'center',
     backgroundColor: '#F9FAFB',
   },

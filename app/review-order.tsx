@@ -12,7 +12,7 @@ export default function ReviewOrder() {
         options={{
           title: 'Review Order',
           headerStyle: {
-            backgroundColor: '#0066CC',
+            backgroundColor: '#667EEA',
           },
           headerTintColor: '#ffffff',
         }}

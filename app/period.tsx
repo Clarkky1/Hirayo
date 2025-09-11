@@ -12,7 +12,7 @@ export default function Period() {
         options={{
           title: 'Rental Period',
           headerStyle: {
-            backgroundColor: '#0066CC',
+            backgroundColor: '#667EEA',
           },
           headerTintColor: '#ffffff',
         }}

@@ -135,13 +135,11 @@ export default function LoginScreen() {
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.logoContainer}>
-              <View style={styles.logoBackground}>
-                <Image 
-                  source={require('@/assets/splash/h-logo.png')} 
-                  style={styles.logo}
-                  resizeMode="contain"
-                />
-              </View>
+              <Image 
+                source={require('@/assets/splash/h-logo.png')} 
+                style={styles.logo}
+                resizeMode="contain"
+              />
             </View>
             <Text style={styles.appName}>Hirayo</Text>
             <Text style={styles.tagline}>Rent anything, anywhere</Text>
@@ -321,36 +319,25 @@ const styles = StyleSheet.create({
 
   content: {
     flex: 1,
-    paddingHorizontal: Spacing['2xl'],
-    paddingTop: Spacing['4xl'],
-    paddingBottom: Spacing['2xl'],
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing['6xl']*2,
+    paddingBottom: Spacing.lg,
   },
 
-  // Modern Header
+  // Header
   header: {
     alignItems: 'center',
-    marginBottom: Spacing['4xl'],
+    marginBottom: Spacing['2xl'],
   },
   logoContainer: {
-    marginBottom: Spacing.lg,
-  },
-  logoBackground: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...Shadows.softLg,
-    borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    marginBottom: Spacing.md,
   },
   logo: {
-    width: 60,
-    height: 60,
+    width: 50,
+    height: 50,
   },
   appName: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '700',
     color: '#FFFFFF',
     marginBottom: Spacing.xs,
@@ -371,18 +358,18 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    padding: Spacing['2xl'],
+    borderRadius: 20,
+    padding: Spacing.lg,
     borderWidth: 1,
     borderColor: 'rgba(0, 0, 0, 0.05)',
     ...Shadows.softLg,
   },
   cardHeader: {
     alignItems: 'center',
-    marginBottom: Spacing['2xl'],
+    marginBottom: Spacing.lg,
   },
   welcomeText: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '700',
     color: '#1F2937',
     marginBottom: Spacing.xs,
@@ -395,10 +382,10 @@ const styles = StyleSheet.create({
 
   // Modern Input Section
   inputSection: {
-    marginBottom: Spacing['2xl'],
+    marginBottom: Spacing.lg,
   },
   inputGroup: {
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.md,
   },
   inputLabel: {
     fontSize: 14,
@@ -410,11 +397,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#F9FAFB',
-    borderRadius: 16,
+    borderRadius: 12,
     borderWidth: 2,
     borderColor: '#E5E7EB',
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.lg,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.md,
   },
   inputWrapperFocused: {
     borderColor: '#667EEA',
@@ -448,8 +435,8 @@ const styles = StyleSheet.create({
   // Modern Primary Button
   primaryButton: {
     backgroundColor: '#E5E7EB',
-    borderRadius: 16,
-    paddingVertical: Spacing.lg,
+    borderRadius: 12,
+    paddingVertical: Spacing.md,
     alignItems: 'center',
     ...Shadows.softButton,
   },

@@ -44,119 +44,15 @@ export default function HelpSupportScreen() {
     },
   ];
 
-  const supportOptions = [
-    {
-      id: 'chat',
-      title: 'Live Chat',
-      subtitle: 'Get instant help from our support team',
-      icon: 'chatbubbles',
-      action: 'Start Chat',
-    },
-    {
-      id: 'email',
-      title: 'Email Support',
-      subtitle: 'Send us a detailed message',
-      icon: 'mail',
-      action: 'Send Email',
-    },
-    {
-      id: 'call',
-      title: 'Phone Support',
-      subtitle: 'Call us directly for urgent issues',
-      icon: 'call',
-      action: 'Call Now',
-    },
-  ];
-
-  const helpResources = [
-    {
-      id: 'guide',
-      title: 'User Guide',
-      subtitle: 'Learn how to use the app effectively',
-      icon: 'book',
-    },
-    {
-      id: 'tutorials',
-      title: 'Video Tutorials',
-      subtitle: 'Watch step-by-step guides',
-      icon: 'play-circle',
-    },
-    {
-      id: 'community',
-      title: 'Community Forum',
-      subtitle: 'Connect with other users',
-      icon: 'people',
-    },
-  ];
 
   const handleFaqToggle = (faqId: string) => {
     setExpandedFaq(expandedFaq === faqId ? null : faqId);
   };
 
-  const handleSupportAction = (optionId: string) => {
-    console.log('Support action:', optionId);
-  };
-
-  const handleResourceTap = (resourceId: string) => {
-    console.log('Resource tapped:', resourceId);
-  };
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Support Options */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Get Help</Text>
-          {supportOptions.map((option) => (
-            <TouchableOpacity
-              key={option.id}
-              style={styles.supportOption}
-              onPress={() => handleSupportAction(option.id)}
-              activeOpacity={0.7}
-            >
-              <View style={styles.optionLeft}>
-                <View style={styles.optionIcon}>
-                  <Ionicons name={option.icon as any} size={24} color="#0066CC" />
-                </View>
-                <View style={styles.optionInfo}>
-                  <Text style={styles.optionTitle}>{option.title}</Text>
-                  <Text style={styles.optionSubtitle}>{option.subtitle}</Text>
-                </View>
-              </View>
-              <TouchableOpacity
-                style={styles.actionButton}
-                onPress={() => handleSupportAction(option.id)}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.actionButtonText}>{option.action}</Text>
-              </TouchableOpacity>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Help Resources */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Help Resources</Text>
-          {helpResources.map((resource) => (
-            <TouchableOpacity
-              key={resource.id}
-              style={styles.resourceItem}
-              onPress={() => handleResourceTap(resource.id)}
-              activeOpacity={0.7}
-            >
-              <View style={styles.resourceLeft}>
-                <View style={styles.resourceIcon}>
-                  <Ionicons name={resource.icon as any} size={24} color="#0066CC" />
-                </View>
-                <View style={styles.resourceInfo}>
-                  <Text style={styles.resourceTitle}>{resource.title}</Text>
-                  <Text style={styles.resourceSubtitle}>{resource.subtitle}</Text>
-                </View>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color="#CCCCCC" />
-            </TouchableOpacity>
-          ))}
-        </View>
 
         {/* FAQ Section */}
         <View style={styles.section}>
@@ -224,87 +120,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#333333',
     marginBottom: 16,
-  },
-  supportOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  optionLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  optionIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#f0f8ff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  optionInfo: {
-    flex: 1,
-  },
-  optionTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#333333',
-    marginBottom: 4,
-  },
-  optionSubtitle: {
-    fontSize: 14,
-    color: '#666666',
-  },
-  actionButton: {
-    backgroundColor: '#0066CC',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  actionButtonText: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  resourceItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  resourceLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  resourceIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#f0f8ff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  resourceInfo: {
-    flex: 1,
-  },
-  resourceTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#333333',
-    marginBottom: 4,
-  },
-  resourceSubtitle: {
-    fontSize: 14,
-    color: '#666666',
   },
   faqItem: {
     paddingVertical: 16,

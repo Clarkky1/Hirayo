@@ -1,9 +1,12 @@
 import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { useLender } from '@/contexts/LenderContext';
+import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
+import { Item } from '@/lib/supabase';
+import { itemsService } from '@/services/itemsService';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   FlatList,
   SafeAreaView,
@@ -13,20 +16,13 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { ItemCardSkeleton } from '../common/SkeletonLoader';
 import { WideCard } from '../ui/WideCard';
 
 interface CategoryItem {
   id: string;
   name: string;
   icon: keyof typeof Ionicons.glyphMap;
-}
-
-interface ExploreItem {
-  id: string;
-  name: string;
-  rating: number;
-  location: string;
-  price: number;
 }
 
 const categories: CategoryItem[] = [
@@ -40,24 +36,35 @@ const categories: CategoryItem[] = [
   { id: '8', name: 'Audio', icon: 'headset' },
 ];
 
-const exploreItems: ExploreItem[] = [
-  { id: '1', name: 'Canon EOS R5 Mirrorless Camera', rating: 4.8, location: 'Talisay, Cebu', price: 2500 },
-  { id: '2', name: 'MacBook Pro M2 14-inch', rating: 4.9, location: 'Cebu City', price: 3500 },
-  { id: '3', name: 'iPhone 15 Pro Max', rating: 4.7, location: 'Mandaue City', price: 1800 },
-  { id: '4', name: 'iPad Pro 12.9" M2', rating: 4.6, location: 'Lapu-Lapu City', price: 2200 },
-];
-
-const popularItems: ExploreItem[] = [
-  { id: 'p1', name: 'DJI Mavic 3 Pro Drone', rating: 4.9, location: 'Cebu City', price: 4200 },
-  { id: 'p2', name: 'Gaming PC RTX 4080', rating: 4.7, location: 'Mandaue City', price: 3800 },
-  { id: 'p3', name: 'PlayStation 5', rating: 4.8, location: 'Lapu-Lapu City', price: 1200 },
-  { id: 'p4', name: 'Sony WH-1000XM5 Headphones', rating: 4.6, location: 'Talisay, Cebu', price: 800 },
-  { id: 'p5', name: 'GoPro Hero 11 Black', rating: 4.8, location: 'Cebu City', price: 1500 },
-];
-
 export default function HomeScreen() {
   const [isNavigating, setIsNavigating] = useState(false);
+  const [items, setItems] = useState<Item[]>([]);
+  const [loading, setLoading] = useState(true);
   const { setHasClickedGetStarted } = useLender();
+  const { user } = useSupabaseAuth();
+
+  // Load items from Supabase
+  const loadItems = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await itemsService.getItems();
+      
+      if (error) {
+        console.error('Error loading items:', error);
+        return;
+      }
+      
+      setItems(data || []);
+    } catch (err) {
+      console.error('Error loading items:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadItems();
+  }, []);
 
   const preventMultipleNavigation = async (navigationFunction: () => void) => {
     if (isNavigating) return;
@@ -82,11 +89,11 @@ export default function HomeScreen() {
     );
   };
 
-  const handleExploreItemPress = (item: ExploreItem) => {
+  const handleExploreItemPress = (item: Item) => {
     preventMultipleNavigation(() => router.push('/item'));
   };
 
-  const handleMessageLender = (item: ExploreItem) => {
+  const handleMessageLender = (item: Item) => {
     // Navigate to messages with item context
     preventMultipleNavigation(() => 
       router.push({
@@ -114,13 +121,22 @@ export default function HomeScreen() {
     </TouchableOpacity>
   );
 
-  const ExploreCard: React.FC<{ item: ExploreItem }> = ({ item }) => (
+  const ExploreCard: React.FC<{ item: Item }> = ({ item }) => (
     <WideCard
-      item={item}
+      item={{
+        ...item,
+        price: item.price_per_day
+      }}
       onPress={() => handleExploreItemPress(item)}
       showFavoriteIcon={true}
     />
   );
+
+  // Get explore items (first 4 items)
+  const exploreItems = items.slice(0, 4);
+  
+  // Get popular items (items 4-8, or remaining items)
+  const popularItems = items.slice(4, 8);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -147,43 +163,71 @@ export default function HomeScreen() {
         {/* Explore Section */}
         <View style={styles.exploreSectionContainer}>
           <View style={styles.exploreSection}>
-          <View style={styles.exploreHeader}>
-            <Text style={styles.exploreTitle}>Explore</Text>
-            <TouchableOpacity onPress={() => router.push('/discover')} activeOpacity={0.7}>
-              <Text style={styles.moreText}>More</Text>
-            </TouchableOpacity>
+            <View style={styles.exploreHeader}>
+              <Text style={styles.exploreTitle}>Explore</Text>
+              <TouchableOpacity onPress={() => router.push('/discover')} activeOpacity={0.7}>
+                <Text style={styles.moreText}>More</Text>
+              </TouchableOpacity>
+            </View>
+            {loading ? (
+              <View style={styles.skeletonContainer}>
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <ItemCardSkeleton key={index} />
+                ))}
+              </View>
+            ) : exploreItems.length > 0 ? (
+              <FlatList
+                data={exploreItems}
+                renderItem={({ item }) => <ExploreCard item={item} />}
+                keyExtractor={(item) => item.id}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.exploreList}
+                ItemSeparatorComponent={() => <View style={{ width: Spacing.md }} />}
+              />
+            ) : (
+              <View style={styles.emptyStateContainer}>
+                <Ionicons name="search-outline" size={32} color={Colors.text.secondary} />
+                <Text style={styles.emptyStateText}>No items yet</Text>
+                <Text style={styles.emptyStateSubtext}>Check back later for new items</Text>
+              </View>
+            )}
           </View>
-          <FlatList
-            data={exploreItems}
-            renderItem={({ item }) => <ExploreCard item={item} />}
-            keyExtractor={(item) => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.exploreList}
-            ItemSeparatorComponent={() => <View style={{ width: Spacing.md }} />}
-          />
-        </View>
         </View>
 
         {/* Popular Section */}
         <View style={styles.popularSectionContainer}>
           <View style={styles.popularSection}>
-          <View style={styles.popularHeader}>
-            <Text style={styles.popularTitle}>Popular</Text>
-            <TouchableOpacity onPress={() => router.push('/discover')} activeOpacity={0.7}>
-              <Text style={styles.moreText}>More</Text>
-            </TouchableOpacity>
+            <View style={styles.popularHeader}>
+              <Text style={styles.popularTitle}>Popular</Text>
+              <TouchableOpacity onPress={() => router.push('/discover')} activeOpacity={0.7}>
+                <Text style={styles.moreText}>More</Text>
+              </TouchableOpacity>
+            </View>
+            {loading ? (
+              <View style={styles.skeletonContainer}>
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <ItemCardSkeleton key={index} />
+                ))}
+              </View>
+            ) : popularItems.length > 0 ? (
+              <FlatList
+                data={popularItems}
+                renderItem={({ item }) => <ExploreCard item={item} />}
+                keyExtractor={(item) => item.id}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.popularList}
+                ItemSeparatorComponent={() => <View style={{ width: Spacing.md }} />}
+              />
+            ) : (
+              <View style={styles.emptyStateContainer}>
+                <Ionicons name="trending-up-outline" size={32} color={Colors.text.secondary} />
+                <Text style={styles.emptyStateText}>No popular items yet</Text>
+                <Text style={styles.emptyStateSubtext}>Items will appear here as they gain popularity</Text>
+              </View>
+            )}
           </View>
-          <FlatList
-            data={popularItems}
-            renderItem={({ item }) => <ExploreCard item={item} />}
-            keyExtractor={(item) => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.popularList}
-            ItemSeparatorComponent={() => <View style={{ width: Spacing.md }} />}
-          />
-        </View>
         </View>
 
         {/* Become a Lender Section */}
@@ -448,5 +492,29 @@ const styles = StyleSheet.create({
   },
   disabledItem: {
     opacity: 0.6,
+  },
+  skeletonContainer: {
+    flexDirection: 'row',
+    gap: Spacing.md,
+    paddingHorizontal: 0,
+  },
+  emptyStateContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: Spacing.xl,
+    paddingHorizontal: Spacing.lg,
+  },
+  emptyStateText: {
+    ...TextStyles.body.medium,
+    color: Colors.text.primary,
+    marginTop: Spacing.sm,
+    marginBottom: Spacing.xs,
+    fontWeight: '600',
+  },
+  emptyStateSubtext: {
+    ...TextStyles.body.small,
+    color: Colors.text.secondary,
+    textAlign: 'center',
+    lineHeight: 18,
   },
 });

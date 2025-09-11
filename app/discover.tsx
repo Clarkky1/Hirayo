@@ -12,7 +12,7 @@ export default function Discover() {
         options={{
           title: 'Discover',
           headerStyle: {
-            backgroundColor: '#0066CC',
+            backgroundColor: '#667EEA',
           },
           headerTintColor: '#ffffff',
         }}

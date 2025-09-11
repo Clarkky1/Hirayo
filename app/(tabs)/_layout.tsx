@@ -32,14 +32,14 @@ export default function TabLayout() {
             backgroundColor: '#ffffff',
             borderTopWidth: 0.5,
             borderTopColor: '#E0E0E0',
-            paddingBottom: 40,
+            paddingBottom: 60,
             paddingTop: 5,
           },
           default: {
             backgroundColor: '#ffffff',
             borderTopWidth: 0.5,
             borderTopColor: '#E0E0E0',
-            paddingBottom: 40,
+            paddingBottom: 60,
             paddingTop: 5,
           },
         }),
@@ -48,7 +48,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <Ionicons name="search" size={20} color={color} />,
+          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? "home" : "home-outline"} size={24} color={color} />,
           headerRight: hasClickedGetStarted ? () => (
             <TouchableOpacity 
               style={{ marginRight: 16 }}
@@ -64,28 +64,28 @@ export default function TabLayout() {
         name="saved"
         options={{
           title: 'Saved',
-          tabBarIcon: ({ color }) => <Ionicons name="heart-outline" size={20} color={color} />,
+          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? "heart" : "heart-outline"} size={24} color={color} />,
         }}
       />
       <Tabs.Screen
         name="transactions"
         options={{
           title: 'Transactions',
-          tabBarIcon: ({ color }) => <Ionicons name="time-outline" size={20} color={color} />,
+          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? "time" : "time-outline"} size={24} color={color} />,
         }}
       />
       <Tabs.Screen
         name="messages"
         options={{
           title: 'Messages',
-          tabBarIcon: ({ color }) => <Ionicons name="chatbubble-outline" size={20} color={color} />,
+          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? "chatbubble" : "chatbubble-outline"} size={24} color={color} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color }) => <Ionicons name="person-outline" size={20} color={color} />,
+          tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? "person" : "person-outline"} size={24} color={color} />,
         }}
       />
     </Tabs>

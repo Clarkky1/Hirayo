@@ -13,7 +13,7 @@ export default function Item() {
           title: 'Item Details',
           headerShown: true,
           headerStyle: {
-            backgroundColor: '#0066CC',
+            backgroundColor: '#667EEA',
           },
           headerTintColor: '#ffffff',
         }}
