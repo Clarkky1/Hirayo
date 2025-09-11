@@ -11,7 +11,7 @@ export const messagesService = {
         renter:users!conversations_renter_id_fkey(*),
         lender:users!conversations_lender_id_fkey(*),
         last_message:messages(
-          content,
+          message_text,
           created_at,
           sender_id
         )
@@ -34,12 +34,12 @@ export const messagesService = {
         senderName: otherUser?.first_name && otherUser?.last_name 
           ? `${otherUser.first_name} ${otherUser.last_name}`
           : otherUser?.email || 'Unknown User',
-        lastMessage: lastMessage?.content || 'No messages yet',
+        lastMessage: lastMessage?.message_text || 'No messages yet',
         timestamp: lastMessage?.created_at 
           ? new Date(lastMessage.created_at).toLocaleDateString()
           : new Date(conv.created_at).toLocaleDateString(),
         unreadCount: 0, // TODO: Implement unread count
-        isOnline: false, // TODO: Implement online status
+        isOnline: false, // TODO: Implement online statusr
         itemName: conv.item?.name || 'Unknown Item',
         itemId: conv.item_id,
       };

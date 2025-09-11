@@ -5,14 +5,15 @@ import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-    LogBox,
-    RefreshControl,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  Alert,
+  LogBox,
+  RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import SkeletonLoader from '../../components/common/SkeletonLoader';
 import { Card } from '../../components/ui/Card';
@@ -79,6 +80,52 @@ export default function MyItemsScreen() {
     if (item.is_available) return 'checkmark-circle';
     if (item.total_rentals > 0) return 'time';
     return 'pause-circle';
+  };
+
+  // CRUD Functions
+  const handleCreateItem = () => {
+    router.push('/post-item' as any);
+  };
+
+  const handleEditItem = (item: LenderItem) => {
+    router.push({
+      pathname: '/post-item' as any,
+      params: { editItem: JSON.stringify(item) }
+    });
+  };
+
+  const handleDeleteItem = (item: LenderItem) => {
+    Alert.alert(
+      'Delete Item',
+      `Are you sure you want to delete "${item.name}"? This action cannot be undone.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await lenderService.deleteItem(item.id);
+              await loadItems(); // Refresh the list
+              Alert.alert('Success', 'Item deleted successfully');
+            } catch (error) {
+              console.error('Error deleting item:', error);
+              Alert.alert('Error', 'Failed to delete item. Please try again.');
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  const handleToggleAvailability = async (item: LenderItem) => {
+    try {
+      await lenderService.toggleItemAvailability(item.id, !item.is_available);
+      await loadItems(); // Refresh the list
+    } catch (error) {
+      console.error('Error toggling availability:', error);
+      Alert.alert('Error', 'Failed to update item availability. Please try again.');
+    }
   };
 
   const renderFilterButton = (filter: 'all' | 'active' | 'rented' | 'inactive', label: string, count: number) => (
@@ -171,26 +218,34 @@ export default function MyItemsScreen() {
         
         <View style={styles.actionButtons}>
           <TouchableOpacity 
-            style={styles.viewButton}
-            onPress={() => router.push({
-              pathname: '/my-items/view',
-              params: { itemId: item.id }
-            })}
+            style={styles.toggleButton}
+            onPress={() => handleToggleAvailability(item)}
             activeOpacity={0.7}
           >
-            <Ionicons name="eye" size={16} color={Colors.text.inverse} />
-            <Text style={styles.viewButtonText}>View</Text>
+            <Ionicons 
+              name={item.is_available ? "pause" : "play"} 
+              size={16} 
+              color={Colors.text.inverse} 
+            />
+            <Text style={styles.toggleButtonText}>
+              {item.is_available ? 'Pause' : 'Activate'}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={styles.editButton}
-            onPress={() => router.push({
-              pathname: '/my-items/edit',
-              params: { itemId: item.id }
-            })}
+            onPress={() => handleEditItem(item)}
             activeOpacity={0.7}
           >
             <Ionicons name="create" size={16} color={Colors.text.inverse} />
             <Text style={styles.editButtonText}>Edit</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.deleteButton}
+            onPress={() => handleDeleteItem(item)}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="trash" size={16} color={Colors.text.inverse} />
+            <Text style={styles.deleteButtonText}>Delete</Text>
           </TouchableOpacity>
         </View>
       </View>

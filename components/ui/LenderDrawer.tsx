@@ -237,15 +237,6 @@ export const LenderDrawer: React.FC<LenderDrawerProps> = ({ isVisible, onClose }
               <Ionicons name="chevron-forward" size={16} color={Colors.text.tertiary} />
             </TouchableOpacity>
 
-            <TouchableOpacity 
-              style={styles.actionButton} 
-              onPress={() => handleQuickActionPress('/lender-settings')}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="settings-outline" size={24} color={Colors.primary[500]} />
-              <Text style={styles.actionText}>Lender Settings</Text>
-              <Ionicons name="chevron-forward" size={16} color={Colors.text.tertiary} />
-            </TouchableOpacity>
           </View>
 
           {/* Stats Section */}

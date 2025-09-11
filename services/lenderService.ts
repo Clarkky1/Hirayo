@@ -291,5 +291,51 @@ export const lenderService = {
       total_rentals: totalRentals,
       recent_activity: activity.slice(0, 5)
     };
+  },
+
+  // Update an item
+  async updateItem(itemId: string, updates: Partial<LenderItem>) {
+    const { data, error } = await supabase
+      .from('items')
+      .update(updates)
+      .eq('id', itemId)
+      .select()
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  },
+
+  // Delete an item
+  async deleteItem(itemId: string) {
+    const { error } = await supabase
+      .from('items')
+      .delete()
+      .eq('id', itemId);
+
+    if (error) {
+      throw error;
+    }
+
+    return { success: true };
+  },
+
+  // Toggle item availability
+  async toggleItemAvailability(itemId: string, isAvailable: boolean) {
+    const { data, error } = await supabase
+      .from('items')
+      .update({ is_available: isAvailable })
+      .eq('id', itemId)
+      .select()
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
   }
 };

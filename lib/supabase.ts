@@ -45,9 +45,11 @@ export interface Message {
   id: string;
   conversation_id: string;
   sender_id: string;
-  receiver_id: string;
-  content: string;
-  message_type: 'text' | 'image' | 'system';
+  message_text: string;
+  message_type: 'text' | 'image' | 'file' | 'system';
+  attachment_url?: string;
+  is_read: boolean;
+  read_at?: string;
   created_at: string;
 }
 

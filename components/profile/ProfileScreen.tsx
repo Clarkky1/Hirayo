@@ -94,9 +94,6 @@ export default function ProfileScreen() {
     router.push('/payment-methods' as any);
   };
 
-  const handleNotifications = () => {
-    router.push('/notifications' as any);
-  };
 
 
   const handleHelp = () => {
@@ -224,12 +221,6 @@ export default function ProfileScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Profile</Text>
           {renderSettingItem('card-outline', 'Payment Methods', 'Manage your payment options', handlePaymentMethods)}
-        </View>
-
-        {/* Settings Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Settings</Text>
-          {renderSettingItem('notifications-outline', 'Notifications', 'Manage your notification preferences', handleNotifications)}
         </View>
 
         {/* Support Section */}
