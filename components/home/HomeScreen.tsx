@@ -4,10 +4,10 @@ import { useSupabaseAuth } from '@/contexts/SupabaseAuthContext';
 import { Item } from '@/lib/supabase';
 import { itemsService } from '@/services/itemsService';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useState } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
 import {
   FlatList,
   SafeAreaView,

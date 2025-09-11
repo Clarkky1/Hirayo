@@ -84,11 +84,14 @@ export default function SavedItemsScreen() {
     }
   }, [user]);
 
-  useEffect(() => {
-    loadSavedItems();
-  }, [user]);
+  // Load items on mount and refresh when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      loadSavedItems();
+    }, [loadSavedItems])
+  );
 
-  const handleItemPress = async (item: any) => {
+  const handleItemPress = async (item: ProductItem) => {
     if (isNavigating) return; // Prevent multiple clicks
     
     setIsNavigating(true);
@@ -107,6 +110,33 @@ export default function SavedItemsScreen() {
     }
   };
 
+  const renderProductItem = ({ item }: { item: ProductItem }) => (
+    <ProductCard
+      item={item}
+      onPress={() => handleItemPress(item)}
+      showFavoriteIcon={true}
+      variant="default"
+    />
+  );
+
+  const renderLoadingState = () => {
+    const skeletonData = Array.from({ length: 8 }, (_, index) => ({ id: `skeleton-${index}` }));
+    
+    return (
+      <FlatList
+        data={skeletonData}
+        renderItem={() => <ItemCardSkeleton />}
+        keyExtractor={(item) => item.id}
+        numColumns={2}
+        columnWrapperStyle={styles.productsRow}
+        contentContainerStyle={styles.productsList}
+        showsVerticalScrollIndicator={false}
+        scrollEnabled={false}
+        ItemSeparatorComponent={() => <View style={{ height: Spacing.md }} />}
+      />
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" />
@@ -121,17 +151,7 @@ export default function SavedItemsScreen() {
       {loading ? (
         /* Loading State - Grid Layout like Discover */
         <View style={styles.savedItemsContainer}>
-          <FlatList
-            data={Array.from({ length: 8 }, (_, index) => ({ id: `skeleton-${index}` }))}
-            renderItem={() => <ItemCardSkeleton />}
-            keyExtractor={(item) => item.id}
-            numColumns={2}
-            columnWrapperStyle={styles.productsRow}
-            contentContainerStyle={styles.productsList}
-            showsVerticalScrollIndicator={false}
-            scrollEnabled={false}
-            ItemSeparatorComponent={() => <View style={{ height: Spacing.md }} />}
-          />
+          {renderLoadingState()}
         </View>
       ) : !hasSavedItems ? (
         /* Empty State - No Saved Items */
@@ -143,40 +163,17 @@ export default function SavedItemsScreen() {
           </Text>
         </View>
       ) : (
-        /* Saved Items List */
+        /* Saved Items Grid - Same layout as Discover page */
         <View style={styles.savedItemsContainer}>
           <FlatList
-            data={savedItems}
+            data={products}
+            renderItem={renderProductItem}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-                             <TouchableOpacity 
-                 style={[styles.savedItemCard, isNavigating && styles.disabledCard]}
-                 onPress={() => handleItemPress(item)}
-                 activeOpacity={isNavigating ? 1 : 0.7}
-                 disabled={isNavigating}
-               >
-                                 <View style={styles.savedItemInfo}>
-                   <Text style={styles.savedItemName}>{item.name}</Text>
-                   <Text style={styles.savedItemLocation}>{item.location}</Text>
-                   <Text style={styles.savedItemPrice}>₱{item.price}/day</Text>
-                   {isNavigating && (
-                     <View style={styles.loadingIndicator}>
-                       <Text style={styles.loadingText}>Opening...</Text>
-                     </View>
-                   )}
-                 </View>
-                <TouchableOpacity 
-                  style={styles.unsaveButton}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    removeSavedItem(item.id);
-                  }}
-                >
-                  <Ionicons name="heart" size={20} color="#00A86B" />
-                </TouchableOpacity>
-              </TouchableOpacity>
-            )}
+            numColumns={2}
+            columnWrapperStyle={styles.productsRow}
+            contentContainerStyle={styles.productsList}
             showsVerticalScrollIndicator={false}
+            ItemSeparatorComponent={() => <View style={{ height: Spacing.md }} />}
           />
         </View>
       )}
@@ -212,28 +209,6 @@ const styles = StyleSheet.create({
     paddingTop: 0,
     marginTop: 0,
   },
-  savedItemCard: {
-    backgroundColor: Colors.background.secondary,
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.sm,
-    marginBottom: Spacing.sm,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.border.light,
-  },
-  disabledCard: {
-    opacity: 0.6,
-  },
-  loadingIndicator: {
-    marginTop: Spacing.xs,
-    alignItems: 'center',
-  },
-  loadingText: {
-    fontSize: 12,
-    color: Colors.text.secondary,
-    fontStyle: 'italic',
-  },
   emptyStateTitle: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -259,29 +234,6 @@ const styles = StyleSheet.create({
   },
   productsList: {
     paddingBottom: 20,
-  },
-
-  savedItemInfo: {
-    flex: 1,
-  },
-  savedItemName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333333',
-    marginBottom: 3,
-  },
-  savedItemLocation: {
-    fontSize: 14,
-    color: '#666666',
-    marginBottom: 3,
-  },
-  savedItemPrice: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: Colors.primary[500],
-  },
-  unsaveButton: {
-    padding: 6,
   },
 
 });

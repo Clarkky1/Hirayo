@@ -6,14 +6,14 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useState } from 'react';
 import {
-    FlatList,
-    RefreshControl,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  FlatList,
+  RefreshControl,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { MessageSkeleton } from '../common/SkeletonLoader';
 
@@ -253,8 +253,8 @@ const styles = StyleSheet.create({
   searchSection: {
     paddingHorizontal: Spacing.lg,
     paddingTop: 0,
-    paddingBottom: Spacing.sm,
-    marginBottom: Spacing.sm,
+    paddingBottom: Spacing.md,
+    backgroundColor: '#FFFFFF',
   },
   searchBar: {
     flexDirection: 'row',
