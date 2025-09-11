@@ -172,7 +172,7 @@ export default function HomeScreen() {
             {loading ? (
               <View style={styles.skeletonContainer}>
                 {Array.from({ length: 3 }).map((_, index) => (
-                  <ItemCardSkeleton key={index} />
+                  <ItemCardSkeleton key={index} isHorizontal={true} />
                 ))}
               </View>
             ) : exploreItems.length > 0 ? (
@@ -207,7 +207,7 @@ export default function HomeScreen() {
             {loading ? (
               <View style={styles.skeletonContainer}>
                 {Array.from({ length: 3 }).map((_, index) => (
-                  <ItemCardSkeleton key={index} />
+                  <ItemCardSkeleton key={index} isHorizontal={true} />
                 ))}
               </View>
             ) : popularItems.length > 0 ? (

@@ -59,8 +59,11 @@ const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
 };
 
 // Skeleton components for specific use cases
-export const ItemCardSkeleton: React.FC = () => (
-  <View style={styles.itemCardSkeleton}>
+export const ItemCardSkeleton: React.FC<{ isHorizontal?: boolean }> = ({ isHorizontal = false }) => (
+  <View style={[
+    styles.itemCardSkeleton,
+    isHorizontal && styles.itemCardSkeletonHorizontal
+  ]}>
     <SkeletonLoader width="100%" height={200} borderRadius={12} />
     <View style={styles.itemCardContent}>
       <SkeletonLoader width="80%" height={16} style={{ marginBottom: 8 }} />
@@ -110,6 +113,12 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     flex: 1,
     marginHorizontal: 4,
+  },
+  itemCardSkeletonHorizontal: {
+    flex: 0,
+    width: 200,
+    marginHorizontal: 0,
+    marginRight: 12,
   },
   itemCardContent: {
     padding: 12,

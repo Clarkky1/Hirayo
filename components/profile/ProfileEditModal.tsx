@@ -1,10 +1,14 @@
-import { BorderRadius, Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
+import { Colors, Spacing, TextStyles } from '@/constants/DesignSystem';
 import { useUser } from '@/contexts/UserContext';
 import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
 import {
     Alert,
+    Image,
     Modal,
+    Platform,
     SafeAreaView,
     ScrollView,
     StyleSheet,
@@ -28,9 +32,12 @@ export function ProfileEditModal({ visible, onClose }: ProfileEditModalProps) {
     phoneNumber: profile?.phoneNumber || '',
     bio: profile?.bio || '',
     location: profile?.location || '',
+    dateOfBirth: profile?.dateOfBirth ? new Date(profile.dateOfBirth) : null,
   });
 
+  const [profileImage, setProfileImage] = useState<string | null>(profile?.profileImage || null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const handleSave = async () => {
     if (!formData.firstName.trim() || !formData.surname.trim() || !formData.email.trim()) {
@@ -45,7 +52,11 @@ export function ProfileEditModal({ visible, onClose }: ProfileEditModalProps) {
 
     setIsLoading(true);
     try {
-      updateProfile(formData);
+      updateProfile({
+        ...formData,
+        profileImage: profileImage || undefined,
+        dateOfBirth: formData.dateOfBirth ? formData.dateOfBirth.toISOString() : undefined,
+      });
       Alert.alert('Success', 'Profile updated successfully');
       onClose();
     } catch (error) {
@@ -62,6 +73,52 @@ export function ProfileEditModal({ visible, onClose }: ProfileEditModalProps) {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const pickImage = async () => {
+    // Request permission
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    
+    if (permissionResult.granted === false) {
+      Alert.alert('Permission Required', 'Permission to access camera roll is required!');
+      return;
+    }
+
+    // Launch image picker
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: 'images',
+      allowsEditing: true,
+      aspect: [1, 1], // Square aspect ratio for profile photos
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      setProfileImage(result.assets[0].uri);
+    }
+  };
+
+  const removeImage = () => {
+    setProfileImage(null);
+  };
+
+  const formatDate = (date: Date | null) => {
+    if (!date) return 'Select your birth date';
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
+  const showDatePickerModal = () => {
+    setShowDatePicker(true);
+  };
+
+  const onDateChange = (event: any, selectedDate?: Date) => {
+    setShowDatePicker(Platform.OS === 'ios');
+    if (selectedDate) {
+      setFormData(prev => ({ ...prev, dateOfBirth: selectedDate }));
+    }
   };
 
   if (!profile) return null;
@@ -93,99 +150,179 @@ export function ProfileEditModal({ visible, onClose }: ProfileEditModalProps) {
             {/* Profile Image Section */}
             <View style={styles.imageSection}>
               <View style={styles.avatarContainer}>
-                <View style={styles.avatar}>
-                  {profile.profileImage ? (
-                    <View style={styles.profileImageContainer}>
-                      <Text style={styles.profileImageText}>IMG</Text>
-                    </View>
+                <TouchableOpacity style={styles.avatar} onPress={pickImage}>
+                  {profileImage ? (
+                    <Image 
+                      source={{ uri: profileImage }} 
+                      style={styles.profileImage}
+                      resizeMode="cover"
+                    />
                   ) : (
                     <Text style={styles.avatarText}>
                       {formData.firstName.split(' ').map(n => n[0]).join('')}
                     </Text>
                   )}
-                </View>
-                <TouchableOpacity style={styles.editImageButton}>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.editImageButton} onPress={pickImage}>
                   <Ionicons name="camera" size={16} color={Colors.text.inverse} />
                 </TouchableOpacity>
+                {profileImage && (
+                  <TouchableOpacity style={styles.removeImageButton} onPress={removeImage}>
+                    <Ionicons name="close" size={12} color={Colors.text.inverse} />
+                  </TouchableOpacity>
+                )}
               </View>
               <Text style={styles.imageHint}>Tap to change profile photo</Text>
             </View>
 
             {/* Form Fields */}
             <View style={styles.formSection}>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>First Name *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={formData.firstName}
-                  onChangeText={(value) => handleInputChange('firstName', value)}
-                  placeholder="Enter your first name"
-                  autoCapitalize="words"
-                />
+              {/* Legal Name Section */}
+              <View style={styles.sectionGroup}>
+                <Text style={styles.sectionLabel}>Legal Name</Text>
+                <View style={styles.inputRow}>
+                  <View style={styles.inputGroup}>
+                    <Text style={styles.inputLabel}>First Name <Text style={styles.requiredAsterisk}>*</Text></Text>
+                    <View style={styles.inputWrapper}>
+                      <Ionicons name="person-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
+                      <TextInput
+                        style={styles.input}
+                        placeholder="First name"
+                        value={formData.firstName}
+                        onChangeText={(value) => handleInputChange('firstName', value)}
+                        autoCapitalize="words"
+                        placeholderTextColor="#9CA3AF"
+                      />
+                    </View>
+                  </View>
+                  <View style={styles.inputGroup}>
+                    <Text style={styles.inputLabel}>Surname <Text style={styles.requiredAsterisk}>*</Text></Text>
+                    <View style={styles.inputWrapper}>
+                      <Ionicons name="person-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
+                      <TextInput
+                        style={styles.input}
+                        placeholder="Surname"
+                        value={formData.surname}
+                        onChangeText={(value) => handleInputChange('surname', value)}
+                        autoCapitalize="words"
+                        placeholderTextColor="#9CA3AF"
+                      />
+                    </View>
+                  </View>
+                </View>
               </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Last Name *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={formData.surname}
-                  onChangeText={(value) => handleInputChange('surname', value)}
-                  placeholder="Enter your last name"
-                  autoCapitalize="words"
-                />
+              {/* Phone Number Section */}
+              <View style={styles.sectionGroup}>
+                <Text style={styles.sectionLabel}>Phone Number</Text>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Phone <Text style={styles.requiredAsterisk}>*</Text></Text>
+                  <View style={styles.inputWrapper}>
+                    <Ionicons name="call-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="09XXXXXXXXX"
+                      value={formData.phoneNumber}
+                      onChangeText={(value) => handleInputChange('phoneNumber', value)}
+                      keyboardType="phone-pad"
+                      placeholderTextColor="#9CA3AF"
+                    />
+                  </View>
+                </View>
               </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Email Address *</Text>
-                <TextInput
-                  style={styles.input}
-                  value={formData.email}
-                  onChangeText={(value) => handleInputChange('email', value)}
-                  placeholder="Enter your email"
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
+              {/* Date of Birth Section */}
+              <View style={styles.sectionGroup}>
+                <Text style={styles.sectionLabel}>Date of Birth</Text>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Birth Date <Text style={styles.requiredAsterisk}>*</Text></Text>
+                  <TouchableOpacity 
+                    style={styles.inputWrapper}
+                    onPress={showDatePickerModal}
+                    activeOpacity={0.7}
+                  >
+                    <Ionicons name="calendar-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
+                    <Text style={[styles.input, styles.dateInputText]}>
+                      {formatDate(formData.dateOfBirth)}
+                    </Text>
+                    <Ionicons name="chevron-down" size={16} color="#9CA3AF" />
+                  </TouchableOpacity>
+                </View>
               </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Phone Number</Text>
-                <TextInput
-                  style={styles.input}
-                  value={formData.phoneNumber}
-                  onChangeText={(value) => handleInputChange('phoneNumber', value)}
-                  placeholder="Enter your phone number"
-                  keyboardType="phone-pad"
-                />
+              {/* Email Section */}
+              <View style={styles.sectionGroup}>
+                <Text style={styles.sectionLabel}>Email Address</Text>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Email <Text style={styles.requiredAsterisk}>*</Text></Text>
+                  <View style={styles.inputWrapper}>
+                    <Ionicons name="mail-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="your@email.com"
+                      value={formData.email}
+                      onChangeText={(value) => handleInputChange('email', value)}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      placeholderTextColor="#9CA3AF"
+                    />
+                  </View>
+                </View>
               </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Location</Text>
-                <TextInput
-                  style={styles.input}
-                  value={formData.location}
-                  onChangeText={(value) => handleInputChange('location', value)}
-                  placeholder="Enter your location"
-                  autoCapitalize="words"
-                />
+              {/* Location Section */}
+              <View style={styles.sectionGroup}>
+                <Text style={styles.sectionLabel}>Location</Text>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Location</Text>
+                  <View style={styles.inputWrapper}>
+                    <Ionicons name="location-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Enter your location"
+                      value={formData.location}
+                      onChangeText={(value) => handleInputChange('location', value)}
+                      autoCapitalize="words"
+                      placeholderTextColor="#9CA3AF"
+                    />
+                  </View>
+                </View>
               </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Bio</Text>
-                <TextInput
-                  style={[styles.input, styles.textArea]}
-                  value={formData.bio}
-                  onChangeText={(value) => handleInputChange('bio', value)}
-                  placeholder="Tell us about yourself"
-                  multiline
-                  numberOfLines={4}
-                  textAlignVertical="top"
-                />
-                <Text style={styles.characterCount}>{formData.bio.length}/200</Text>
+              {/* Bio Section */}
+              <View style={styles.sectionGroup}>
+                <Text style={styles.sectionLabel}>About You</Text>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Bio</Text>
+                  <TextInput
+                    style={[styles.input, styles.textArea]}
+                    value={formData.bio}
+                    onChangeText={(value) => handleInputChange('bio', value)}
+                    placeholder="Tell us about yourself"
+                    multiline
+                    numberOfLines={4}
+                    textAlignVertical="top"
+                    placeholderTextColor="#9CA3AF"
+                  />
+                  <Text style={styles.characterCount}>{formData.bio.length}/200</Text>
+                </View>
               </View>
             </View>
           </View>
         </ScrollView>
       </SafeAreaView>
+
+      {/* Date Picker Modal */}
+      {showDatePicker && (
+        <DateTimePicker
+          value={formData.dateOfBirth || new Date()}
+          mode="date"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={onDateChange}
+          maximumDate={new Date()}
+          minimumDate={new Date(1900, 0, 1)}
+        />
+      )}
     </Modal>
   );
 }
@@ -254,17 +391,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: Colors.text.inverse,
   },
-  profileImageContainer: {
+  profileImage: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: Colors.neutral[200],
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  profileImageText: {
-    ...TextStyles.body.medium,
-    color: Colors.text.tertiary,
   },
   editImageButton: {
     position: 'absolute',
@@ -279,6 +409,19 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: Colors.background.primary,
   },
+  removeImageButton: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: Colors.error,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: Colors.background.primary,
+  },
   imageHint: {
     ...TextStyles.caption,
     color: Colors.text.tertiary,
@@ -286,23 +429,55 @@ const styles = StyleSheet.create({
   formSection: {
     gap: Spacing.lg,
   },
-  inputGroup: {
-    gap: Spacing.xs,
+  sectionGroup: {
+    marginBottom: Spacing.lg,
   },
-  label: {
-    ...TextStyles.body.medium,
-    color: Colors.text.primary,
-    fontWeight: '500',
+  sectionLabel: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1F2937',
+    marginBottom: Spacing.sm,
+  },
+  inputRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: Spacing.md,
+  },
+  inputGroup: {
+    flex: 1,
+    marginHorizontal: Spacing.xs,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: Spacing.sm,
+  },
+  requiredAsterisk: {
+    color: '#EF4444',
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.md,
+  },
+  inputIcon: {
+    marginRight: Spacing.md,
   },
   input: {
-    borderWidth: 1,
-    borderColor: Colors.border.light,
-    borderRadius: BorderRadius.base,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
-    ...TextStyles.body.medium,
-    color: Colors.text.primary,
-    backgroundColor: Colors.background.primary,
+    flex: 1,
+    fontSize: 16,
+    color: '#1F2937',
+    paddingVertical: 0,
+  },
+  dateInputText: {
+    color: '#1F2937',
+    fontSize: 16,
   },
   textArea: {
     height: 100,
