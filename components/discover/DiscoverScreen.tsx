@@ -5,6 +5,7 @@ import { Item } from '@/lib/supabase';
 import { itemsService } from '@/services/itemsService';
 import { debounce, SearchableItem, searchItems } from '@/utils';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useState } from 'react';
@@ -31,6 +32,9 @@ interface ProductItem extends SearchableItem {
   category: string;
   images?: string[];
   description?: string;
+  image?: string;
+  ownerName?: string;
+  ownerAvatar?: string;
 }
 
 export default function DiscoverScreen() {
@@ -96,6 +100,9 @@ export default function DiscoverScreen() {
         category: item.category,
         images: item.images,
         description: item.description,
+        image: item.images && item.images.length > 0 ? item.images[0] : undefined,
+        ownerName: item.lender ? `${item.lender.first_name} ${item.lender.last_name}` : 'Unknown Owner',
+        ownerAvatar: item.lender?.avatar_url,
       }));
       
       setProducts(convertedItems);
@@ -138,6 +145,13 @@ export default function DiscoverScreen() {
   useEffect(() => {
     loadItems();
   }, [loadItems]);
+
+  // Refresh items when the screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      loadItems();
+    }, [loadItems])
+  );
 
   // Debounced search function
   const debouncedSearch = useCallback(

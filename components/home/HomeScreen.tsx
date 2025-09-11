@@ -6,7 +6,8 @@ import { itemsService } from '@/services/itemsService';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   FlatList,
   SafeAreaView,
@@ -65,6 +66,13 @@ export default function HomeScreen() {
   useEffect(() => {
     loadItems();
   }, []);
+
+  // Refresh items when the screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      loadItems();
+    }, [])
+  );
 
   const preventMultipleNavigation = async (navigationFunction: () => void) => {
     if (isNavigating) return;
@@ -128,7 +136,10 @@ export default function HomeScreen() {
     <WideCard
       item={{
         ...item,
-        price: item.price_per_day
+        price: item.price_per_day,
+        image: item.images && item.images.length > 0 ? item.images[0] : undefined,
+        ownerName: item.lender ? `${item.lender.first_name} ${item.lender.last_name}` : 'Unknown Owner',
+        ownerAvatar: item.lender?.avatar_url,
       }}
       onPress={() => handleExploreItemPress(item)}
       showFavoriteIcon={true}

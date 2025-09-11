@@ -12,6 +12,8 @@ export interface WideCardProps {
     rating: number;
     location: string;
     image?: string;
+    ownerName?: string;
+    ownerAvatar?: string;
   };
   onPress: () => void;
   showFavoriteIcon?: boolean;
@@ -104,10 +106,11 @@ export const WideCard: React.FC<WideCardProps> = ({
         </View>
         
         <View style={styles.ownerSection}>
-          <Text style={styles.ownerLabel}>Owner:</Text>
-          <View style={styles.ownerInfo}>
-            <Text style={styles.ownerLocation}>{item.location}</Text>
+          <View style={styles.ownerRow}>
+            <Text style={styles.ownerLabel}>Owner: </Text>
+            <Text style={styles.ownerName}>{item.ownerName || 'Unknown Owner'}</Text>
           </View>
+          <Text style={styles.ownerLocation}>{item.location}</Text>
         </View>
         
         <Text style={styles.priceText}>
@@ -198,21 +201,24 @@ const styles = StyleSheet.create({
   ownerSection: {
     marginBottom: Spacing.xs,
   },
+  ownerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 2,
+  },
   ownerLabel: {
     ...TextStyles.caption,
     color: Colors.text.secondary,
     fontWeight: '600',
-    marginBottom: Spacing.xs,
   },
-  ownerInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  ownerName: {
+    ...TextStyles.caption,
+    color: Colors.text.primary,
+    fontWeight: '600',
   },
   ownerLocation: {
     ...TextStyles.caption,
     color: Colors.text.secondary,
-    flex: 1,
   },
 
   perDayText: {

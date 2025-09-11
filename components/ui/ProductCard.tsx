@@ -12,6 +12,8 @@ export interface ProductCardProps {
     rating: number;
     location: string;
     image?: string;
+    ownerName?: string;
+    ownerAvatar?: string;
   };
   onPress: () => void;
   showFavoriteIcon?: boolean;
@@ -136,6 +138,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </View>
         
         <Text style={styles.locationText}>{item.location}</Text>
+        
+        {item.ownerName && (
+          <View style={styles.ownerContainer}>
+            <Text style={styles.ownerLabel}>Owner: </Text>
+            <Text style={styles.ownerName}>{item.ownerName}</Text>
+          </View>
+        )}
         
         <Text style={variantStyles.price}>
           ₱{item.price.toLocaleString()} 
@@ -293,6 +302,21 @@ const styles = StyleSheet.create({
   perDayText: {
     fontWeight: 'normal',
     color: Colors.text.secondary,
+  },
+  ownerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Spacing.xs,
+  },
+  ownerLabel: {
+    ...TextStyles.caption,
+    color: Colors.text.secondary,
+    fontWeight: '500',
+  },
+  ownerName: {
+    ...TextStyles.caption,
+    color: Colors.text.primary,
+    fontWeight: '600',
   },
   disabledCard: {
     opacity: 0.6,

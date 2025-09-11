@@ -6,7 +6,8 @@ import { savedItemsService } from '@/services/savedItemsService';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   FlatList,
   SafeAreaView,
@@ -16,6 +17,21 @@ import {
   View
 } from 'react-native';
 import { ItemCardSkeleton } from '../common/SkeletonLoader';
+import { ProductCard } from '../ui/ProductCard';
+
+interface ProductItem {
+  id: string;
+  name: string;
+  rating: number;
+  location: string;
+  price: number;
+  category: string;
+  images?: string[];
+  description?: string;
+  image?: string;
+  ownerName?: string;
+  ownerAvatar?: string;
+}
 
 export default function SavedItemsScreen() {
   const { savedItems, removeSavedItem } = useSavedItems();
@@ -24,11 +40,12 @@ export default function SavedItemsScreen() {
   const [isNavigating, setIsNavigating] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [products, setProducts] = useState<ProductItem[]>([]);
 
-  const hasSavedItems = savedItems.length > 0;
+  const hasSavedItems = products.length > 0;
 
   // Load saved items from Supabase
-  const loadSavedItems = async () => {
+  const loadSavedItems = useCallback(async () => {
     if (!user) return;
     
     try {
@@ -43,28 +60,29 @@ export default function SavedItemsScreen() {
         return;
       }
       
-      // Convert Supabase saved items to the format expected by the context
-      const convertedItems = (data || []).map((savedItem: any) => ({
+      // Convert Supabase saved items to ProductItem format
+      const convertedItems: ProductItem[] = (data || []).map((savedItem: any) => ({
         id: savedItem.item.id,
         name: savedItem.item.name,
-        rating: savedItem.item.rating,
+        rating: savedItem.item.rating || 0,
         location: savedItem.item.location,
         price: savedItem.item.price_per_day,
         category: savedItem.item.category,
         images: savedItem.item.images,
         description: savedItem.item.description,
+        image: savedItem.item.images && savedItem.item.images.length > 0 ? savedItem.item.images[0] : undefined,
+        ownerName: savedItem.item.lender ? `${savedItem.item.lender.first_name} ${savedItem.item.lender.last_name}` : 'Unknown Owner',
+        ownerAvatar: savedItem.item.lender?.avatar_url,
       }));
       
-      // Update the context with the loaded items
-      // Note: You might need to add a method to the SavedItemsContext to set items
-      // For now, we'll work with the existing context
+      setProducts(convertedItems);
     } catch (err) {
       console.error('Error loading saved items:', err);
       setError('Failed to load saved items');
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     loadSavedItems();

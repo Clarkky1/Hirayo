@@ -320,7 +320,7 @@ export default function ItemDetailScreen() {
         {activeTab === 'description' && (
           <View style={styles.descriptionContent}>
             <Text style={styles.descriptionText}>
-              Capture high-resolution photos and 4K video with this versatile DSLR. Perfect for events, travel, or content creation. Rent it for a day or a week — no strings attached.
+              {item?.description || "No description available"}
             </Text>
             {isDescriptionLong && (
               <TouchableOpacity style={styles.showMoreButton} onPress={handleShowMore} activeOpacity={0.7}>
@@ -335,59 +335,42 @@ export default function ItemDetailScreen() {
           <View style={styles.reviewContent}>
             {/* Review Summary */}
             <View style={styles.reviewSummary}>
-              <Text style={styles.reviewSummaryText}>★ {item.rating} · 12 reviews</Text>
+              <Text style={styles.reviewSummaryText}>★ {item?.rating || 0} · No reviews yet</Text>
             </View>
 
             {/* Individual Reviews */}
             <View style={styles.reviewsList}>
-              {/* First Review */}
-              <View style={styles.reviewItem}>
-                <View style={styles.reviewHeader}>
-                                     <View style={styles.starsRow}>
-                     <Ionicons name="star" size={16} color="#FFD700" />
-                     <Ionicons name="star" size={16} color="#FFD700" />
-                     <Ionicons name="star" size={16} color="#FFD700" />
-                     <Ionicons name="star" size={16} color="#FFD700" />
-                     <Ionicons name="star" size={16} color="#FFD700" />
-                   </View>
-                  <Text style={styles.reviewDate}>January 12, 2025</Text>
+              {item?.rating && item.rating > 0 ? (
+                <View style={styles.reviewItem}>
+                  <View style={styles.reviewHeader}>
+                    <View style={styles.starsRow}>
+                      {[...Array(5)].map((_, index) => (
+                        <Ionicons 
+                          key={index}
+                          name="star" 
+                          size={16} 
+                          color={index < Math.floor(item.rating) ? "#FFD700" : "#E0E0E0"} 
+                        />
+                      ))}
+                    </View>
+                    <Text style={styles.reviewDate}>Recently</Text>
+                  </View>
+                  <Text style={styles.reviewText}>
+                    This item has a rating of {item.rating} stars. Be the first to leave a review after renting this item!
+                  </Text>
+                  <View style={styles.reviewerInfo}>
+                    <View style={styles.reviewerAvatar} />
+                    <Text style={styles.reviewerName}>System</Text>
+                  </View>
                 </View>
-                <Text style={styles.reviewText}>
-                  The camera was in excellent condition and worked flawlessly throughout a 4-day shoot. Batteries were fully charged, lenses were clean, and everything came in a padded case — very professional setup. Setup w...
-                </Text>
-                <TouchableOpacity style={styles.showMoreLink} activeOpacity={0.7}>
-                  <Text style={styles.showMoreLinkText}>Show more</Text>
-                </TouchableOpacity>
-                <View style={styles.reviewerInfo}>
-                  <View style={styles.reviewerAvatar} />
-                  <Text style={styles.reviewerName}>Alyssa T.</Text>
+              ) : (
+                <View style={styles.noReviewsContainer}>
+                  <Ionicons name="star-outline" size={48} color="#E0E0E0" />
+                  <Text style={styles.noReviewsText}>No reviews yet</Text>
+                  <Text style={styles.noReviewsSubtext}>Be the first to review this item after renting it!</Text>
                 </View>
-              </View>
-
-              {/* Second Review */}
-              <View style={styles.reviewItem}>
-                                 <View style={styles.reviewHeader}>
-                   <View style={styles.starsRow}>
-                     <Ionicons name="star" size={16} color="#FFD700" />
-                     <Ionicons name="star" size={16} color="#FFD700" />
-                     <Ionicons name="star" size={16} color="#FFD700" />
-                   </View>
-                  <Text style={styles.reviewDate}>January 10, 2025</Text>
-                </View>
-                <Text style={styles.reviewText}>
-                  The flawless fully in a Show...
-                </Text>
-                <View style={styles.reviewerInfo}>
-                  <View style={styles.reviewerAvatar} />
-                  <Text style={styles.reviewerName}>John D.</Text>
-                </View>
-              </View>
+              )}
             </View>
-
-            {/* Show All Reviews Button */}
-            <TouchableOpacity style={styles.showAllReviewsButton} activeOpacity={0.7}>
-              <Text style={styles.showAllReviewsText}>Show all 12 reviews</Text>
-            </TouchableOpacity>
           </View>
         )}
 
@@ -395,15 +378,11 @@ export default function ItemDetailScreen() {
         {activeTab === 'description' && (
           <View style={styles.statsSection}>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>10</Text>
-              <Text style={styles.statLabel}>Rented</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>8</Text>
+              <Text style={styles.statNumber}>0</Text>
               <Text style={styles.statLabel}>Reviews</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>5.0</Text>
+              <Text style={styles.statNumber}>{item?.rating || 0}</Text>
                              <View style={styles.starsContainer}>
                  <Ionicons name="star" size={16} color="#FFD700" />
                  <Ionicons name="star" size={16} color="#FFD700" />
@@ -773,6 +752,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#000000',
+  },
+  noReviewsContainer: {
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  noReviewsText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#666666',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  noReviewsSubtext: {
+    fontSize: 14,
+    color: '#999999',
+    textAlign: 'center',
   },
   imageContainer: {
     height: 300,
